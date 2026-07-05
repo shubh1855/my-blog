@@ -16,11 +16,11 @@ site:
   subtitle: "Code, Create, Repeat"
   name: Shubh
   description: "about development, technology and security. And trinkets of what i enjoy"
-  avatar: /img/avatar.webp
+  avatar: /img/avatar.png
   showLogo: true
   author: Shubh
   url: http://localhost:4321
-  defaultOgImage: /img/avatar.webp
+  defaultOgImage: /img/avatar.png
   startYear: 2025
   timezone: Asia/Kolkata
   keywords:

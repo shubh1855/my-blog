@@ -37,11 +37,11 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
 ---
 
 <div class={cn('flex flex-col items-center md:py-2', className)} data-home-info-container={uniqueId}>
-  <div class="relative h-40 w-40 rounded-full" style={getLqipStyle(siteConfig.avatar ?? '/img/avatar.webp')}>
+  <div class="relative h-40 w-40 rounded-lg overflow-hidden" style={getLqipStyle(siteConfig.avatar ?? '/img/avatar.png')}>
     <img
       transition:persist="page-home-info-avatar"
-      class="shadow-card-darker hover:animate-shake h-full w-full rounded-full transition"
-      src={siteConfig.avatar ?? '/img/avatar.webp'}
+      class="shadow-card-darker hover:animate-shake h-full w-full rounded-lg object-cover transition"
+      src={siteConfig.avatar ?? '/img/avatar.png'}
       alt={`${siteConfig.name ?? ''} avatar`}
       loading="eager"
       fetchpriority="high"
