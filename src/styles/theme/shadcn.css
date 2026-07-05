@@ -1,31 +1,31 @@
 @layer base {
   :root {
-    --background: 218 32% 94%; /* Light Nord Blue */
+    --background: 219 28% 88%; /* Nord 4 (Darker Light Nord Blue) */
     --foreground: 220 16% 22%; /* Dark Nord text */
 
-    --card: 218 27% 89%;
+    --card: 218 27% 92%; /* Nord 5 (Slightly lighter than bg for contrast) */
     --card-foreground: 220 16% 22%;
 
-    --popover: 218 32% 94%;
+    --popover: 218 27% 92%;
     --popover-foreground: 220 16% 22%;
 
     --primary: 217 100% 61%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 218 27% 84%;
+    --secondary: 219 28% 84%;
     --secondary-foreground: 220 16% 22%;
 
-    --muted: 218 27% 84%;
+    --muted: 219 28% 84%;
     --muted-foreground: 220 16% 40%;
 
-    --accent: 218 27% 84%;
+    --accent: 219 28% 84%;
     --accent-foreground: 220 16% 22%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 218 27% 84%;
-    --input: 218 27% 84%;
+    --border: 219 28% 80%;
+    --input: 219 28% 80%;
     --ring: 217 100% 61%;
 
     --badge-primary: 217 100% 61%;
