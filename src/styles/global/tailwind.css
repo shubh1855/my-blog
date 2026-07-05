@@ -27,7 +27,7 @@
 
   body {
     overscroll-behavior-y: none;
-    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
+    background: var(--gradient-bg-start);
     scroll-behavior: smooth;
     letter-spacing: 0.02em;
     color: hsl(var(--foreground));
@@ -41,11 +41,12 @@
   h6 {
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     letter-spacing: 0.02em;
+    color: #d9e6ff;
   }
 
   html {
     scrollbar-gutter: stable;
-    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
+    background: var(--gradient-bg-start);
     overflow: auto;
   }
 

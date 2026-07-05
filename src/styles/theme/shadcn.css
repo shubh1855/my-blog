@@ -1,71 +1,37 @@
 /* shadCN theme - https://ui.shadcn.com/themes */
-/* Dark minimalist theme with blue-indigo accent */
+/* Dark OLED theme with Cyber Twilight accents */
 @layer base {
-  :root {
-    --background: 220 15% 10%;
-    --foreground: 220 10% 90%;
-
-    --card: 220 15% 13%;
-    --card-foreground: 220 10% 90%;
-
-    --popover: 220 15% 13%;
-    --popover-foreground: 220 10% 90%;
-
-    --primary: 234 89% 74%;
-    --primary-foreground: 220 15% 10%;
-
-    --secondary: 220 15% 16%;
-    --secondary-foreground: 220 10% 90%;
-
-    --muted: 220 15% 16%;
-    --muted-foreground: 220 10% 55%;
-
-    --accent: 220 15% 16%;
-    --accent-foreground: 220 10% 90%;
-
+  :root, .dark {
+    --background: 0 0% 0%; /* #000000 */
+    --foreground: 220 64% 76%; /* #9ab4e9 */
+    
+    --card: 224 71% 4%; /* #030712 */
+    --card-foreground: 220 64% 76%;
+    
+    --popover: 224 71% 4%;
+    --popover-foreground: 220 64% 76%;
+    
+    --primary: 217 100% 61%; /* #3a86ff */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 224 71% 8%;
+    --secondary-foreground: 219 100% 93%; /* #d9e6ff */
+    
+    --muted: 224 71% 8%;
+    --muted-foreground: 220 20% 55%;
+    
+    --accent: 217 100% 61%;
+    --accent-foreground: 0 0% 100%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    
+    --border: 224 71% 8%;
+    --input: 224 71% 8%;
+    --ring: 217 100% 61%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 234 89% 64%;
-
-    --badge-primary: 234 70% 60%;
-
-    --radius: 0rem;
-  }
-
-  .dark {
-    --background: 220 20% 8%;
-    --foreground: 220 10% 90%;
-
-    --card: 220 18% 12%;
-    --card-foreground: 220 10% 90%;
-
-    --popover: 220 18% 12%;
-    --popover-foreground: 220 10% 90%;
-
-    --primary: 234 89% 74%;
-    --primary-foreground: 220 15% 10%;
-
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 220 10% 90%;
-
-    --muted: 220 15% 16%;
-    --muted-foreground: 220 10% 55%;
-
-    --accent: 220 15% 18%;
-    --accent-foreground: 220 10% 90%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 234 89% 64%;
-
-    --badge-primary: 234 89% 74%;
-
+    --badge-primary: 217 100% 61%;
+    
     --radius: 0rem;
   }
 }
