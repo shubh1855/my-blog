@@ -38,7 +38,7 @@ export function SeriesNavigation({ prevPost, nextPost, className, locale }: Seri
               href={localizedPath(routeBuilder(Routes.Post, prevPost), locale)}
               className={cn(
                 'group flex items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-                'text-muted-foreground hover:bg-accent hover:text-primary',
+                'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                 'min-w-0 max-w-[45%] flex-1',
               )}
               title={prevPost.title}
@@ -58,7 +58,7 @@ export function SeriesNavigation({ prevPost, nextPost, className, locale }: Seri
               href={localizedPath(routeBuilder(Routes.Post, nextPost), locale)}
               className={cn(
                 'group flex items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-                'text-muted-foreground hover:bg-accent hover:text-primary',
+                'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                 'min-w-0 max-w-[45%] flex-1 justify-end text-right',
               )}
               title={nextPost.title}
@@ -80,7 +80,7 @@ export function SeriesNavigation({ prevPost, nextPost, className, locale }: Seri
             onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior })}
             className={cn(
               'flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-              'text-muted-foreground text-xs hover:bg-accent hover:text-primary',
+              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground',
             )}
             title={t('floating.backToTop')}
             aria-label={t('floating.backToTop')}
@@ -93,7 +93,7 @@ export function SeriesNavigation({ prevPost, nextPost, className, locale }: Seri
             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: scrollBehavior })}
             className={cn(
               'flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-              'text-muted-foreground text-xs hover:bg-accent hover:text-primary',
+              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground',
             )}
             title={t('floating.scrollToBottom')}
             aria-label={t('floating.scrollToBottom')}

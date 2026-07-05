@@ -20,8 +20,8 @@
     --muted: 224 71% 8%;
     --muted-foreground: 220 20% 55%;
     
-    --accent: 217 100% 61%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 224 71% 12%; /* Subtle dark blue for hover backgrounds */
+    --accent-foreground: 219 100% 93%; /* #d9e6ff for hover text */
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;

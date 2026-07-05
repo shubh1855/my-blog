@@ -44,6 +44,7 @@ function ButtonLink({ url, label, isActive, children }: ButtonLinkProps) {
     <a
       href={url}
       aria-label={label}
+      data-astro-prefetch="hover"
       className={cn(
         'relative flex items-center px-3 py-2 text-base tracking-wider',
         'after:absolute after:bottom-1 after:left-1/2 after:block after:h-0.5 after:w-0 after:-translate-x-1/2 after:transition-all after:duration-300',

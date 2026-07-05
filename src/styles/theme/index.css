@@ -1,9 +1,9 @@
 :root, .dark {
   --gradient-bg-start: #000000;
   --gradient-bg-end: #000000;
-  --gradient-bg: #000000;
-  --gradient-pink: #3a86ff;
-  --gradient-header: #000000;
+  --gradient-bg: linear-gradient(180deg, #000000, #000000);
+  --gradient-pink: linear-gradient(to right, #3a86ff, #3a86ff);
+  --gradient-header: linear-gradient(to right, #000000, #000000);
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.5);
@@ -11,7 +11,7 @@
 
   --gradient-shoka-button-start: #3a86ff;
   --gradient-shoka-button-end: #3a86ff;
-  --gradient-shoka-button: #3a86ff;
+  --gradient-shoka-button: linear-gradient(to right, #3a86ff, #3a86ff);
   
   --shoka-blue: 217 100% 61%;
   --color-pink: #3a86ff;

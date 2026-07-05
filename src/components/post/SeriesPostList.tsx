@@ -32,6 +32,7 @@ export function SeriesPostList({ posts, currentPostSlug, className, locale }: Se
           <a
             key={post.slug}
             href={href}
+            data-astro-prefetch="hover"
             className={cn(
               'group relative flex items-center gap-3 rounded-md px-1 py-2 transition-colors',
               'hover:bg-accent/50',
@@ -50,7 +51,7 @@ export function SeriesPostList({ posts, currentPostSlug, className, locale }: Se
             <span
               className={cn(
                 'line-clamp-2 flex-1 text-sm leading-relaxed transition-colors',
-                isActive ? 'text-primary' : 'text-foreground group-hover:text-primary',
+                isActive ? 'text-primary' : 'text-foreground group-hover:text-accent-foreground',
               )}
             >
               {post.title}
