@@ -1,9 +1,9 @@
 :root {
-  --gradient-bg-start: #000000;
-  --gradient-bg-end: #000000;
-  --gradient-bg: linear-gradient(to right, #000000, #000000);
-  --gradient-pink: linear-gradient(to right, #3a86ff, #3a86ff);
-  --gradient-header: linear-gradient(to right, #000000, #000000);
+  --gradient-bg-start: hsl(var(--card));
+  --gradient-bg-end: hsl(var(--card));
+  --gradient-bg: hsl(var(--card));
+  --gradient-pink: #3a86ff;
+  --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.3);
@@ -36,11 +36,11 @@
 }
 
 .dark {
-  --gradient-bg-start: #000000;
-  --gradient-bg-end: #000000;
-  --gradient-bg: linear-gradient(to right, #000000, #000000);
-  --gradient-pink: linear-gradient(to right, #3a86ff, #3a86ff);
-  --gradient-header: linear-gradient(to right, #000000, #000000);
+  --gradient-bg-start: hsl(var(--card));
+  --gradient-bg-end: hsl(var(--card));
+  --gradient-bg: hsl(var(--card));
+  --gradient-pink: #3a86ff;
+  --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.5);
