@@ -1,4 +1,4 @@
-:root, .dark {
+:root, .dark, [data-theme="dark"] {
   --gradient-bg-start: #000000;
   --gradient-bg-end: #000000;
   --gradient-bg: linear-gradient(180deg, #000000, #000000);

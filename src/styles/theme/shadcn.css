@@ -1,7 +1,6 @@
 /* shadCN theme - https://ui.shadcn.com/themes */
 /* Dark OLED theme with Cyber Twilight accents */
-@layer base {
-  :root, .dark {
+:root, .dark, [data-theme="dark"] {
     --background: 0 0% 0%; /* #000000 */
     --foreground: 220 64% 76%; /* #9ab4e9 */
     
@@ -34,4 +33,3 @@
     
     --radius: 0rem;
   }
-}

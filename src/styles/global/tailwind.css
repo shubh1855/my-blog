@@ -81,40 +81,40 @@
   }
 
   /* Force typography to use our solid OLED theme colors regardless of toggle */
-  .prose {
-    --tw-prose-body: hsl(var(--foreground));
+  .prose, .prose-invert, .dark .prose-invert, [data-theme="dark"] .prose-invert {
+    --tw-prose-body: #9ab4e9;
     --tw-prose-headings: #d9e6ff;
-    --tw-prose-lead: hsl(var(--foreground));
-    --tw-prose-links: hsl(var(--primary));
+    --tw-prose-lead: #9ab4e9;
+    --tw-prose-links: #3a86ff;
     --tw-prose-bold: #d9e6ff;
-    --tw-prose-counters: hsl(var(--muted-foreground));
-    --tw-prose-bullets: hsl(var(--muted-foreground));
-    --tw-prose-hr: hsl(var(--border));
-    --tw-prose-quotes: hsl(var(--foreground));
-    --tw-prose-quote-borders: hsl(var(--border));
-    --tw-prose-captions: hsl(var(--muted-foreground));
-    --tw-prose-code: hsl(var(--primary));
-    --tw-prose-pre-code: hsl(var(--foreground));
-    --tw-prose-pre-bg: hsl(var(--card));
-    --tw-prose-th-borders: hsl(var(--border));
-    --tw-prose-td-borders: hsl(var(--border));
+    --tw-prose-counters: #8b9cb6;
+    --tw-prose-bullets: #8b9cb6;
+    --tw-prose-hr: #111623;
+    --tw-prose-quotes: #9ab4e9;
+    --tw-prose-quote-borders: #111623;
+    --tw-prose-captions: #8b9cb6;
+    --tw-prose-code: #3a86ff;
+    --tw-prose-pre-code: #9ab4e9;
+    --tw-prose-pre-bg: #030712;
+    --tw-prose-th-borders: #111623;
+    --tw-prose-td-borders: #111623;
     
-    --tw-prose-invert-body: hsl(var(--foreground));
+    --tw-prose-invert-body: #9ab4e9;
     --tw-prose-invert-headings: #d9e6ff;
-    --tw-prose-invert-lead: hsl(var(--foreground));
-    --tw-prose-invert-links: hsl(var(--primary));
+    --tw-prose-invert-lead: #9ab4e9;
+    --tw-prose-invert-links: #3a86ff;
     --tw-prose-invert-bold: #d9e6ff;
-    --tw-prose-invert-counters: hsl(var(--muted-foreground));
-    --tw-prose-invert-bullets: hsl(var(--muted-foreground));
-    --tw-prose-invert-hr: hsl(var(--border));
-    --tw-prose-invert-quotes: hsl(var(--foreground));
-    --tw-prose-invert-quote-borders: hsl(var(--border));
-    --tw-prose-invert-captions: hsl(var(--muted-foreground));
-    --tw-prose-invert-code: hsl(var(--primary));
-    --tw-prose-invert-pre-code: hsl(var(--foreground));
-    --tw-prose-invert-pre-bg: hsl(var(--card));
-    --tw-prose-invert-th-borders: hsl(var(--border));
-    --tw-prose-invert-td-borders: hsl(var(--border));
+    --tw-prose-invert-counters: #8b9cb6;
+    --tw-prose-invert-bullets: #8b9cb6;
+    --tw-prose-invert-hr: #111623;
+    --tw-prose-invert-quotes: #9ab4e9;
+    --tw-prose-invert-quote-borders: #111623;
+    --tw-prose-invert-captions: #8b9cb6;
+    --tw-prose-invert-code: #3a86ff;
+    --tw-prose-invert-pre-code: #9ab4e9;
+    --tw-prose-invert-pre-bg: #030712;
+    --tw-prose-invert-th-borders: #111623;
+    --tw-prose-invert-td-borders: #111623;
   }
 }
 
