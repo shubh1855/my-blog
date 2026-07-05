@@ -79,6 +79,43 @@
       display: none;
     }
   }
+
+  /* Force typography to use our solid OLED theme colors regardless of toggle */
+  .prose {
+    --tw-prose-body: hsl(var(--foreground));
+    --tw-prose-headings: #d9e6ff;
+    --tw-prose-lead: hsl(var(--foreground));
+    --tw-prose-links: hsl(var(--primary));
+    --tw-prose-bold: #d9e6ff;
+    --tw-prose-counters: hsl(var(--muted-foreground));
+    --tw-prose-bullets: hsl(var(--muted-foreground));
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--border));
+    --tw-prose-captions: hsl(var(--muted-foreground));
+    --tw-prose-code: hsl(var(--primary));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: hsl(var(--card));
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
+    
+    --tw-prose-invert-body: hsl(var(--foreground));
+    --tw-prose-invert-headings: #d9e6ff;
+    --tw-prose-invert-lead: hsl(var(--foreground));
+    --tw-prose-invert-links: hsl(var(--primary));
+    --tw-prose-invert-bold: #d9e6ff;
+    --tw-prose-invert-counters: hsl(var(--muted-foreground));
+    --tw-prose-invert-bullets: hsl(var(--muted-foreground));
+    --tw-prose-invert-hr: hsl(var(--border));
+    --tw-prose-invert-quotes: hsl(var(--foreground));
+    --tw-prose-invert-quote-borders: hsl(var(--border));
+    --tw-prose-invert-captions: hsl(var(--muted-foreground));
+    --tw-prose-invert-code: hsl(var(--primary));
+    --tw-prose-invert-pre-code: hsl(var(--foreground));
+    --tw-prose-invert-pre-bg: hsl(var(--card));
+    --tw-prose-invert-th-borders: hsl(var(--border));
+    --tw-prose-invert-td-borders: hsl(var(--border));
+  }
 }
 
 /* utils */
