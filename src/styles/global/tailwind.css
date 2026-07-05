@@ -27,7 +27,7 @@
 
   body {
     overscroll-behavior-y: none;
-    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
+    background-color: hsl(var(--background));
     scroll-behavior: smooth;
     letter-spacing: 0.02em;
     color: hsl(var(--foreground));

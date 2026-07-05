@@ -124,7 +124,6 @@ export default {
         '5.5xl': '3.5rem',
       },
       fontFamily: {
-        sans: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       clipPath: {
