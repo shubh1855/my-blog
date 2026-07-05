@@ -15,7 +15,7 @@ site:
   alternate: shubh
   subtitle: "Code, Create, Repeat"
   name: Shubh
-  description: A modern tech blog about development, design, and engineering
+  description: "about development, technology and security. And trinkets of what i enjoy"
   avatar: /img/avatar.webp
   showLogo: true
   author: Shubh
@@ -61,6 +61,7 @@ categoryMap:
   周刊: weekly
   # Secondary categories (for nested paths)
   前端: front-end
+  Writeups: writeups
   # Add more as needed:
   # 书摘: reading
   # 后端: back-end
@@ -86,10 +87,10 @@ featuredCategories:
     label: Notes
     image: /img/cover/4.webp
     description: Technical notes and learnings
-  - link: note/front-end
-    label: Frontend
+  - link: writeups
+    label: Writeups
     image: /img/cover/1.webp
-    description: Frontend development
+    description: Cybersecurity CTF and challenge writeups
   - link: tools
     label: Tools
     image: /img/cover/11.webp
@@ -358,6 +359,9 @@ navigation:
     nameKey: nav.weekly
     path: /weekly
     icon: ri:newspaper-line
+  - name: Writeups
+    path: /categories/writeups
+    icon: ri:shield-keyhole-fill
   - name: 文章 # 有子菜单时，path 可省略
     nameKey: nav.posts
     icon: ri:quill-pen-ai-fill
