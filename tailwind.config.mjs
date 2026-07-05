@@ -144,8 +144,23 @@ export default {
         '8xl': '87.5rem',
       },
       borderWidth: {
-        16: '16px',
       },
+      typography: () => ({
+        DEFAULT: {
+          css: {
+            color: 'hsl(var(--foreground))',
+            h1: { color: 'hsl(var(--foreground))' },
+            h2: { color: 'hsl(var(--foreground))' },
+            h3: { color: 'hsl(var(--foreground))' },
+            h4: { color: 'hsl(var(--foreground))' },
+            p: { color: 'hsl(var(--foreground))' },
+            a: { color: 'hsl(var(--primary))' },
+            strong: { color: 'hsl(var(--foreground))' },
+            code: { color: 'hsl(var(--foreground))' },
+            blockquote: { color: 'hsl(var(--muted-foreground))' },
+          },
+        },
+      }),
     },
   },
   plugins: [require('@tailwindcss/container-queries'), require('tailwindcss-animate'), require('@tailwindcss/typography')],

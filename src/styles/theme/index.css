@@ -1,21 +1,58 @@
-:root, .dark, [data-theme="dark"] {
+:root {
   --gradient-bg-start: #000000;
   --gradient-bg-end: #000000;
-  --gradient-bg: linear-gradient(180deg, #000000, #000000);
-  --gradient-pink: linear-gradient(to right, #3a86ff, #3a86ff);
-  --gradient-header: linear-gradient(to right, #000000, #000000);
+  --gradient-bg: #000000;
+  --gradient-pink: #3a86ff;
+  --gradient-header: #000000;
+
+  /* shoka migrate */
+  --box-bg-shadow: rgba(0, 0, 0, 0.3);
+  --grey-1-a5: rgba(21, 27, 40, 0.5);
+  --gradient-shoka-button-start: #3a86ff;
+  --gradient-shoka-button-end: #3a86ff;
+  --gradient-shoka-button: #3a86ff;
+  --shoka-blue: 234 89% 74%;
+  --grey-4: 220 10% 35%;
+  --color-pink: #6366f1;
+  --color-pink-a3: rgba(99, 102, 241, 0.3);
+
+  /* Shoka container/effect colors */
+  --shoka-default: 220 10% 50%;
+  --shoka-info: 210 100% 60%;
+  --shoka-success: 142 76% 42%;
+  --shoka-warning: 45 100% 50%;
+  --shoka-danger: 0 84% 65%;
+
+  /* Named text colors — for dark backgrounds */
+  --color-red: #f87171;
+  --color-pink-text: #818cf8;
+  --color-orange: #fbbf24;
+  --color-yellow: #facc15;
+  --color-green: #4ade80;
+  --color-aqua: #2dd4bf;
+  --color-blue: #60a5fa;
+  --color-purple: #c084fc;
+  --color-grey: #9ca3af;
+}
+
+.dark {
+  --gradient-bg-start: #000000;
+  --gradient-bg-end: #000000;
+  --gradient-bg: #000000;
+  --gradient-pink: #3a86ff;
+  --gradient-header: #000000;
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.5);
-  --grey-1-a5: rgba(0, 0, 0, 0.5);
+  --grey-1-a5: rgba(13, 17, 23, 0.5);
 
   --gradient-shoka-button-start: #3a86ff;
   --gradient-shoka-button-end: #3a86ff;
-  --gradient-shoka-button: linear-gradient(to right, #3a86ff, #3a86ff);
-  
-  --shoka-blue: 217 100% 61%;
-  --color-pink: #3a86ff;
-  --color-pink-a3: rgba(58, 134, 255, 0.3);
+  --gradient-shoka-button: #3a86ff;
+  --shoka-blue: 234 89% 74%;
+  --grey-4: 220 10% 35%;
+  --color-pink: #818cf8;
+  --color-pink-a3: rgba(99, 102, 241, 0.3);
 
   /* Shoka container/effect colors (dark mode) */
   --shoka-default: 220 10% 55%;
@@ -26,13 +63,12 @@
 
   /* Named text colors — brighter for dark backgrounds */
   --color-red: #f87171;
-  --color-pink-text: #3a86ff;
+  --color-pink-text: #a5b4fc;
   --color-orange: #fbbf24;
   --color-yellow: #facc15;
   --color-green: #4ade80;
   --color-aqua: #2dd4bf;
-  --color-blue: #3a86ff;
-  --color-purple: #8338ec;
+  --color-blue: #60a5fa;
+  --color-purple: #c084fc;
   --color-grey: #9ca3af;
 }
-

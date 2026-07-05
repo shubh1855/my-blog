@@ -1,35 +1,69 @@
-/* shadCN theme - https://ui.shadcn.com/themes */
-/* Dark OLED theme with Cyber Twilight accents */
-:root, .dark, [data-theme="dark"] {
-    --background: 0 0% 0%; /* #000000 */
-    --foreground: 220 64% 76%; /* #9ab4e9 */
-    
-    --card: 224 71% 4%; /* #030712 */
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 220 64% 76%;
+
+    --card: 224 71% 4%;
     --card-foreground: 220 64% 76%;
-    
+
     --popover: 224 71% 4%;
     --popover-foreground: 220 64% 76%;
-    
-    --primary: 217 100% 61%; /* #3a86ff */
+
+    --primary: 217 100% 61%;
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: 224 71% 8%;
-    --secondary-foreground: 219 100% 93%; /* #d9e6ff */
-    
+    --secondary-foreground: 219 100% 93%;
+
     --muted: 224 71% 8%;
     --muted-foreground: 220 20% 55%;
-    
-    --accent: 224 71% 12%; /* Subtle dark blue for hover backgrounds */
-    --accent-foreground: 219 100% 93%; /* #d9e6ff for hover text */
-    
+
+    --accent: 224 71% 12%;
+    --accent-foreground: 219 100% 93%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    
+
     --border: 224 71% 8%;
     --input: 224 71% 8%;
     --ring: 217 100% 61%;
 
     --badge-primary: 217 100% 61%;
-    
+
     --radius: 0rem;
   }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 220 64% 76%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 220 64% 76%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 220 64% 76%;
+
+    --primary: 217 100% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 224 71% 8%;
+    --secondary-foreground: 219 100% 93%;
+
+    --muted: 224 71% 8%;
+    --muted-foreground: 220 20% 55%;
+
+    --accent: 224 71% 12%;
+    --accent-foreground: 219 100% 93%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 224 71% 8%;
+    --input: 224 71% 8%;
+    --ring: 217 100% 61%;
+
+    --badge-primary: 217 100% 61%;
+
+    --radius: 0rem;
+  }
+}

@@ -27,7 +27,7 @@
 
   body {
     overscroll-behavior-y: none;
-    background: var(--gradient-bg-start);
+    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
     scroll-behavior: smooth;
     letter-spacing: 0.02em;
     color: hsl(var(--foreground));
@@ -41,12 +41,11 @@
   h6 {
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     letter-spacing: 0.02em;
-    color: #d9e6ff;
   }
 
   html {
     scrollbar-gutter: stable;
-    background: var(--gradient-bg-start);
+    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
     overflow: auto;
   }
 
@@ -78,43 +77,6 @@
     &::-webkit-scrollbar {
       display: none;
     }
-  }
-
-  /* Force typography to use our solid OLED theme colors regardless of toggle */
-  .prose, .prose-invert, .dark .prose-invert, [data-theme="dark"] .prose-invert {
-    --tw-prose-body: #9ab4e9;
-    --tw-prose-headings: #d9e6ff;
-    --tw-prose-lead: #9ab4e9;
-    --tw-prose-links: #3a86ff;
-    --tw-prose-bold: #d9e6ff;
-    --tw-prose-counters: #8b9cb6;
-    --tw-prose-bullets: #8b9cb6;
-    --tw-prose-hr: #111623;
-    --tw-prose-quotes: #9ab4e9;
-    --tw-prose-quote-borders: #111623;
-    --tw-prose-captions: #8b9cb6;
-    --tw-prose-code: #3a86ff;
-    --tw-prose-pre-code: #9ab4e9;
-    --tw-prose-pre-bg: #030712;
-    --tw-prose-th-borders: #111623;
-    --tw-prose-td-borders: #111623;
-    
-    --tw-prose-invert-body: #9ab4e9;
-    --tw-prose-invert-headings: #d9e6ff;
-    --tw-prose-invert-lead: #9ab4e9;
-    --tw-prose-invert-links: #3a86ff;
-    --tw-prose-invert-bold: #d9e6ff;
-    --tw-prose-invert-counters: #8b9cb6;
-    --tw-prose-invert-bullets: #8b9cb6;
-    --tw-prose-invert-hr: #111623;
-    --tw-prose-invert-quotes: #9ab4e9;
-    --tw-prose-invert-quote-borders: #111623;
-    --tw-prose-invert-captions: #8b9cb6;
-    --tw-prose-invert-code: #3a86ff;
-    --tw-prose-invert-pre-code: #9ab4e9;
-    --tw-prose-invert-pre-bg: #030712;
-    --tw-prose-invert-th-borders: #111623;
-    --tw-prose-invert-td-borders: #111623;
   }
 }
 
@@ -164,10 +126,10 @@
     text-align: center;
     font-family: "Bear Days", sans-serif;
     font-weight: 700;
-    color: #6366f1;
+    color: #3a86ff;
   }
 }
 
 .dark .logo-text {
-  color: #818cf8;
+  color: #3a86ff;
 }
