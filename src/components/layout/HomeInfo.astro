@@ -53,21 +53,19 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
   <p class="text-muted-foreground mt-3 text-center">{siteConfig?.description}</p>
   <Social />
   <div
-    class="text-muted-foreground mt-3 flex justify-center text-center text-sm/4 whitespace-nowrap select-none dark:text-white/80"
+    class="text-muted-foreground mt-3 flex w-full justify-center text-center text-sm/4 whitespace-nowrap select-none dark:text-white/80"
   >
-    <a href={localizedPath('/', locale)} class="hover:text-blue flex cursor-pointer flex-col gap-2 p-1 transition">
+    <a href={localizedPath('/', locale)} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
       <span class="text-lg/5 font-bold">{postCount}</span>
       {t(locale, 'homeInfo.articles')}
     </a>
-    <div class="bg-muted-foreground mx-3 w-px"></div>
-    <a href={localizedPath('/categories', locale)} aria-label={t(locale, 'homeInfo.categories')} class="hover:text-blue">
-      <p class="flex cursor-pointer flex-col gap-2 p-1 transition">
-        <span class="text-lg/5 font-bold">{Object.keys(countMap).length}</span>
-        {t(locale, 'homeInfo.categories')}
-      </p>
+    <div class="bg-muted-foreground mx-1 w-px"></div>
+    <a href={localizedPath('/categories', locale)} aria-label={t(locale, 'homeInfo.categories')} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
+      <span class="text-lg/5 font-bold">{Object.keys(countMap).length}</span>
+      {t(locale, 'homeInfo.categories')}
     </a>
-    <div class="bg-muted-foreground mx-3 w-px"></div>
-    <a href={localizedPath('/tags', locale)} class="hover:text-blue flex cursor-pointer flex-col gap-2 p-1 transition">
+    <div class="bg-muted-foreground mx-1 w-px"></div>
+    <a href={localizedPath('/tags', locale)} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
       <span class="text-lg/5 font-bold">{allTags?.length ?? 0}</span>
       {t(locale, 'homeInfo.tags')}
     </a>
