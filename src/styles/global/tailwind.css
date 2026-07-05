@@ -91,10 +91,10 @@
   #site-header {
     @apply relative translate-y-0 text-white transition-transform duration-300;
 
-    /* Pseudo-element for gradient background with opacity transition */
+    /* Pseudo-element for background with opacity transition */
     &::before {
       content: "";
-      @apply pointer-events-none absolute inset-0 -z-1 bg-gradient-header opacity-0 transition-opacity duration-300 ease-out;
+      @apply pointer-events-none absolute inset-0 -z-1 bg-background opacity-0 transition-opacity duration-300 ease-out;
     }
 
     button,
