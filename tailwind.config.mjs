@@ -33,19 +33,19 @@ export default {
         gray: {
           400: 'hsl(var(--grey-4))',
         },
-        logo: '#e91e63',
+        logo: '#4F46E5',
         mandy: {
-          50: '#fef2f3',
-          100: '#fde6e8',
-          200: '#fbd0d4',
-          300: '#f7aab2',
-          400: '#f27a8a',
-          500: '#e91e63',
-          600: '#d42a4c',
-          700: '#b21e3f',
-          800: '#961b3b',
-          900: '#801b38',
-          950: '#470a1a',
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
         },
         // shoka migrate
         pink: {
@@ -124,8 +124,8 @@ export default {
         '5.5xl': '3.5rem',
       },
       fontFamily: {
-        sans: ['寒蝉全圆体', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-        'chill-round': ['寒蝉全圆体', 'sans-serif'],
+        sans: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       clipPath: {
         'post-img-left': 'polygon(0 0,92% 0%,100% 100%,0% 100%)',

@@ -11,30 +11,26 @@
 # Site Basic Information
 # =============================================================================
 site:
-  title: 余弦の博客 # 网站名称
-  alternate: cosine # 网站英文名称 用于页脚、Logo、@ handle 等
-  subtitle: WA 的一声就哭了 # 网站副标题
-  name: cos # 作者名称 - 请修改为你的名字
-  description: 一个基于 Astro 的现代化博客主题 # 网站描述
-  avatar: /img/avatar.webp # 网站头像
-  showLogo: true # 是否显示 Logo
-  author: Author # 作者名称 - 请修改为你的名字
-  url: https://koharu.cosine.ren # 站点 URL 用于 RSS 和 SEO
-  defaultOgImage: /img/avatar.webp # 默认 Open Graph 图片
-  startYear: 2024 # 建站年份
-  timezone: Asia/Shanghai # 时区配置 (IANA 格式)，用于日期显示和处理
-  keywords: # SEO 关键词 (全局)
-    - 博客
-    - Astro
-    - 技术
-    - 前端
-    # 请根据你的网站内容添加关键词
-  # breadcrumbHome: 首页  # 面包屑导航中首页的显示名称（默认: '首页'）
-  # icp:                         # ICP 备案号（可自定义链接）
-  #   text: "粤ICP备xxxxxxxxxx号"
-  #   link: "https://beian.miit.gov.cn/"
+  title: "Shubh's Corner"
+  alternate: shubh
+  subtitle: "Code, Create, Repeat"
+  name: Shubh
+  description: A modern tech blog about development, design, and engineering
+  avatar: /img/avatar.webp
+  showLogo: true
+  author: Shubh
+  url: http://localhost:4321
+  defaultOgImage: /img/avatar.webp
+  startYear: 2025
+  timezone: Asia/Kolkata
+  keywords:
+    - blog
+    - tech
+    - development
+    - engineering
+    - frontend
+  # breadcrumbHome: Home
   # Enable slug transliteration (converts CJK characters to pinyin/romaji)
-  # Note: enabling this will break existing CJK URLs. Run `pnpm save-slugs` first to save old slugs into frontmatter.link
   # enableSlugTransliteration: true
 
 # =============================================================================
@@ -47,15 +43,10 @@ site:
 #   - label: 语言显示名称（如 '中文', 'English'）
 # -----------------------------------------------------------------------------
 i18n:
-  defaultLocale: zh
+  defaultLocale: en
   locales:
-    - code: zh
-      label: 中文
     - code: en
       label: English
-      # enabled: false  # 内容存在但暂时禁用（保留内容但不生成路由）
-    - code: ja
-      label: 日本語
 
 # =============================================================================
 # Category Map
@@ -87,22 +78,22 @@ categoryMap:
 #   description: 分类描述文字，显示在卡片上
 # -----------------------------------------------------------------------------
 featuredCategories:
-  - link: life # 对应 categoryMap 中 随笔: life
-    label: 随笔
+  - link: life
+    label: Life
     image: /img/cover/2.webp
-    description: 生活记录、随想随笔
-  - link: note # 对应 categoryMap 中 笔记: note
-    label: 笔记
+    description: Personal musings and reflections
+  - link: note
+    label: Notes
     image: /img/cover/4.webp
-    description: 技术笔记、学习笔记
-  - link: note/front-end # 嵌套分类：笔记/前端
-    label: 前端
+    description: Technical notes and learnings
+  - link: note/front-end
+    label: Frontend
     image: /img/cover/1.webp
-    description: 前端技术相关
-  - link: tools # 对应 categoryMap 中 工具: tools
-    label: 工具
+    description: Frontend development
+  - link: tools
+    label: Tools
     image: /img/cover/11.webp
-    description: 工具使用、效率提升
+    description: Tools and productivity tips
 
 # =============================================================================
 # Featured Series
@@ -122,31 +113,19 @@ featuredCategories:
 #   links: 相关链接配置（可选）
 # -----------------------------------------------------------------------------
 featuredSeries:
-  - slug: weekly # URL 路径: /weekly
-    categoryName: 周刊 # 必须与 categoryMap 中的分类名匹配
-    label: 我的周刊 # 简短名称
-    fullName: 我的技术周刊 # 完整名称
-    description: | # 支持多行 Markdown
-      这是周刊/系列文章功能的示例配置。
-      你可以用它来发布定期更新的系列内容，如技术周刊、读书笔记系列等。
-      设置 enabled: false 可以关闭此功能。
-    cover: /img/weekly_header.webp # 系列页面头图
-    enabled: true # 启用此系列
-    icon: ri:newspaper-line # 导航图标
-    links: # 相关链接（可选）
-      github: https://github.com/your-username/your-repo # (可选) GitHub 仓库
-      rss: /rss.xml # (可选) RSS 订阅链接
-      # chrome: https://chromewebstore.google.com/detail/your-extension-id # (可选) 浏览器插件
-      # docs: https://your-docs-url # (可选) 文档链接
-  # 示例：添加第二个系列（取消注释启用）
-  # - slug: reading # URL 路径: /reading
-  #   categoryName: 书摘
-  #   label: 读书笔记
-  #   fullName: 我的读书笔记
-  #   description: 阅读记录与读后感
-  #   cover: /img/weekly_header.webp # 记得添加，我这里就是个示例
-  #   enabled: true
-  #   icon: ri:book-read-line
+  - slug: weekly
+    categoryName: 周刊
+    label: Weekly
+    fullName: Tech Weekly
+    description: |
+      A weekly roundup of interesting tech finds,
+      learnings, and development insights.
+    cover: /img/weekly_header.webp
+    enabled: true
+    icon: ri:newspaper-line
+    links:
+      github: https://github.com/your-username/your-repo
+      rss: /rss.xml
 
 # =============================================================================
 # Social Links

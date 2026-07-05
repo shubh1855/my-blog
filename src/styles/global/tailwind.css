@@ -39,17 +39,8 @@
   h4,
   h5,
   h6 {
-    font-family: "寒蝉全圆体", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    letter-spacing: 0.04em;
-  }
-
-  /* Japanese pages: use Gen Jyuu Gothic P for correct JIS glyphs (fix #113) */
-  :lang(ja) {
-    font-family: "Gen Jyuu Gothic P", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  }
-
-  :lang(ja) :is(h1, h2, h3, h4, h5, h6) {
-    font-family: "Gen Jyuu Gothic P", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.02em;
   }
 
   html {
@@ -135,10 +126,10 @@
     text-align: center;
     font-family: "Bear Days", sans-serif;
     font-weight: 700;
-    color: #e9546b;
+    color: #6366f1;
   }
 }
 
 .dark .logo-text {
-  color: #ed788c;
+  color: #818cf8;
 }

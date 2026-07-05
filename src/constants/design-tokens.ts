@@ -44,15 +44,15 @@ export const colors = {
 
   // Shoka theme accent (replaces hardcoded #E95469)
   shoka: {
-    DEFAULT: '#E95469',
-    light: '#FF6B7A',
-    dark: '#D63F55',
+    DEFAULT: '#4F46E5',
+    light: '#6366F1',
+    dark: '#4338CA',
   },
 
   // Theme toggle colors
   themeToggle: {
-    sun: '#ffbb52',
-    moon: '#17181c',
+    sun: '#fbbf24',
+    moon: '#818cf8',
   },
 
   // UI colors
@@ -211,9 +211,9 @@ export const shadows = {
   inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
 
   // Custom shadows from project
-  card: '0 0.625rem 1.875rem rgba(90, 97, 105, 0.12)',
-  'card-darker': '0 0.625rem 1.875rem rgba(90, 97, 105, 0.2)',
-  'shoka-button': '0px 0px 16px 0px rgb(233, 84, 105, 0.8)',
+  card: '0 0.625rem 1.875rem rgba(0, 0, 0, 0.2)',
+  'card-darker': '0 0.625rem 1.875rem rgba(0, 0, 0, 0.35)',
+  'shoka-button': '0px 0px 16px 0px rgb(99, 102, 241, 0.6)',
 } as const;
 
 /**
@@ -223,13 +223,13 @@ export const shadows = {
  */
 export const borderRadius = {
   none: '0',
-  sm: '0.125rem', // 2px
-  DEFAULT: '0.25rem', // 4px
-  md: '0.375rem', // 6px
-  lg: '0.5rem', // 8px
-  xl: '0.75rem', // 12px
-  '2xl': '1rem', // 16px
-  '3xl': '1.5rem', // 24px
+  sm: '0',
+  DEFAULT: '0',
+  md: '0',
+  lg: '0',
+  xl: '0',
+  '2xl': '0',
+  '3xl': '0',
   full: '9999px',
 } as const;
 
@@ -366,8 +366,8 @@ export const zIndex = {
  * Multi-color arrays for gradients and backgrounds.
  */
 export const gridBackground = {
-  light: ['#ed719a', '#FFACDE', '#FBD7ED', '#EEF1F0', '#DDDDDD', '#B4B4B4'],
-  dark: ['#212832', '#3F4659', '#8592A7', '#EEEFEA', '#212832', '#3F4659'],
+  light: ['#151b28', '#1a2235', '#1f2940', '#243050', '#1a2235', '#151b28'],
+  dark: ['#0d1117', '#141b27', '#1a2235', '#1f2940', '#141b27', '#0d1117'],
 } as const;
 
 /**

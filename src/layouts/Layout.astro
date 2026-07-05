@@ -83,21 +83,13 @@ const keywords = keywordsOverride || siteConfig.keywords || [siteConfig.title];
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    {/* Async load rounded fonts — Japanese pages use Gen Jyuu Gothic P, others use ChillRoundF (fix #113) */}
-    {locale === 'ja' ? (
-      <>
-        <link rel="stylesheet" href="/fonts/GenJyuuGothic-P-Regular/result.css" media="print" onload="this.setAttribute('media','all')" />
-        <link rel="stylesheet" href="/fonts/GenJyuuGothic-P-Bold/result.css" media="print" onload="this.setAttribute('media','all')" />
-      </>
-    ) : (
-      <>
-        <link rel="stylesheet" href="/fonts/ChillRoundFRegular/result.css" media="print" onload="this.setAttribute('media','all')" />
-        <link rel="stylesheet" href="/fonts/ChillRoundFBold/result.css" media="print" onload="this.setAttribute('media','all')" />
-      </>
-    )}
+    {/* Load JetBrains Mono from Google Fonts */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" />
 
     <ClientRouter />
-    <LoadingIndicator color="#e9536a" />
+    <LoadingIndicator color="#6366f1" />
     <Tooltips />
 
     <!-- SEO 元数据由 astro-seo 管理 -->
@@ -143,10 +135,10 @@ const keywords = keywordsOverride || siteConfig.keywords || [siteConfig.title];
       (function() {
         function getTheme() {
           // 用户明确选择了主题
-          if (localStorage.theme === 'dark') return 'dark';
+          // User explicitly chose light
           if (localStorage.theme === 'light') return 'light';
-          // 未设置，跟随系统偏好
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          // User explicitly chose dark, or no preference — default to dark
+          return 'dark';
         }
 
         function applyTheme(theme) {
