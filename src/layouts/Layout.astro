@@ -344,6 +344,7 @@ const keywords = keywordsOverride || siteConfig.keywords || [siteConfig.title];
           <GlobalBGMPlayer client:only="react" audioGroups={bgmConfig.audio} metingApi={bgmConfig.metingApi} />
         </div>
       )}
+
       <FloatingGroup client:only="react" />
       <MobileDrawer type={siderType} post={post} />
       <SearchDialog client:idle />

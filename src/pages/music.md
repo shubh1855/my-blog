@@ -4,23 +4,30 @@ title: "歌单"
 description: "我喜欢的音乐"
 ---
 
-这里可以放你喜欢的音乐歌单。
+这里是你喜欢的音乐歌单。
 
-使用 `{% media audio %}` 标签嵌入网易云音乐或 QQ 音乐歌单：
+你可以使用 `{% media audio %}` 标签来嵌入 YouTube 音乐歌单：
 
 ```markdown
 {% media audio %}
-- title: 我的歌单
+- title: My Heavy Metal Mix
   list:
-    - https://music.163.com/#/playlist?id=你的歌单ID
+    - name: For Whom The Bell Tolls
+      artist: Metallica
+      youtubeId: B_HSa1dEL9s
 {% endmedia %}
 ```
 
 {% media audio %}
-- title: 诗岸歌单 山山～全是山山～
+- title: Heavy Metal Mix
   list:
-    - https://music.163.com/#/playlist?id=8676645748
-- title: 超かぐや姫！
-  list:
-    - https://music.163.com/#/album?id=358640968
+    - name: "For Whom The Bell Tolls"
+      artist: "Metallica"
+      youtubeId: "B_HSa1dEL9s"
+    - name: "Dance of Death"
+      artist: "Iron Maiden"
+      youtubeId: "3659fTXvFts"
+    - name: "Fade to Black"
+      artist: "Metallica"
+      youtubeId: "9HZ_tx8aWuA"
 {% endmedia %}

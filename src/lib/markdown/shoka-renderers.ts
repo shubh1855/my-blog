@@ -27,16 +27,18 @@ export interface FriendLinkData {
   color?: string;
 }
 
+import type { YouTubeTrack } from '../config/types';
+
 export interface MediaItem {
   name?: string;
   url?: string;
   title?: string;
-  list?: string[];
+  list?: YouTubeTrack[];
 }
 
 interface AudioGroup {
   title?: string;
-  list: string[];
+  list: YouTubeTrack[];
 }
 
 export function renderFriendLinks(items: FriendLinkData[]): string {
@@ -61,8 +63,6 @@ export function renderAudioMedia(items: MediaItem[]): string {
   for (const item of items) {
     if (item.list && Array.isArray(item.list)) {
       groups.push({ title: item.title, list: item.list });
-    } else if (item.url) {
-      groups.push({ list: [item.url] });
     }
   }
 

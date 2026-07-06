@@ -9,7 +9,7 @@
 import { usePlaybackFormattedTime, usePlaybackProgress } from '@hooks/usePlaybackTime';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
-import type { MetingSong } from '@lib/meting';
+import type { YouTubeTrack } from '@lib/config/types';
 import type { PlaybackTimeStore } from '@lib/playback-time-store';
 import { cn } from '@lib/utils';
 import { memo, useRef } from 'react';
@@ -21,7 +21,7 @@ export interface PlaylistGroup {
 }
 
 interface PlayerPlaylistProps {
-  tracks: MetingSong[];
+  tracks: YouTubeTrack[];
   groups: PlaylistGroup[];
   currentIndex: number;
   timeStore: PlaybackTimeStore;

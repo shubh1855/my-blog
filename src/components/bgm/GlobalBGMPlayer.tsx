@@ -12,82 +12,45 @@ import { PlayerPlaylist, type PlaylistGroup } from '@components/markdown/audio-p
 import { PlayerPreview } from '@components/markdown/audio-player/PlayerPreview';
 import { MediaControls } from '@components/markdown/shared/MediaControls';
 import { FloatingFocusManager, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { useAudioPlayer } from '@hooks/useAudioPlayer';
 import { useMediaQuery } from '@hooks/useMediaQuery';
 import { useTranslation } from '@hooks/useTranslation';
+import { useYouTubePlayer } from '@hooks/useYouTubePlayer';
 import { Icon } from '@iconify/react';
-import type { BgmAudioGroup } from '@lib/config/types';
-import type { MetingSong } from '@lib/meting';
-import { resolvePlaylist } from '@lib/meting';
+import type { BgmAudioGroup, YouTubeTrack } from '@lib/config/types';
 import { useStore } from '@nanostores/react';
 import { $isAnyModalOpen, $isDrawerOpen } from '@store/modal';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { $bgmPanelOpen, closeBgmPanel } from '@/store/bgm';
 
 interface GlobalBGMPlayerProps {
   audioGroups: BgmAudioGroup[];
-  metingApi?: string;
 }
 
-export default function GlobalBGMPlayer({ audioGroups, metingApi }: GlobalBGMPlayerProps) {
+export default function GlobalBGMPlayer({ audioGroups }: GlobalBGMPlayerProps) {
   const { t } = useTranslation();
   const panelOpen = useStore($bgmPanelOpen);
   const isDrawerOpen = useStore($isDrawerOpen);
   const isAnyModalOpen = useStore($isAnyModalOpen);
   const isMobilePlayer = useMediaQuery('(max-width: 600px)');
 
-  const [tracks, setTracks] = useState<MetingSong[]>([]);
+  const [tracks, setTracks] = useState<YouTubeTrack[]>([]);
   const [groups, setGroups] = useState<PlaylistGroup[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [retryKey, setRetryKey] = useState(0);
-
-  // Track which retryKey has been resolved to avoid duplicate fetches.
-  // Starts at -1 so the first open (retryKey=0) always triggers a load.
-  const resolvedRetryRef = useRef(-1);
 
   useEffect(() => {
-    if (!panelOpen || resolvedRetryRef.current === retryKey) return;
-    resolvedRetryRef.current = retryKey;
-
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    async function resolve() {
-      try {
-        const results = await Promise.all(audioGroups.map((group) => resolvePlaylist(group.list, metingApi)));
-
-        if (!cancelled) {
-          const allTracks: MetingSong[] = [];
-          const resolvedGroups: PlaylistGroup[] = [];
-          for (let i = 0; i < results.length; i++) {
-            const startIndex = allTracks.length;
-            allTracks.push(...results[i]);
-            resolvedGroups.push({ title: audioGroups[i].title, startIndex, count: results[i].length });
-          }
-          setTracks(allTracks);
-          setGroups(resolvedGroups);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load playlist');
-          setLoading(false);
-        }
-      }
+    const allTracks: YouTubeTrack[] = [];
+    const resolvedGroups: PlaylistGroup[] = [];
+    for (const group of audioGroups) {
+      const startIndex = allTracks.length;
+      allTracks.push(...group.list);
+      resolvedGroups.push({ title: group.title, startIndex, count: group.list.length });
     }
+    setTracks(allTracks);
+    setGroups(resolvedGroups);
+  }, [audioGroups]);
 
-    resolve();
-    return () => {
-      cancelled = true;
-    };
-  }, [panelOpen, audioGroups, retryKey, metingApi]);
-
-  // Audio hook at top level — Audio element persists across panel open/close
-  const player = useAudioPlayer(tracks);
+  const player = useYouTubePlayer(tracks);
   const currentTrack = tracks[player.state.currentIndex] ?? null;
 
   // Hide panel when drawer is open
@@ -112,26 +75,6 @@ export default function GlobalBGMPlayer({ audioGroups, metingApi }: GlobalBGMPla
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const renderPanelContent = () => {
-    if (loading) {
-      return (
-        <output className="audio-player audio-player-loading bgm-panel-player">
-          <div className="audio-player-spinner" />
-          <span>{t('audio.loading')}</span>
-        </output>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="audio-player audio-player-error bgm-panel-player" role="alert">
-          <span>{t('audio.loadError', { error })}</span>
-          <button type="button" className="audio-player-btn" onClick={() => setRetryKey((k) => k + 1)}>
-            {t('audio.retry')}
-          </button>
-        </div>
-      );
-    }
-
     if (tracks.length === 0) {
       return (
         <div className="audio-player audio-player-empty bgm-panel-player">

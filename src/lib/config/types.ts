@@ -536,9 +536,15 @@ export interface DevConfig {
 // BGM (Background Music) Configuration
 // =============================================================================
 
+export interface YouTubeTrack {
+  name: string;
+  artist: string;
+  youtubeId: string;
+}
+
 export interface BgmAudioGroup {
   title?: string;
-  list: string[];
+  list: YouTubeTrack[];
 }
 
 export interface BgmConfig {

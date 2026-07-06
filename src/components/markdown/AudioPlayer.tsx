@@ -5,10 +5,9 @@
  * Meting API at runtime, builds a grouped playlist, and renders the player UI.
  */
 
-import { useAudioPlayer } from '@hooks/useAudioPlayer';
 import { useTranslation } from '@hooks/useTranslation';
-import type { MetingSong } from '@lib/meting';
-import { resolvePlaylist } from '@lib/meting';
+import { useYouTubePlayer } from '@hooks/useYouTubePlayer';
+import type { YouTubeTrack } from '@lib/config/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PlayerPlaylist } from './audio-player/PlayerPlaylist';
 import { PlayerPreview } from './audio-player/PlayerPreview';
@@ -16,7 +15,7 @@ import { MediaControls } from './shared/MediaControls';
 
 interface AudioGroup {
   title?: string;
-  list: string[];
+  list: YouTubeTrack[];
 }
 
 interface PlaylistGroup {
@@ -32,7 +31,6 @@ interface AudioPlayerProps {
 export function AudioPlayer({ element }: AudioPlayerProps) {
   const { t } = useTranslation();
   const dataSrc = element.dataset.src || '[]';
-  const apiUrl = element.dataset.api;
 
   const audioGroups: AudioGroup[] = useMemo(() => {
     try {
@@ -42,57 +40,29 @@ export function AudioPlayer({ element }: AudioPlayerProps) {
     }
   }, [dataSrc]);
 
-  const [tracks, setTracks] = useState<MetingSong[]>([]);
+  const [tracks, setTracks] = useState<YouTubeTrack[]>([]);
   const [groups, setGroups] = useState<PlaylistGroup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
 
-  // Resolve all URLs via Meting API
-  // biome-ignore lint/correctness/useExhaustiveDependencies: retryCount is an intentional trigger to re-run the effect
   useEffect(() => {
-    let cancelled = false;
+    const allTracks: YouTubeTrack[] = [];
+    const resolvedGroups: PlaylistGroup[] = [];
 
-    async function resolve() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const allTracks: MetingSong[] = [];
-        const resolvedGroups: PlaylistGroup[] = [];
-
-        for (const group of audioGroups) {
-          const startIndex = allTracks.length;
-          const songs = await resolvePlaylist(group.list, apiUrl);
-          allTracks.push(...songs);
-          resolvedGroups.push({
-            title: group.title,
-            startIndex,
-            count: songs.length,
-          });
-        }
-
-        if (!cancelled) {
-          setTracks(allTracks);
-          setGroups(resolvedGroups);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load playlist');
-          setLoading(false);
-        }
-      }
+    for (const group of audioGroups) {
+      const startIndex = allTracks.length;
+      allTracks.push(...group.list);
+      resolvedGroups.push({
+        title: group.title,
+        startIndex,
+        count: group.list.length,
+      });
     }
 
-    resolve();
-    return () => {
-      cancelled = true;
-    };
-  }, [audioGroups, apiUrl, retryCount]);
+    setTracks(allTracks);
+    setGroups(resolvedGroups);
+  }, [audioGroups]);
 
-  const player = useAudioPlayer(tracks);
+  const player = useYouTubePlayer(tracks);
   const currentTrack = tracks[player.state.currentIndex] ?? null;
 
   const handleTrackSelect = useCallback(
@@ -101,26 +71,6 @@ export function AudioPlayer({ element }: AudioPlayerProps) {
     },
     [player.play],
   );
-
-  if (loading) {
-    return (
-      <div className="audio-player audio-player-loading">
-        <div className="audio-player-spinner" />
-        <span>{t('audio.loading')}</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="audio-player audio-player-error">
-        <span>{t('audio.loadError', { error })}</span>
-        <button type="button" className="audio-player-btn" onClick={() => setRetryCount((c) => c + 1)}>
-          {t('audio.retry')}
-        </button>
-      </div>
-    );
-  }
 
   if (tracks.length === 0) {
     return (
