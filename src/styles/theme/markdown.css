@@ -1,6 +1,7 @@
 .prose {
   /* override the max-width of the prose */
   max-width: none;
+  font-size: 0.9375rem; /* ~15px, slightly smaller to fix user request */
 
   a {
     @apply text-primary hover:text-blue no-underline transition-colors duration-300 hover:underline;

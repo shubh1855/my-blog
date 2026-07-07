@@ -3,8 +3,7 @@ title: "RAIT-CTF Finals Crypto 1 - Secure Shell"
 description: "Writeup for RAIT-CTF Finals Crypto 1 - Secure Shell from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - CTF
-  - Writeups
+  - [Writeups, 周刊]
 tags:
   - RAIT-CTF
   - Crypto
@@ -12,15 +11,16 @@ tags:
 
 # RAIT-CTF Finals Crypto 1 - Secure Shell
 
-Flag: RAIT-CTF{crC32_1snT_4uTh_mY_dUd3}
+**Flag:** `RAIT-CTF{crC32_1snT_4uTh_mY_dUd3}`
 
-RAIT-CTF Final Round Report
+## Approach (Step by Step)
 
-Approach (Step by Step):
+### 1. Connection and Bit-Flipping Exploit
 
-1.  Run the below script
+To retrieve the flag, we need to bypass the security mechanism using a bit-flipping attack and a CRC mismatch leak. 
+Run the below Python exploit script:
 
-python
+```python
 from pwn import *
 import binascii
 import struct
@@ -38,7 +38,7 @@ def solve():
     r = remote(HOST, PORT)
     r.sendlineafter(b"User Login : ", b"user1")
 
-   plain # 2. Inject the 'get_flag' command into history
+    # 2. Inject the 'get_flag' command into history
     print("[*] Injecting target command...")
     r.sendlineafter(b"> ", b"3")
     r.sendlineafter(b"$ ", b"get_flag")
@@ -58,7 +58,6 @@ def solve():
     # JSON payload starts at Block 1.
     # To modify Block 1 plaintext, we XOR Block 0 ciphertext.
     # Block 0 starts at index 16 (first 16 bytes are IV).
-
     offset_in_block = 10
     block0_start = 16
 
@@ -68,8 +67,6 @@ def solve():
 
     for i in range(len(xor_mask)):
         data[block0_start + offset_in_block + i] ^= xor_mask[i]
-
-
 
     # 5. Send the corrupted payload to leak the correct CRC
     bad_payload = binascii.hexlify(data).decode()
@@ -104,7 +101,6 @@ def solve():
     # The CRC is in the first 4 bytes of the plaintext.
     # P_0 = Decrypt(C_0) ^ IV.
     # We modify IV to force P_0 to be the correct CRC.
-
     bad_crc_bytes = struct.pack("<I", bad_crc)
     good_crc_bytes = struct.pack("<I", good_crc)
 
@@ -124,14 +120,14 @@ def solve():
     r.sendlineafter(b"> ", b"3")      # Execute Command
     r.sendlineafter(b"$ ", b"!1")     # Run it!
 
-    # Print the flag
-
-
+    # Interactive shell to view flag
     r.interactive()
 
 if __name__ == "__main__":
     solve()
+```
 
-2.  You will get the flag RAIT-CTF{crC32_1snT_4uTh_mY_dUd3}
+### 2. Result
 
-RAIT-CTF Final Round Report
+Running the exploit modifies the token context to `admin` and repairs the CRC signature. The service will return the target flag:
+`RAIT-CTF{crC32_1snT_4uTh_mY_dUd3}`
