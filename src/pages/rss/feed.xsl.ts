@@ -35,10 +35,6 @@ export async function GET(_context: APIContext) {
             </head>
             <body style="background-color: #121214; color: #f0f0f0; margin: 0; padding: 0;">
                 <div class="background-decorations">
-                    <div class="floating-shape shape-1"></div>
-                    <div class="floating-shape shape-2"></div>
-                    <div class="floating-shape shape-3"></div>
-                    <div class="stars-container"></div>
                 </div>
 
                 <div class="container">
@@ -48,8 +44,6 @@ export async function GET(_context: APIContext) {
                             <div class="avatar-wrapper">
                                 <div class="avatar-container">
                                     <img src="${siteConfig.avatar}" alt="${siteConfig.name}" class="avatar" />
-                                    <div class="cat-ear left"></div>
-                                    <div class="cat-ear right"></div>
                                 </div>
                             </div>
 

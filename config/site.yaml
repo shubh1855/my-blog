@@ -153,6 +153,13 @@ social:
     url: mailto:paulshubh2005@gmail.com
     icon: ri:mail-line
     color: '#55acd5'
+<<<<<<< HEAD
+=======
+  rss:
+    url: /rss.xml
+    icon: ri:rss-line
+    color: '#ff6600'
+>>>>>>> e93e169 (refactor: update RSS layout and refine social links)
 
   # -------------------------------------------------------------------------
   # 以下是更多可选的社交平台配置示例，取消注释并修改即可启用：
