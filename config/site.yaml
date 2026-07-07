@@ -151,25 +151,26 @@ social:
     url: /rss.xml
     icon: ri:rss-line
     color: '#ff6600'
-    # -------------------------------------------------------------------------
-    # 以下是更多可选的社交平台配置示例，取消注释并修改即可启用：
-    # -------------------------------------------------------------------------
-    # twitter:
-    #   url: https://x.com/your-handle
-    #   icon: ri:twitter-fill
-    #   color: '#4b9ae4'
-    # bilibili:
-    #   url: https://space.bilibili.com/your-id
-    #   icon: ri:bilibili-fill
-    #   color: '#da708a'
-    # zhihu:
-    #   url: https://www.zhihu.com/people/your-id
-    #   icon: ri:zhihu-fill
-    #   color: '#1e88e5'
-    # music:
-    #   url: https://music.163.com/#/user/home?id=your-id
-    #   icon: ri:netease-cloud-music-line
-    #   color: '#e60026'
+
+  # -------------------------------------------------------------------------
+  # 以下是更多可选的社交平台配置示例，取消注释并修改即可启用：
+  # -------------------------------------------------------------------------
+  # twitter:
+  #   url: https://x.com/your-handle
+  #   icon: ri:twitter-fill
+  #   color: '#4b9ae4'
+  # bilibili:
+  #   url: https://space.bilibili.com/your-id
+  #   icon: ri:bilibili-fill
+  #   color: '#da708a'
+  # zhihu:
+  #   url: https://www.zhihu.com/people/your-id
+  #   icon: ri:zhihu-fill
+  #   color: '#1e88e5'
+  # music:
+  #   url: https://music.163.com/#/user/home?id=your-id
+  #   icon: ri:netease-cloud-music-line
+  #   color: '#e60026'
 # =============================================================================
 # Friends Links
 # 友情链接页面配置 - 展示友链列表和申请说明
