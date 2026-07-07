@@ -21,7 +21,7 @@ export async function GET(_context: APIContext) {
     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
     <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" />
     <xsl:template match="/">
-        <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN">
+        <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
             <head>
                 <title><xsl:value-of select="/rss/channel/title" /> - RSS Feed</title>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -30,10 +30,10 @@ export async function GET(_context: APIContext) {
                 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
                     rel="stylesheet" />
                 <link
-                    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
                     rel="stylesheet" />
             </head>
-            <body style="background-color: #121214; color: #f0f0f0; margin: 0; padding: 0;">
+            <body style="background-color: #000000; color: hsl(220 64% 76%); margin: 0; padding: 0;">
                 <div class="background-decorations">
                 </div>
 
@@ -64,7 +64,7 @@ export async function GET(_context: APIContext) {
                                     <xsl:attribute name="href">
                                         <xsl:value-of select="/rss/channel/link" />
                                     </xsl:attribute>
-    访问网站 <i class="ri-arrow-right-line"></i>
+    Visit Site <i class="ri-arrow-right-line"></i>
                                 </a>
                             </div>
                         </div>
@@ -72,7 +72,7 @@ export async function GET(_context: APIContext) {
 
                     <main class="feed-content">
                         <div class="content-header">
-                            <h2><i class="ri-sparkling-fill"></i> 最近更新</h2>
+                            <h2><i class="ri-sparkling-fill"></i> Recent Posts</h2>
                             <p class="feed-desc">
                                 <xsl:value-of select="/rss/channel/description" />
                             </p>
@@ -127,7 +127,7 @@ export async function GET(_context: APIContext) {
                                             <xsl:attribute name="href">
                                                 <xsl:value-of select="link" />
                                             </xsl:attribute>
-    阅读全文 <i class="ri-arrow-right-s-line"></i>
+    Read More <i class="ri-arrow-right-s-line"></i>
                                         </a>
                                     </div>
                                 </article>
