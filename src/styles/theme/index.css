@@ -2,73 +2,73 @@
   --gradient-bg-start: hsl(var(--card));
   --gradient-bg-end: hsl(var(--card));
   --gradient-bg: hsl(var(--card));
-  --gradient-pink: #3a86ff;
+  --gradient-pink: #e80dc3;
   --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
-  --box-bg-shadow: rgba(0, 0, 0, 0.3);
-  --grey-1-a5: rgba(21, 27, 40, 0.5);
-  --gradient-shoka-button-start: #3a86ff;
-  --gradient-shoka-button-end: #3a86ff;
-  --gradient-shoka-button: linear-gradient(to right, #3a86ff, #3a86ff);
-  --shoka-blue: 234 89% 74%;
-  --grey-4: 220 10% 35%;
-  --color-pink: #6366f1;
-  --color-pink-a3: rgba(99, 102, 241, 0.3);
+  --box-bg-shadow: rgba(25, 17, 46, 0.3);
+  --grey-1-a5: rgba(25, 17, 46, 0.5);
+  --gradient-shoka-button-start: #e80dc3;
+  --gradient-shoka-button-end: #e80dc3;
+  --gradient-shoka-button: #e80dc3;
+  --shoka-blue: 305 92% 48%;
+  --grey-4: 310 10% 42%;
+  --color-pink: #e80dc3;
+  --color-pink-a3: rgba(232, 13, 195, 0.3);
 
   /* Shoka container/effect colors */
-  --shoka-default: 220 10% 50%;
-  --shoka-info: 210 100% 60%;
+  --shoka-default: 310 10% 50%;
+  --shoka-info: 280 70% 55%;
   --shoka-success: 142 76% 42%;
   --shoka-warning: 45 100% 50%;
-  --shoka-danger: 0 84% 65%;
+  --shoka-danger: 345 82% 50%;
 
-  /* Named text colors — for dark backgrounds */
-  --color-red: #f87171;
-  --color-pink-text: #818cf8;
+  /* Named text colors */
+  --color-red: #b21145;
+  --color-pink-text: #e80dc3;
   --color-orange: #fbbf24;
   --color-yellow: #facc15;
   --color-green: #4ade80;
   --color-aqua: #2dd4bf;
-  --color-blue: #60a5fa;
-  --color-purple: #c084fc;
-  --color-grey: #9ca3af;
+  --color-blue: #8a2666;
+  --color-purple: #471e4b;
+  --color-grey: #a994a2;
 }
 
 .dark {
   --gradient-bg-start: hsl(var(--card));
   --gradient-bg-end: hsl(var(--card));
   --gradient-bg: hsl(var(--card));
-  --gradient-pink: #3a86ff;
+  --gradient-pink: #e815db;
   --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.5);
-  --grey-1-a5: rgba(13, 17, 23, 0.5);
+  --grey-1-a5: rgba(25, 17, 46, 0.6);
 
-  --gradient-shoka-button-start: #3a86ff;
-  --gradient-shoka-button-end: #3a86ff;
-  --gradient-shoka-button: linear-gradient(to right, #3a86ff, #3a86ff);
-  --shoka-blue: 234 89% 74%;
-  --grey-4: 220 10% 35%;
-  --color-pink: #818cf8;
-  --color-pink-a3: rgba(99, 102, 241, 0.3);
+  --gradient-shoka-button-start: #e815db;
+  --gradient-shoka-button-end: #e815db;
+  --gradient-shoka-button: #e815db;
+  --shoka-blue: 305 92% 55%;
+  --grey-4: 310 10% 42%;
+  --color-pink: #e815db;
+  --color-pink-a3: rgba(232, 21, 219, 0.35);
 
   /* Shoka container/effect colors (dark mode) */
-  --shoka-default: 220 10% 55%;
-  --shoka-info: 210 100% 65%;
+  --shoka-default: 310 10% 55%;
+  --shoka-info: 280 70% 60%;
   --shoka-success: 142 76% 50%;
   --shoka-warning: 45 100% 55%;
-  --shoka-danger: 0 84% 70%;
+  --shoka-danger: 345 82% 55%;
 
   /* Named text colors — brighter for dark backgrounds */
-  --color-red: #f87171;
-  --color-pink-text: #a5b4fc;
+  --color-red: #e90ea8;
+  --color-pink-text: #e815db;
   --color-orange: #fbbf24;
   --color-yellow: #facc15;
   --color-green: #4ade80;
   --color-aqua: #2dd4bf;
-  --color-blue: #60a5fa;
-  --color-purple: #c084fc;
-  --color-grey: #9ca3af;
+  --color-blue: #a994a2;
+  --color-purple: #e80dc3;
+  --color-grey: #a994a2;
 }
