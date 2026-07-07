@@ -125,7 +125,7 @@ featuredSeries:
     enabled: true
     icon: ri:newspaper-line
     links:
-      github: https://github.com/your-username/your-repo
+      github: https://github.com/shubh1855/
       rss: /rss.xml
 
 # =============================================================================
@@ -142,15 +142,19 @@ featuredSeries:
 # -----------------------------------------------------------------------------
 social:
   github:
-    url: https://github.com/your-username # 替换为你的 GitHub 链接
-    icon: ri:github-fill # Remix Icon 的 GitHub 图标
-    color: '#191717' # (可选) 图标颜色
+    url: https://github.com/shubh1855/
+    icon: ri:github-fill
+    color: '#191717'
+  linkedin:
+    url: https://www.linkedin.com/in/shubhranil-paul
+    icon: ri:linkedin-box-fill
+    color: '#0A66C2'
   email:
-    url: mailto:your@email.com # 替换为你的邮箱，需加 mailto: 前缀
+    url: mailto:paulshubh2005@gmail.com
     icon: ri:mail-line
     color: '#55acd5'
   rss:
-    url: /rss.xml # 站内 RSS 订阅地址
+    url: /rss.xml
     icon: ri:rss-line
     color: '#ff6600'
   # -------------------------------------------------------------------------
@@ -637,7 +641,7 @@ bangumi:
 #     - urlTemplate: URL 模板，支持占位符 {path}（文件绝对路径）
 # -----------------------------------------------------------------------------
 dev:
-  localProjectPath: '/Users/yourname/path/to/astro-koharu' # 请修改为你的项目绝对路径
+  localProjectPath: '/home/shubh/Project/astro-koharu'
   contentRelativePath: 'src/content/blog'
   editors:
     - id: vscode

@@ -1,6 +1,6 @@
 import { useControlledState } from '@hooks/useControlledState';
 import { cn } from '@lib/utils';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import React from 'react';
 
 export type OptionType<T extends string | number = string | number> = {
@@ -64,27 +64,8 @@ export const Segmented = <T extends string | number = string | number>({
             {/* 图标 */}
             {icon && <span className="flex-center shrink-0">{React.createElement(icon, { className: 'w-4 h-4' })}</span>}
 
-            {/* 文字标签 - 只在选中时显示 */}
-            <AnimatePresence initial={false} mode="wait">
-              {selected && label && (
-                <motion.span
-                  initial={shouldReduceMotion ? undefined : { width: 0, opacity: 0 }}
-                  animate={{ width: 'auto', opacity: 1 }}
-                  exit={shouldReduceMotion ? undefined : { width: 0, opacity: 0 }}
-                  transition={
-                    shouldReduceMotion
-                      ? { duration: 0 }
-                      : {
-                          width: { duration: 0.2, ease: 'easeInOut' },
-                          opacity: { duration: 0.15, ease: 'easeInOut' },
-                        }
-                  }
-                  className="overflow-hidden whitespace-nowrap"
-                >
-                  {label}
-                </motion.span>
-              )}
-            </AnimatePresence>
+            {/* 文字标签 - 始终显示 */}
+            {label && <span className="overflow-hidden whitespace-nowrap text-sm">{label}</span>}
 
             {/* 选中背景 */}
             {selected && (

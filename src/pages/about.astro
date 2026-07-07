@@ -1,0 +1,70 @@
+---
+import GithubContributions from '@components/about/GithubContributions.tsx';
+import HomeSider from '@components/layout/HomeSider.astro';
+import Cover from '@components/ui/cover/Cover.astro';
+import { CONTENT_PADDING } from '@constants/layout';
+import { seoConfig } from '@constants/site-config';
+import Layout from '@layouts/Layout.astro';
+import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
+---
+
+<Layout title={`About | ${seoConfig.title}`}>
+  <TwoColumnLayout>
+    <Cover slot="cover" title="About Me" />
+    <HomeSider slot="sider" />
+    <div class={`shadow-box bg-gradient-start mx-0 flex w-full flex-col gap-8 ${CONTENT_PADDING.standard}`}>
+      <div class="prose md:prose-sm dark:prose-invert" data-pagefind-body>
+
+        <h2>Hey, I'm Shubh 👋</h2>
+        <p>
+          I'm a developer and cybersecurity enthusiast who loves building things and breaking them.
+          I write about development, technology, security, and the little trinkets of what I enjoy.
+        </p>
+
+        <blockquote><p>Code, Create, Repeat.</p></blockquote>
+
+        <h3>Find Me</h3>
+        <div class="not-prose flex flex-wrap gap-2 my-4">
+          <a href="https://github.com/shubh1855/">
+            <img src="https://img.shields.io/badge/GitHub-shubh1855-181717?style=for-the-badge&logo=github" alt="GitHub" />
+          </a>
+          <a href="https://www.linkedin.com/in/shubhranil-paul">
+            <img src="https://img.shields.io/badge/LinkedIn-Shubhranil_Paul-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn" />
+          </a>
+          <a href="mailto:paulshubh2005@gmail.com">
+            <img src="https://img.shields.io/badge/Email-paulshubh2005-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+          </a>
+        </div>
+
+        <h3>Tech Stack</h3>
+        <div class="not-prose flex flex-wrap gap-2 my-4">
+          <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+          <img src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go" />
+          <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=cplusplus&logoColor=white" alt="C++" />
+          <img src="https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=black" alt="C" />
+          <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" />
+          <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+          <img src="https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnubash&logoColor=white" alt="Bash" />
+          <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
+          <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
+          <img src="https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black" alt="Linux" />
+          <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+          <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" />
+          <img src="https://img.shields.io/badge/Wireshark-1679A7?style=flat-square&logo=wireshark&logoColor=white" alt="Wireshark" />
+          <img src="https://img.shields.io/badge/Burp_Suite-FF6633?style=flat-square&logo=burpsuite&logoColor=white" alt="Burp Suite" />
+        </div>
+
+        <h3>GitHub Stats</h3>
+        <div class="not-prose flex flex-col gap-4 my-4">
+          <a href="https://github.com/shubh1855/">
+            <img src="https://github-readme-streak-stats-rust-tau.vercel.app?user=shubh1855&theme=tokyonight&hide_border=true&date_format=%5BY%20%5DM%20" alt="GitHub Streak" loading="lazy" />
+          </a>
+        </div>
+
+        <h3>Contributions</h3>
+      </div>
+
+      <GithubContributions client:load username="shubh1855" />
+    </div>
+  </TwoColumnLayout>
+</Layout>
