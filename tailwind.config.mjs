@@ -142,8 +142,7 @@ export default {
       maxWidth: {
         '8xl': '87.5rem',
       },
-      borderWidth: {
-      },
+      borderWidth: {},
       typography: () => ({
         DEFAULT: {
           css: {
