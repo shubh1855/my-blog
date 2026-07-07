@@ -3,7 +3,7 @@ title: "RAIT-CTF Finals Crypto 3 - Chain of Trust"
 description: "Writeup for RAIT-CTF Finals Crypto 3 - Chain of Trust from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - [Writeups, 周刊]
+  - [Writeups]
 tags:
   - RAIT-CTF
   - Crypto

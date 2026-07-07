@@ -3,7 +3,7 @@ title: "RAIT-CTF Finals Reverse 2 - Employee Manager"
 description: "Writeup for RAIT-CTF Finals Reverse 2 - Employee Manager from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - [Writeups, 周刊]
+  - [Writeups]
 tags:
   - RAIT-CTF
   - Reverse Engineering
@@ -56,7 +56,7 @@ for i := 0; i < len(encrypted_array); i++ {
 
 This is the equivalent Assembly implementation at `0x14070a742` (`func1`) and `0x14070a235` (`func3`):
 
-```assembly
+```asm
 MOVZX ESI, byte ptr [RDX + RBX*0x1]  ; Load encrypted byte
 MOVZX EDI, byte ptr [0x140795a20]    ; Load key (0x55)
 XOR   ESI, EDI                       ; XOR decrypt
@@ -125,7 +125,7 @@ The redemption handler checks the input against a hardcoded 8-byte value stored 
 
 Assembly implementation at `0x14070a166`:
 
-```assembly
+```asm
 CMP qword ptr [RSI+0x78], 0x8      ; Check length == 8
 JNZ fail
 MOV RSI, qword ptr [RSI+0x70]      ; Get string data pointer

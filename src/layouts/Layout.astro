@@ -341,7 +341,7 @@ const keywords = keywordsOverride || siteConfig.keywords || [siteConfig.title];
       </main>
       {bgmConfig.enabled && bgmConfig.audio.length > 0 && (
         <div transition:persist="global-bgm">
-          <GlobalBGMPlayer client:only="react" audioGroups={bgmConfig.audio} metingApi={bgmConfig.metingApi} />
+          <GlobalBGMPlayer client:only="react" audioGroups={bgmConfig.audio} />
         </div>
       )}
 
