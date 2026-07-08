@@ -118,18 +118,18 @@
   .logo-text {
     font-size: 2rem;
     text-shadow:
-      3px 4px 2px #19112e,
-      -1px -1px 0px rgba(232, 13, 195, 0.3);
+      3px 4px 2px #0f0b1d,
+      -1px -1px 0px rgba(176, 80, 160, 0.25);
     text-transform: uppercase;
     letter-spacing: 1px;
     line-height: 0.95;
     text-align: center;
     font-family: "Bear Days", sans-serif;
     font-weight: 700;
-    color: #e80dc3;
+    color: #b050a0;
   }
 }
 
 .dark .logo-text {
-  color: #e815db;
+  color: #b858a8;
 }

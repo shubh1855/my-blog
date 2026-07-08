@@ -1,28 +1,28 @@
 @layer base {
   :root {
-    /* Code Geass Light Mode — Darker muted purple palette */
-    --background: 270 20% 18%;        /* Dark muted purple bg */
-    --foreground: 300 10% 78%;        /* Light lavender text */
+    /* Code Geass Light Mode — Dark purple palette */
+    --background: 253 45% 8%;          /* #0f0b1d */
+    --foreground: 300 10% 78%;
 
-    --card: 270 22% 15%;              /* Darker card */
+    --card: 253 45% 6%;
     --card-foreground: 300 10% 78%;
 
-    --popover: 270 22% 15%;
+    --popover: 253 45% 6%;
     --popover-foreground: 300 10% 78%;
 
-    --primary: 307 91% 48%;           /* #e80dc3 — Geass magenta */
+    --primary: 305 55% 52%;            /* Muted magenta — easier on eyes */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 20% 22%;         /* Slightly lighter purple */
+    --secondary: 253 45% 12%;
     --secondary-foreground: 300 10% 78%;
 
-    --muted: 270 20% 22%;
+    --muted: 253 45% 12%;
     --muted-foreground: 300 8% 55%;
 
-    --accent: 270 18% 25%;
+    --accent: 253 45% 16%;
     --accent-foreground: 300 10% 78%;
 
-    --destructive: 345 82% 39%;       /* #b21145 — Britannian crimson */
+    --destructive: 345 65% 40%;
     --destructive-foreground: 0 0% 98%;
 
     --success: 142 76% 42%;
@@ -31,39 +31,39 @@
     --warning: 45 100% 50%;
     --warning-foreground: 0 0% 10%;
 
-    --border: 270 18% 24%;
-    --input: 270 18% 24%;
-    --ring: 307 91% 48%;
+    --border: 253 45% 14%;
+    --input: 253 45% 14%;
+    --ring: 305 55% 52%;
 
-    --badge-primary: 307 91% 48%;
+    --badge-primary: 305 55% 52%;
 
     --radius: 0.5rem;
   }
 
   .dark {
     /* Code Geass Dark Mode — Deep indigo-purple noir */
-    --background: 257 46% 12%;        /* #19112e */
-    --foreground: 300 8% 82%;
+    --background: 253 45% 8%;          /* #0f0b1d */
+    --foreground: 300 8% 78%;
 
-    --card: 257 46% 8%;
-    --card-foreground: 300 8% 82%;
+    --card: 253 45% 6%;
+    --card-foreground: 300 8% 78%;
 
-    --popover: 257 46% 8%;
-    --popover-foreground: 300 8% 82%;
+    --popover: 253 45% 6%;
+    --popover-foreground: 300 8% 78%;
 
-    --primary: 305 92% 48%;           /* #e815db — Geass magenta */
+    --primary: 305 55% 52%;            /* Muted magenta — easier on eyes */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 257 46% 16%;
-    --secondary-foreground: 300 20% 88%;
+    --secondary: 253 45% 12%;
+    --secondary-foreground: 300 15% 82%;
 
-    --muted: 257 46% 16%;
-    --muted-foreground: 300 8% 58%;
+    --muted: 253 45% 12%;
+    --muted-foreground: 300 8% 52%;
 
-    --accent: 257 46% 20%;
-    --accent-foreground: 300 20% 88%;
+    --accent: 253 45% 16%;
+    --accent-foreground: 300 15% 82%;
 
-    --destructive: 345 82% 39%;       /* #b21145 */
+    --destructive: 345 65% 40%;
     --destructive-foreground: 0 0% 98%;
 
     --success: 142 76% 42%;
@@ -72,11 +72,11 @@
     --warning: 45 100% 55%;
     --warning-foreground: 0 0% 10%;
 
-    --border: 257 46% 18%;
-    --input: 257 46% 18%;
-    --ring: 305 92% 48%;
+    --border: 253 45% 14%;
+    --input: 253 45% 14%;
+    --ring: 305 55% 52%;
 
-    --badge-primary: 305 92% 48%;
+    --badge-primary: 305 55% 52%;
 
     --radius: 0rem;
   }

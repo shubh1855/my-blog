@@ -39,8 +39,8 @@ h2.shoka-decoration-circle {
       background-color: transparent;
       background-image: repeating-linear-gradient(
         to bottom,
-        rgba(232, 13, 195, 0.7) 0,
-        rgba(232, 13, 195, 0.7) 4px,
+        rgba(176, 80, 160, 0.5) 0,
+        rgba(176, 80, 160, 0.5) 4px,
         transparent 8px,
         transparent 12px
       );
