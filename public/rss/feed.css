@@ -1,20 +1,23 @@
-/* RSS Feed Style — Matches site dark theme (Nord/Indigo) */
+/* RSS Feed Style — Code Geass Theme */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg:          #000000;
-  --bg-card:     hsl(224 71% 4%);
-  --bg-card-2:   hsl(224 71% 7%);
-  --border:      hsl(224 71% 8%);
-  --border-mid:  hsl(224 71% 14%);
+  --bg:          #100b20;
+  --bg-card:     #19112e;
+  --bg-card-2:   #1f1638;
+  --border:      #251840;
+  --border-mid:  #311f52;
 
-  --primary:     hsl(217 100% 61%);   /* #3b82f6 */
-  --primary-dim: hsla(217 100% 61% / 0.12);
-  --primary-glow:hsla(217 100% 61% / 0.25);
+  --primary:     #e80dc3;
+  --primary-dim: rgba(232, 13, 195, 0.12);
+  --primary-glow:rgba(232, 13, 195, 0.25);
 
-  --text:        hsl(220 64% 76%);
-  --text-muted:  hsl(220 20% 55%);
-  --text-bright: hsl(219 100% 93%);
+  --crimson:     #b21145;
+  --crimson-dim: rgba(178, 17, 69, 0.15);
+
+  --text:        #a994a2;
+  --text-muted:  #7a6a78;
+  --text-bright: #d4c8d0;
 
   --radius: 0px;
   --font: 'Inter', system-ui, -apple-system, sans-serif;
@@ -118,11 +121,11 @@ html, body {
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
-.social-btn:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-dim); }
-.social-btn.github:hover  { color: #e2e2e2; border-color: #555; background: rgba(255,255,255,0.06); }
-.social-btn.email:hover   { color: #55acd5; border-color: #55acd5; background: rgba(85,172,213,0.1); }
-.social-btn.linkedin:hover{ color: #0A66C2; border-color: #0A66C2; background: rgba(10,102,194,0.1); }
-.social-btn.rss:hover     { color: #ff6600; border-color: #ff6600; background: rgba(255,102,0,0.1); }
+.social-btn:hover       { color: var(--primary); border-color: var(--primary); background: var(--primary-dim); }
+.social-btn.github:hover  { color: #d4c8d0; border-color: #471e4b; background: rgba(71,30,75,0.3); }
+.social-btn.email:hover   { color: #e815db; border-color: #e815db; background: rgba(232,21,219,0.1); }
+.social-btn.linkedin:hover{ color: #a994a2; border-color: #8a2666; background: rgba(138,38,102,0.15); }
+.social-btn.rss:hover     { color: #e80dc3; border-color: #e80dc3; background: rgba(232,13,195,0.1); }
 
 /* ── Feed Actions ── */
 .feed-actions {
@@ -145,7 +148,7 @@ html, body {
   background: var(--bg-card-2);
 }
 
-.feed-badge i { color: #f97316; }
+.feed-badge i { color: var(--primary); }
 
 .visit-btn {
   padding: 0.55rem 1.25rem;
@@ -163,7 +166,7 @@ html, body {
 }
 
 .visit-btn:hover {
-  background: hsl(217 100% 55%);
+  background: #e815db;
   box-shadow: 0 0 18px var(--primary-glow);
 }
 
@@ -256,7 +259,7 @@ html, body {
 }
 
 .meta-item { display: flex; align-items: center; gap: 0.25rem; }
-.meta-item.category { color: var(--primary); font-weight: 500; }
+.meta-item.category { color: var(--crimson); font-weight: 500; }
 
 /* ── Post Summary ── */
 .post-summary {
@@ -288,13 +291,13 @@ html, body {
   color: var(--primary);
   font-size: 0.7rem;
   font-weight: 500;
-  border: 1px solid hsla(217 100% 61% / 0.2);
+  border: 1px solid rgba(232, 13, 195, 0.2);
   transition: background 0.2s;
   white-space: nowrap;
 }
 
 .tag-badge i { font-size: 0.65rem; }
-.tag-badge:hover { background: hsla(217 100% 61% / 0.2); }
+.tag-badge:hover { background: rgba(232, 13, 195, 0.2); }
 
 /* ── Read More ── */
 .post-footer {
