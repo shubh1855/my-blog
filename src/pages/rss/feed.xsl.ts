@@ -33,7 +33,7 @@ export async function GET(_context: APIContext) {
                     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
                     rel="stylesheet" />
             </head>
-            <body style="background-color: #100b20; color: #a994a2; margin: 0; padding: 0;">
+            <body style="background-color: #0f0b1d; color: #988892; margin: 0; padding: 0;">
                 <div class="background-decorations">
                 </div>
 

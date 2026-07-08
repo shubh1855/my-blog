@@ -2,22 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg:          #100b20;
-  --bg-card:     #19112e;
-  --bg-card-2:   #1f1638;
-  --border:      #251840;
-  --border-mid:  #311f52;
+  --bg:          #0f0b1d;
+  --bg-card:     #140e28;
+  --bg-card-2:   #1a1430;
+  --border:      #201838;
+  --border-mid:  #2a1e48;
 
-  --primary:     #e80dc3;
-  --primary-dim: rgba(232, 13, 195, 0.12);
-  --primary-glow:rgba(232, 13, 195, 0.25);
+  --primary:     #b050a0;
+  --primary-dim: rgba(176, 80, 160, 0.12);
+  --primary-glow:rgba(176, 80, 160, 0.2);
 
-  --crimson:     #b21145;
-  --crimson-dim: rgba(178, 17, 69, 0.15);
+  --crimson:     #8a2666;
+  --crimson-dim: rgba(138, 38, 102, 0.15);
 
-  --text:        #a994a2;
-  --text-muted:  #7a6a78;
-  --text-bright: #d4c8d0;
+  --text:        #988892;
+  --text-muted:  #706068;
+  --text-bright: #c4b8c0;
 
   --radius: 0px;
   --font: 'Inter', system-ui, -apple-system, sans-serif;
@@ -122,10 +122,10 @@ html, body {
 }
 
 .social-btn:hover       { color: var(--primary); border-color: var(--primary); background: var(--primary-dim); }
-.social-btn.github:hover  { color: #d4c8d0; border-color: #471e4b; background: rgba(71,30,75,0.3); }
-.social-btn.email:hover   { color: #e815db; border-color: #e815db; background: rgba(232,21,219,0.1); }
-.social-btn.linkedin:hover{ color: #a994a2; border-color: #8a2666; background: rgba(138,38,102,0.15); }
-.social-btn.rss:hover     { color: #e80dc3; border-color: #e80dc3; background: rgba(232,13,195,0.1); }
+.social-btn.github:hover  { color: #c4b8c0; border-color: #402048; background: rgba(64,32,72,0.3); }
+.social-btn.email:hover   { color: #b858a8; border-color: #b858a8; background: rgba(184,88,168,0.1); }
+.social-btn.linkedin:hover{ color: #988892; border-color: #8a2666; background: rgba(138,38,102,0.15); }
+.social-btn.rss:hover     { color: #b050a0; border-color: #b050a0; background: rgba(176,80,160,0.1); }
 
 /* ── Feed Actions ── */
 .feed-actions {
@@ -166,7 +166,7 @@ html, body {
 }
 
 .visit-btn:hover {
-  background: #e815db;
+  background: #9a4890;
   box-shadow: 0 0 18px var(--primary-glow);
 }
 
@@ -291,13 +291,13 @@ html, body {
   color: var(--primary);
   font-size: 0.7rem;
   font-weight: 500;
-  border: 1px solid rgba(232, 13, 195, 0.2);
+  border: 1px solid rgba(176, 80, 160, 0.2);
   transition: background 0.2s;
   white-space: nowrap;
 }
 
 .tag-badge i { font-size: 0.65rem; }
-.tag-badge:hover { background: rgba(232, 13, 195, 0.2); }
+.tag-badge:hover { background: rgba(176, 80, 160, 0.18); }
 
 /* ── Read More ── */
 .post-footer {
