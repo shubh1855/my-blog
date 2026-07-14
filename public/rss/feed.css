@@ -15,9 +15,9 @@
   --crimson:     #8a2666;
   --crimson-dim: rgba(138, 38, 102, 0.15);
 
-  --text:        #988892;
-  --text-muted:  #706068;
-  --text-bright: #c4b8c0;
+  --text:        #8888cc;
+  --text-muted:  #5858a0;
+  --text-bright: #b0b0e0;
 
   --radius: 0px;
   --font: 'Inter', system-ui, -apple-system, sans-serif;
