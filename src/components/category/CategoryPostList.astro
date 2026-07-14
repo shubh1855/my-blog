@@ -14,7 +14,20 @@ interface Props {
 }
 const { categories, countMap, rootCategory } = Astro.props;
 const locale = getLocaleFromUrl(Astro.url.pathname);
-const posts = await getPostsByCategory(rootCategory?.name ?? '', locale);
+const allPosts = await getPostsByCategory(rootCategory?.name ?? '', locale);
+
+// Only show posts that belong DIRECTLY to this category (not to any subcategory).
+// A post is "direct" if its first category array has exactly one entry (the root name),
+// or if the root has no subcategories at all.
+const hasChildren = categories.some((c) => c.children?.length);
+const posts = hasChildren
+  ? allPosts.filter((post) => {
+      const firstCat = post.data.categories?.[0];
+      if (!Array.isArray(firstCat)) return true;
+      // Direct if the category path terminates at the root (only one element = root name)
+      return firstCat.length === 1;
+    })
+  : allPosts;
 ---
 
 <div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.normal}`}>
@@ -33,10 +46,10 @@ const posts = await getPostsByCategory(rootCategory?.name ?? '', locale);
     {
       categories.map(
         (category) =>
-          category?.children?.length && (
+          (category?.children?.length ?? 0) > 0 && (
             <div class="category-first-level-container flex flex-col">
-              {category?.children?.length &&
-                category.children.map((child) => (
+              {(category?.children?.length ?? 0) > 0 &&
+                category.children!.map((child) => (
                   <SubCategory category={child} parentName={category.name} countMap={countMap} />
                 ))}
             </div>
@@ -44,7 +57,7 @@ const posts = await getPostsByCategory(rootCategory?.name ?? '', locale);
       )
     }
     {
-      posts?.length && (
+      (posts?.length ?? 0) > 0 && (
         <div class="category-second-level-container flex flex-col">
           {posts.map((post) => (
             <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9">

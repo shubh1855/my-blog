@@ -59,6 +59,9 @@ categoryMap:
   # Secondary categories (for nested paths)
   前端: front-end
   Writeups: writeups
+  # CTF groups
+  RAIT-CTF 2026 Finals: rait-ctf-2026-finals
+  Technovate CTF: technovate-ctf
   # Add more as needed:
   # 书摘: reading
   # 后端: back-end

@@ -1,5 +1,9 @@
 ---
 import { buildCategoryPath, type Category, translateCategoryName } from '@lib/content';
+import { getPostSlug } from '@lib/content/locale';
+import { getPostsByCategory } from '@lib/content/posts';
+import { displayDate } from '@lib/date';
+import { encodeSlug } from '@lib/route';
 import { getLocaleFromUrl, localizedPath } from '@/i18n';
 import CategoryTitle from './CategoryTitle.astro';
 
@@ -11,6 +15,9 @@ interface Props {
 
 const { category, parentName, countMap } = Astro.props;
 const locale = getLocaleFromUrl(Astro.url.pathname);
+
+// Fetch posts that belong directly to this CTF subcategory
+const ctfPosts = await getPostsByCategory(category.name, locale);
 ---
 
 <CategoryTitle
@@ -19,18 +26,31 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
   href={localizedPath(buildCategoryPath([parentName, category.name]), locale)}
   level="h3"
 />
-{
-  category.children?.length && (
-    <div class="category-second-level-container flex flex-col">
-      {category.children.map((grandChild) => (
-        <p class="shoka-decoration-circle relative px-7.5 py-2 text-base/9 text-primary hover:text-blue">
-          <a href={localizedPath(buildCategoryPath([parentName, category.name, grandChild.name]), locale)} class="dashed-border">
-            {translateCategoryName(grandChild.name, locale)}
-          </a>
-          <span class="text-sm text-muted-foreground">({countMap[grandChild.name] ?? 0})</span>
-        </p>
-      ))}
-    </div>
-  )
-}
-<!-- </div> -->
+
+{/* Inline post list — indented under the CTF name */}
+{ctfPosts?.length > 0 && (
+  <div class="category-second-level-container flex flex-col pl-4">
+    {ctfPosts.map((post) => (
+      <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9">
+        <span class="text-muted-foreground mr-2 text-xs">{displayDate.shortDate(post.data.date)}</span>
+        <a href={localizedPath(`/post/${encodeSlug(getPostSlug(post))}`, locale)} class="dashed-border">
+          {post?.data?.title}
+        </a>
+      </p>
+    ))}
+  </div>
+)}
+
+{/* Grandchildren (deeper nesting, if any) */}
+{category.children?.length && (
+  <div class="category-second-level-container flex flex-col">
+    {category.children.map((grandChild) => (
+      <p class="shoka-decoration-circle relative px-7.5 py-2 text-base/9 text-primary hover:text-blue">
+        <a href={localizedPath(buildCategoryPath([parentName, category.name, grandChild.name]), locale)} class="dashed-border">
+          {translateCategoryName(grandChild.name, locale)}
+        </a>
+        <span class="text-sm text-muted-foreground">({countMap[grandChild.name] ?? 0})</span>
+      </p>
+    ))}
+  </div>
+)}
