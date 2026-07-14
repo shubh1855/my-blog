@@ -16,7 +16,7 @@ site:
   name: Shubh
   description: "About development, technology and security. Along with small trinkets I enjoy"
   avatar: /img/avatar.png
-  showLogo: true
+  showLogo: false
   author: Shubh
   url: http://localhost:4321
   defaultOgImage: /img/avatar.png
@@ -79,15 +79,15 @@ categoryMap:
 featuredCategories:
   - link: note
     label: Notes
-    image: /img/cover/4.webp
+    image: /img/cover/notes.webp
     description: Technical notes and learnings
   - link: writeups
     label: Writeups
-    image: /img/cover/1.webp
+    image: /img/cover/writeups.webp
     description: Cybersecurity CTF and challenge writeups
   - link: tools
     label: Tools
-    image: /img/cover/11.webp
+    image: /img/cover/tools.webp
     description: Tools and productivity tips
 # =============================================================================
 # Featured Series
@@ -279,9 +279,21 @@ announcements:
 # 默认封面列表 - 文章没有指定封面时将随机从列表中选择一张作为封面
 # 不设置则使用内置的 21 张默认封面 (/img/cover/1~21.webp)
 # =============================================================================
-# defaultCoverList:
-#   - /img/cover/1.webp
-#   - https://example.com/custom-cover.webp
+defaultCoverList:
+  - /img/cover/kallen-mech.webp
+  - /img/cover/lancelot-final.webp
+  - /img/cover/lancelot-powerups.webp
+  - /img/cover/lelouch-aura.webp
+  - /img/cover/lelouch-inside-mech.webp
+  - /img/cover/lelouch-on-attack.webp
+  - /img/cover/lelouch-on-laptop.webp
+  - /img/cover/lelouch-using-geass.webp
+  - /img/cover/mechs-tired.webp
+  - /img/cover/suzaku-dejected.webp
+  - /img/cover/lelouch-on-sees-laptop.webp
+  - /img/cover/notes.webp
+  - /img/cover/writeups.webp
+  - /img/cover/tools.webp
 
 # =============================================================================
 # Content Processing Options

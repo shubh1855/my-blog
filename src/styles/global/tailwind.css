@@ -133,3 +133,15 @@
 .dark .logo-text {
   color: #b858a8;
 }
+
+/* Geass symbol floating button */
+.geass-btn-icon img {
+  filter: drop-shadow(0 0 4px rgba(176, 80, 160, 0.6)) drop-shadow(0 0 8px rgba(138, 38, 102, 0.4));
+  transition: filter 0.3s ease;
+  opacity: 0.85;
+}
+
+button:hover .geass-btn-icon img {
+  filter: drop-shadow(0 0 8px rgba(184, 88, 168, 1)) drop-shadow(0 0 18px rgba(176, 80, 160, 0.8)) drop-shadow(0 0 30px rgba(138, 38, 102, 0.5));
+  opacity: 1;
+}

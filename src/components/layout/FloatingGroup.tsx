@@ -1,3 +1,5 @@
+import geassSymbol from '@assets/svg/geass-symbol.svg?url';
+
 /**
  * FloatingGroup Component
  *
@@ -127,7 +129,13 @@ export default function FloatingGroup() {
         title={t('floating.toggleToolbar')}
         className="size-9 flex-center"
       >
-        <Icon icon={isExpanded ? 'ri:close-large-fill' : 'ri:magic-fill'} className="size-4" />
+        {isExpanded ? (
+          <Icon icon="ri:close-large-fill" className="size-5" />
+        ) : (
+          <span className="geass-btn-icon">
+            <img src={geassSymbol} alt="geass" className="size-6" />
+          </span>
+        )}
       </FloatingButton>
     </motion.div>
   );
