@@ -3,7 +3,7 @@ title: "RAIT-CTF Finals Forensics 1 - Move It"
 description: "Writeup for RAIT-CTF Finals Forensics 1 - Move It from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - [Writeups]
+  - [Writeups, RAIT-CTF 2026 Finals]
 tags:
   - RAIT-CTF
   - Forensics

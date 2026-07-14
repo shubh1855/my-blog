@@ -3,7 +3,7 @@ title: "RAIT-CTF Finals Reverse 1 - Runner"
 description: "Writeup for RAIT-CTF Finals Reverse 1 - Runner from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00
 categories:
-  - [Writeups]
+  - [Writeups, RAIT-CTF 2026 Finals]
 tags:
   - RAIT-CTF
   - Reverse Engineering
