@@ -14,7 +14,7 @@ site:
   alternate: shubh
   subtitle: "Code, Create, Repeat"
   name: Shubh
-  description: "about development, technology and security. And trinkets of what i enjoy"
+  description: "About development, technology and security. Along with small trinkets I enjoy"
   avatar: /img/avatar.png
   showLogo: true
   author: Shubh
@@ -52,7 +52,6 @@ i18n:
 # =============================================================================
 categoryMap:
   # Primary categories
-  随笔: life
   笔记: note
   工具: tools
   周刊: weekly
@@ -78,10 +77,6 @@ categoryMap:
 #   description: 分类描述文字，显示在卡片上
 # -----------------------------------------------------------------------------
 featuredCategories:
-  - link: life
-    label: Life
-    image: /img/cover/2.webp
-    description: Personal musings and reflections
   - link: note
     label: Notes
     image: /img/cover/4.webp
@@ -609,10 +604,10 @@ christmas:
 #   label: 导航显示名称（可选，默认：追番）
 #   icon: 导航图标，Iconify 格式（可选，默认：ri:bilibili-fill）
 # -----------------------------------------------------------------------------
-bangumi:
-  userId: cosine
-  # label: 追番
-  # icon: ri:bilibili-fill
+# bangumi:
+#   userId: cosine
+#   # label: 追番
+#   # icon: ri:bilibili-fill
 # =============================================================================
 # Development Tools (Dev Only)
 # 开发工具配置 - 仅在开发环境（pnpm dev）生效

@@ -62,24 +62,10 @@ const startYear = siteConfig?.startYear ?? currentYear;
 
     </div>
 
-    <!-- Copyright -->
     <div class="text-muted-foreground flex items-center gap-0.5 text-sm">
       <span class="opacity-75">©</span>
-      <span class="font-medium opacity-75">{startYear}</span>
-      {
-        startYear !== currentYear && (
-          <>
-            <span class="opacity-50">-</span>
-            <span class="font-medium opacity-75" itemprop="copyrightYear">
-              {currentYear}
-            </span>
-          </>
-        )
-      }
-      <SakuraSVG className="mx-1 size-5 animate-spin text-[#FFC0CB] duration-10000" />
-      <span class="author font-medium opacity-75" itemprop="copyrightHolder">
+      <span class="author font-medium opacity-75 ml-1" itemprop="copyrightHolder">
         {siteConfig.name}
-        {siteConfig?.alternate ? `@${siteConfig.alternate}` : ''}
       </span>
     </div>
 
@@ -105,15 +91,6 @@ const startYear = siteConfig?.startYear ?? currentYear;
         class="footer-link font-medium transition-all duration-300"
       >
         astro-koharu
-      </a>
-      <span class="opacity-50">·</span>
-      <span class="opacity-75">Inspired by</span>
-      <a
-        href="https://github.com/amehime/hexo-theme-shoka"
-        target="_blank"
-        class="footer-link font-medium transition-all duration-300"
-      >
-        Shoka
       </a>
     </div>
   </div>
