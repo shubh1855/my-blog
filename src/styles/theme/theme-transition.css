@@ -63,6 +63,19 @@ html.theme-transition #site-header {
   z-index: 0;
 }
 
+/* Light mode: override Shiki's white code block backgrounds to blue-purple */
+html:not(.dark) .astro-code {
+  /* biome-ignore lint/complexity/noImportantStyles: Safe - Override Shiki inline bg */
+  background-color: #2a2545 !important;
+}
+
+html:not(.dark) .astro-code span {
+  /* biome-ignore lint/complexity/noImportantStyles: Safe - Override Shiki inline colors */
+  color: var(--shiki-dark) !important;
+  /* biome-ignore lint/complexity/noImportantStyles: Safe - Override Shiki inline bg */
+  background-color: transparent !important;
+}
+
 html.dark .astro-code,
 html.dark .astro-code span {
   /* biome-ignore lint/complexity/noImportantStyles: Safe - Shiki code blocks */

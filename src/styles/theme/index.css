@@ -2,37 +2,37 @@
   --gradient-bg-start: hsl(var(--card));
   --gradient-bg-end: hsl(var(--card));
   --gradient-bg: hsl(var(--card));
-  --gradient-pink: #b050a0;
+  --gradient-pink: #6a5acd;
   --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
-  --box-bg-shadow: rgba(15, 11, 29, 0.4);
-  --grey-1-a5: rgba(15, 11, 29, 0.5);
-  --gradient-shoka-button-start: #b050a0;
-  --gradient-shoka-button-end: #b050a0;
-  --gradient-shoka-button: #b050a0;
-  --shoka-blue: 305 55% 52%;
-  --grey-4: 300 8% 40%;
-  --color-pink: #b050a0;
-  --color-pink-a3: rgba(176, 80, 160, 0.3);
+  --box-bg-shadow: rgba(80, 70, 140, 0.25);
+  --grey-1-a5: rgba(60, 50, 110, 0.35);
+  --gradient-shoka-button-start: #6a5acd;
+  --gradient-shoka-button-end: #5b4fbf;
+  --gradient-shoka-button: #6a5acd;
+  --shoka-blue: 260 50% 55%;
+  --grey-4: 245 12% 55%;
+  --color-pink: #6a5acd;
+  --color-pink-a3: rgba(106, 90, 205, 0.25);
 
   /* Shoka container/effect colors */
-  --shoka-default: 300 8% 48%;
-  --shoka-info: 270 50% 50%;
-  --shoka-success: 142 60% 40%;
-  --shoka-warning: 45 85% 48%;
+  --shoka-default: 245 12% 52%;
+  --shoka-info: 260 50% 50%;
+  --shoka-success: 142 60% 36%;
+  --shoka-warning: 45 85% 46%;
   --shoka-danger: 345 65% 45%;
 
   /* Named text colors */
   --color-red: #9a2040;
-  --color-pink-text: #b050a0;
-  --color-orange: #d4a020;
-  --color-yellow: #d4b020;
-  --color-green: #3ab868;
-  --color-aqua: #28b8a0;
-  --color-blue: #7a3060;
-  --color-purple: #402048;
-  --color-grey: #988892;
+  --color-pink-text: #6a5acd;
+  --color-orange: #c49018;
+  --color-yellow: #c4a018;
+  --color-green: #2a9850;
+  --color-aqua: #1898a0;
+  --color-blue: #4a48b0;
+  --color-purple: #5a3d8a;
+  --color-grey: #7a7590;
 }
 
 .dark {
