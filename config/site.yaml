@@ -18,7 +18,7 @@ site:
   avatar: /img/avatar.png
   showLogo: false
   author: Shubh
-  url: http://localhost:4321
+  url: https://shubhsec.dev
   defaultOgImage: /img/avatar.png
   startYear: 2025
   timezone: Asia/Kolkata
@@ -526,9 +526,7 @@ comment:
 # -----------------------------------------------------------------------------
 analytics:
   umami:
-    enabled: true
-    id: your-umami-id
-    endpoint: https://stats.example.com
+    enabled: false
     # statistics_display:
     #   token: your-umami-share-token
     #   article_page_views: true
