@@ -1,8 +1,8 @@
+import geassSymbol from '@assets/svg/geass-symbol.svg?url';
 import { friendsIntro } from '@constants/friends-config';
 import { useTranslation } from '@hooks/useTranslation';
 import { useClipboard } from 'foxact/use-clipboard';
 import { useCallback, useState } from 'react';
-import SakuraSVG from '../svg/SakuraSvg';
 
 interface FormData {
   site: string;
@@ -31,8 +31,7 @@ export default function FriendRequestForm() {
 url: ${formData.url || 'https://example.com'}
 owner: ${formData.owner || t('friends.ownerPlaceholder')}
 desc: ${formData.desc || t('friends.descPlaceholder')}
-image: ${formData.image || 'https://example.com/avatar.jpg'}
-color: "${formData.color || '#ffc0cb'}"`;
+image: ${formData.image || 'https://example.com/avatar.jpg'}`;
   }, [formData, t]);
 
   const handleCopy = useCallback(() => {
@@ -63,7 +62,7 @@ color: "${formData.color || '#ffc0cb'}"`;
           <div className="relative z-10">
             <div className="mb-6">
               <h2 className="mb-2 flex items-center gap-2 font-black text-2xl text-gray-800 dark:text-white">
-                <SakuraSVG className="size-6 animate-spin text-[#FFC0CB] duration-10000" />
+                <img src={geassSymbol} alt="geass" className="size-6" />
                 {t('friends.applyTitle')}
               </h2>
               <p className="font-medium text-gray-500 text-sm dark:text-gray-400">{friendsIntro.applyDesc}</p>
@@ -134,50 +133,19 @@ color: "${formData.color || '#ffc0cb'}"`;
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="group relative">
-                  <label
-                    htmlFor="friend-image"
-                    className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide"
-                  >
-                    {t('friends.avatarUrl')}
-                  </label>
-                  <input
-                    id="friend-image"
-                    type="url"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                    placeholder="https://..."
-                  />
-                </div>
-                <div className="group relative">
-                  <label
-                    htmlFor="friend-color"
-                    className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide"
-                  >
-                    {t('friends.themeColor')}
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-xl border-2 border-gray-100 shadow-sm transition-transform hover:scale-105 dark:border-gray-700">
-                      <input
-                        id="friend-color"
-                        type="color"
-                        name="color"
-                        value={formData.color}
-                        onChange={handleChange}
-                        className="absolute -top-1/2 -left-1/2 h-[200%] w-[200%] cursor-pointer p-0"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      className="flex-1 rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                    />
-                  </div>
-                </div>
+              <div className="group relative">
+                <label htmlFor="friend-image" className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide">
+                  {t('friends.avatarUrl')}
+                </label>
+                <input
+                  id="friend-image"
+                  type="url"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
+                  placeholder="https://..."
+                />
               </div>
             </div>
           </div>
