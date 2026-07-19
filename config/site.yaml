@@ -114,7 +114,7 @@ featuredSeries:
     description: |
       A weekly roundup of interesting tech finds,
       learnings, and development insights.
-    cover: /img/weekly_header.webp
+    cover: /img/site_header_1920.webp
     enabled: true
     icon: ri:newspaper-line
     links:
