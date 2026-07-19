@@ -7,7 +7,6 @@ import { cn } from '@lib/utils';
 import { Icon } from 'astro-icon/components';
 import UmamiPVSpan from '@/components/umami/UmamiPVSpan';
 import { getLocaleFromUrl, t } from '@/i18n';
-import SakuraSVG from '../svg/SakuraSvg';
 
 interface Props {
   className?: string;
@@ -17,8 +16,6 @@ const { className } = Astro.props;
 
 const locale = getLocaleFromUrl(Astro.url.pathname);
 const stats = await getSiteStats();
-const currentYear = new Date().getFullYear();
-const startYear = siteConfig?.startYear ?? currentYear;
 ---
 
 <footer class={cn('mt-auto pb-6', className)}>

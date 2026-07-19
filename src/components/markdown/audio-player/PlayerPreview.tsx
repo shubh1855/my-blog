@@ -15,7 +15,7 @@ interface PlayerPreviewProps {
   lrcContainerHeight?: number;
 }
 
-export const PlayerPreview = memo(function PlayerPreview({ track, playing, timeStore }: PlayerPreviewProps) {
+export const PlayerPreview = memo(function PlayerPreview({ track, playing }: PlayerPreviewProps) {
   return (
     <div className="audio-player-preview">
       {/* Disc wrapper: vinyl disc + tonearm */}
