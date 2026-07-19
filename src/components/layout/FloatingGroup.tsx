@@ -127,13 +127,13 @@ export default function FloatingGroup() {
         onClick={toggleExpand}
         ariaLabel={t('floating.toggleToolbar')}
         title={t('floating.toggleToolbar')}
-        className="size-9 flex-center"
+        className="flex size-12 items-center justify-center border border-primary/30"
       >
         {isExpanded ? (
-          <Icon icon="ri:close-large-fill" className="size-5" />
+          <Icon icon="ri:close-large-fill" className="size-6" />
         ) : (
-          <span className="geass-btn-icon">
-            <img src={geassSymbol} alt="geass" className="size-6" />
+          <span className="geass-btn-icon flex items-center justify-center">
+            <img src={geassSymbol} alt="geass" className="size-9" />
           </span>
         )}
       </FloatingButton>
