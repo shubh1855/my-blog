@@ -17,7 +17,7 @@
     --secondary-foreground: 250 35% 16%;
 
     --muted: 245 25% 76%;
-    --muted-foreground: 250 20% 38%;
+    --muted-foreground: 250 22% 30%;    /* Boosted contrast for readability */
 
     --accent: 248 28% 72%;               /* Even deeper lavender */
     --accent-foreground: 250 35% 15%;
@@ -58,7 +58,7 @@
     --secondary-foreground: 300 15% 82%;
 
     --muted: 253 45% 12%;
-    --muted-foreground: 300 8% 52%;
+    --muted-foreground: 300 10% 65%;    /* Boosted contrast for readability */
 
     --accent: 253 45% 16%;
     --accent-foreground: 300 15% 82%;
