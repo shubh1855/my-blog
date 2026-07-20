@@ -45,6 +45,9 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
       alt={`${siteConfig.name ?? ''} avatar`}
       loading="eager"
       fetchpriority="high"
+      decoding="async"
+      width="160"
+      height="160"
     />
     {christmasConfig.enabled && christmasConfig.features.christmasHat && <ChristmasHat />}
   </div>
