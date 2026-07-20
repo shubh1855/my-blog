@@ -83,6 +83,8 @@ const keywords = keywordsOverride || siteConfig.keywords || [siteConfig.title];
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    {/* Preload local custom font used above-the-fold */}
+    <link rel="preload" as="font" href="/fonts/bear-days.woff2" type="font/woff2" crossorigin />
     {/* Load JetBrains Mono from Google Fonts — non-render-blocking */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
