@@ -10,7 +10,21 @@ async function optimizeImages() {
   console.log(chalk.blue('Starting image optimization...'));
 
   const files = await glob(IMAGE_GLOB);
-  const toProcess = files.filter((f) => !f.endsWith('-mobile.webp'));
+  const originalFiles = files.filter((f) => !f.endsWith('-mobile.webp'));
+
+  const toProcess = [];
+  for (const file of originalFiles) {
+    const ext = path.extname(file);
+    const basename = path.basename(file, ext);
+    const dir = path.dirname(file);
+    const mobileWebpPath = path.join(dir, `${basename}-mobile.webp`);
+
+    try {
+      await fs.access(mobileWebpPath);
+    } catch {
+      toProcess.push(file);
+    }
+  }
 
   for (const file of toProcess) {
     const ext = path.extname(file);
