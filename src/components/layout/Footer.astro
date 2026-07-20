@@ -18,7 +18,7 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
 const stats = await getSiteStats();
 ---
 
-<footer class={cn('mt-auto pb-6', className)}>
+<footer class={cn('mt-auto pb-6 [content-visibility:auto] [contain-intrinsic-size:auto_300px]', className)}>
   <div class={cn('mx-auto flex flex-col items-center gap-3 px-6 md:pb-10 md:px-3', MAX_WIDTH.content)}>
     <!-- Announcements Entry -->
     <FooterAnnouncementEntry client:load />
