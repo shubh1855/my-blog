@@ -11,7 +11,7 @@
     "generate:summaries:force": "npx tsx src/scripts/generateSummaries.ts --force",
     "generate:all": "npm run generate:lqips && npm run generate:summaries && npm run generate:similarities",
     "optimize:images": "npx tsx src/scripts/optimizeImages.ts",
-    "build": "npm run optimize:images && astro build",
+    "build": "pnpm run optimize:images && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
