@@ -94,15 +94,18 @@ const pageStatsConfig = createArticleStatsConfig(href);
           lqipProps.class,
         )}
       >
-        <img
-          src={finalCover}
-          loading="lazy"
-          decoding="async"
-          width="800"
-          height="450"
-          alt="post cover"
-          class="h-full w-full cursor-pointer object-cover transition duration-500 group-hover:scale-110 group-hover:rotate-3"
-        />
+        <picture>
+          <source media="(max-width: 768px)" srcset={finalCover.replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" />
+          <img
+            src={finalCover.replace(/\.(png|jpg|jpeg)$/i, '.webp')}
+            loading="lazy"
+            decoding="async"
+            width="800"
+            height="450"
+            alt="post cover"
+            class="h-full w-full cursor-pointer object-cover transition duration-500 group-hover:scale-110 group-hover:rotate-3"
+          />
+        </picture>
       </a>
     )
   }
