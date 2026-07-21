@@ -15,56 +15,56 @@ import { UpdateApp } from './koharu/update.js';
 
 const args = parseArgs();
 
-// 显示帮助
+// Display help
 if (args.help) {
   console.log(`
 koharu - astro-koharu CLI
 
-用法:
-  pnpm koharu              交互式主菜单
-  pnpm koharu backup       备份博客内容和配置
-  pnpm koharu restore      从备份恢复
-  pnpm koharu update       更新主题
-  pnpm koharu clean        清理旧备份
-  pnpm koharu list         查看所有备份
-  pnpm koharu generate     生成内容资产
-  pnpm koharu new          新建内容
+Usage:
+  pnpm koharu              Interactive main menu
+  pnpm koharu backup       Backup blog content and configuration
+  pnpm koharu restore      Restore from backup
+  pnpm koharu update       Update theme
+  pnpm koharu clean        Clean old backups
+  pnpm koharu list         View all backups
+  pnpm koharu generate     Generate content assets
+  pnpm koharu new          Create new content
 
-备份选项:
-  --full                   完整备份（包含所有图片和资产）
+Backup options:
+  --full                   Full backup (includes all images and assets)
 
-还原选项:
-  --latest                 还原最新备份
-  --dry-run                预览将要还原的文件
-  --force                  跳过确认提示
+Restore options:
+  --latest                 Restore latest backup
+  --dry-run                Preview files to be restored
+  --force                  Skip confirmation prompts
 
-更新选项:
-  --check                  仅检查更新（不执行）
-  --skip-backup            跳过备份步骤
-  --force                  跳过确认提示
-  --tag <version>          指定目标版本（如 v2.0.0）
-  --rebase                 使用 rebase 模式（重写历史，强制备份）
-  --clean                  使用 clean 模式（零冲突，强制备份）
-  --dry-run                预览操作（不实际执行）
+Update options:
+  --check                  Check for updates only (do not execute)
+  --skip-backup            Skip backup step
+  --force                  Skip confirmation prompts
+  --tag <version>          Specify target version (e.g. v2.0.0)
+  --rebase                 Use rebase mode (rewrites history, forces backup)
+  --clean                  Use clean mode (zero conflicts, forces backup)
+  --dry-run                Preview operation (do not execute)
 
-清理选项:
-  --keep N                 保留最近 N 个备份，删除其余
+Clean options:
+  --keep N                 Keep the most recent N backups and delete the rest
 
-生成选项:
-  pnpm koharu generate lqips        生成 LQIP 图片占位符
-  pnpm koharu generate similarities 生成相似度向量
-  pnpm koharu generate summaries    生成 AI 摘要
-  pnpm koharu generate all          生成全部
-  --model <name>                    指定 LLM 模型 (用于 summaries)
-  --force                           强制重新生成 (用于 summaries)
+Generate options:
+  pnpm koharu generate lqips        Generate LQIP image placeholders
+  pnpm koharu generate similarities Generate similarity vectors
+  pnpm koharu generate summaries    Generate AI summaries
+  pnpm koharu generate all          Generate all
+  --model <name>                    Specify LLM model (for summaries)
+  --force                           Force regeneration (for summaries)
 
-新建选项:
-  pnpm koharu new                   交互式选择内容类型
-  pnpm koharu new post              新建博客文章
-  pnpm koharu new friend            新建友情链接
+New content options:
+  pnpm koharu new                   Interactive content type selection
+  pnpm koharu new post              Create new blog post
+  pnpm koharu new friend            Create new friend link
 
-通用选项:
-  --help, -h               显示帮助信息
+General options:
+  --help, -h               Display help information
 `);
   process.exit(0);
 }
@@ -73,10 +73,10 @@ type AppMode = 'menu' | 'backup' | 'restore' | 'update' | 'clean' | 'list' | 'he
 
 function KoharuApp() {
   const { exit } = useApp();
-  // 判断是否从主菜单进入（没有命令行参数）
+  // Determine whether entered from main menu (no command-line arguments)
   const [fromMenu] = useState(() => !args.command);
   const [mode, setMode] = useState<AppMode>(() => {
-    // 根据命令行参数决定初始模式
+    // Determine initial mode from command-line arguments
     if (args.command === 'backup') return 'backup';
     if (args.command === 'restore') return 'restore';
     if (args.command === 'update') return 'update';
@@ -90,10 +90,10 @@ function KoharuApp() {
 
   const handleComplete = () => {
     if (fromMenu) {
-      // 从主菜单进入的，返回主菜单
+      // Entered from main menu; return to main menu
       setMode('menu');
     } else {
-      // 命令行直接进入的，完成后退出
+      // Entered directly from command line; exit after completion
       setTimeout(() => exit(), 100);
     }
   };
@@ -106,7 +106,7 @@ function KoharuApp() {
     setMode(value as AppMode);
   };
 
-  // 获取还原用的备份文件
+  // Get backup file for restore
   const getRestoreBackupFile = (): string | undefined => {
     if (args.latest) {
       const backups = getBackupList();
@@ -136,19 +136,19 @@ function KoharuApp() {
 
       {mode === 'menu' && (
         <Box flexDirection="column">
-          <Text>请选择操作:</Text>
+          <Text>Please select an operation:</Text>
           <Select
             visibleOptionCount={10}
             options={[
-              { label: '新建 - 创建博客文章或友链', value: 'new' },
-              { label: '备份 - 备份博客内容和配置', value: 'backup' },
-              { label: '还原 - 从备份恢复', value: 'restore' },
-              { label: '更新 - 更新主题', value: 'update' },
-              { label: '生成 - 生成内容资产 (LQIP, 相似度, 摘要)', value: 'generate' },
-              { label: '清理 - 清理旧备份', value: 'clean' },
-              { label: '列表 - 查看所有备份', value: 'list' },
-              { label: '帮助 - 查看命令用法', value: 'help' },
-              { label: '退出', value: 'exit' },
+              { label: 'New - Create blog post or friend link', value: 'new' },
+              { label: 'Backup - Backup blog content and configuration', value: 'backup' },
+              { label: 'Restore - Restore from backup', value: 'restore' },
+              { label: 'Update - Update theme', value: 'update' },
+              { label: 'Generate - Generate content assets (LQIP, similarities, summaries)', value: 'generate' },
+              { label: 'Clean - Clean old backups', value: 'clean' },
+              { label: 'List - View all backups', value: 'list' },
+              { label: 'Help - View command usage', value: 'help' },
+              { label: 'Exit', value: 'exit' },
             ]}
             onChange={handleMenuSelect}
           />

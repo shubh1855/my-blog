@@ -15,12 +15,12 @@ export function ErrorScreen({ title, error, showReturnHint }: ErrorScreenProps) 
         </Text>
       </Box>
       <Text bold color="red">
-        操作失败
+        Operation failed
       </Text>
       <Text color="red">{error}</Text>
       {showReturnHint && (
         <Box marginTop={1}>
-          <Text dimColor>按任意键返回主菜单...</Text>
+          <Text dimColor>Press any key to return to main menu...</Text>
         </Box>
       )}
     </Box>

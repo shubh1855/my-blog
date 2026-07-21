@@ -46,7 +46,7 @@ export function CycleSelect({ options, onChange, visibleOptionCount = DEFAULT_VI
     <Box flexDirection="column">
       {hasMoreAbove && (
         <Box>
-          <Text dimColor> ↑ 更多选项</Text>
+          <Text dimColor> ↑ more options</Text>
         </Box>
       )}
       {visibleOptions.map((option) => (
@@ -54,7 +54,7 @@ export function CycleSelect({ options, onChange, visibleOptionCount = DEFAULT_VI
       ))}
       {hasMoreBelow && (
         <Box>
-          <Text dimColor> ↓ 更多选项</Text>
+          <Text dimColor> ↓ more options</Text>
         </Box>
       )}
     </Box>

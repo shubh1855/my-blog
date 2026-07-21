@@ -16,20 +16,20 @@ interface StepConfig {
 }
 
 const STEP_CONFIGS: StepConfig[] = [
-  { id: 'site', label: '站点名称' },
-  { id: 'url', label: '站点 URL' },
-  { id: 'owner', label: '站长昵称' },
-  { id: 'desc', label: '站点描述' },
-  { id: 'image', label: '头像 URL' },
-  { id: 'color', label: '主题色' },
+  { id: 'site', label: 'Site name' },
+  { id: 'url', label: 'Site URL' },
+  { id: 'owner', label: 'Owner nickname' },
+  { id: 'desc', label: 'Site description' },
+  { id: 'image', label: 'Avatar URL' },
+  { id: 'color', label: 'Theme color' },
 ];
 
 const PRESET_COLORS = [
-  { label: '粉色 (#ffc0cb)', value: '#ffc0cb' },
-  { label: '蓝色 (#BEDCFF)', value: '#BEDCFF' },
-  { label: '绿色 (#98D8AA)', value: '#98D8AA' },
-  { label: '自定义颜色', value: 'custom' },
-  { label: '不设置颜色', value: '' },
+  { label: 'Pink (#ffc0cb)', value: '#ffc0cb' },
+  { label: 'Blue (#BEDCFF)', value: '#BEDCFF' },
+  { label: 'Green (#98D8AA)', value: '#98D8AA' },
+  { label: 'Custom color', value: 'custom' },
+  { label: 'No color', value: '' },
 ];
 
 export function FriendCreator({ onComplete, showReturnHint = false }: CreatorProps) {
@@ -67,7 +67,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
         case 'image':
           return image;
         case 'color':
-          return color || '(无)';
+          return color || '(none)';
         default:
           return '';
       }
@@ -84,7 +84,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   const handleSiteSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('站点名称不能为空');
+        setInputError('Site name is required');
         return;
       }
       setSite(value.trim());
@@ -97,11 +97,11 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   const handleUrlSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('站点 URL 不能为空');
+        setInputError('Site URL  is required');
         return;
       }
       if (!isValidUrl(value.trim())) {
-        setInputError('请输入有效的 URL');
+        setInputError('Enter a valid URL');
         return;
       }
       setUrl(value.trim());
@@ -114,7 +114,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   const handleOwnerSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('站长昵称不能为空');
+        setInputError('Owner nickname is required');
         return;
       }
       setOwner(value.trim());
@@ -127,7 +127,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   const handleDescSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('站点描述不能为空');
+        setInputError('Site description is required');
         return;
       }
       setDesc(value.trim());
@@ -140,11 +140,11 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   const handleImageSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('头像 URL 不能为空');
+        setInputError('Avatar URL  is required');
         return;
       }
       if (!isValidUrl(value.trim())) {
-        setInputError('请输入有效的头像 URL');
+        setInputError('Enter a valid avatar URL');
         return;
       }
       setImage(value.trim());
@@ -170,7 +170,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
     (value: string) => {
       const trimmed = value.trim();
       if (trimmed && !/^#[0-9A-Fa-f]{6}$/.test(trimmed)) {
-        setInputError('请输入有效的十六进制颜色 (如 #FF5733)');
+        setInputError('Enter a valid hex color (e.g. #FF5733)');
         return;
       }
       setColor(trimmed);
@@ -219,7 +219,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
               <Text dimColor>{'> '}</Text>
               <TextInput defaultValue={url || 'https://'} onSubmit={handleUrlSubmit} />
             </Box>
-            <Text dimColor> 直接输入域名或删除后粘贴完整 URL</Text>
+            <Text dimColor> Enter domain directly, or delete and paste full URL</Text>
           </Box>
         );
       case 'owner':
@@ -243,7 +243,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
               <Text dimColor>{'> '}</Text>
               <TextInput defaultValue={image || 'https://'} onSubmit={handleImageSubmit} />
             </Box>
-            <Text dimColor> 直接输入路径或删除后粘贴完整 URL</Text>
+            <Text dimColor> Enter path directly, or delete and paste full URL</Text>
           </Box>
         );
       case 'color':
@@ -255,7 +255,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
               <Text dimColor>{'> '}</Text>
               <TextInput defaultValue={color} onSubmit={handleCustomColorSubmit} />
             </Box>
-            <Text dimColor> 如: #FF5733</Text>
+            <Text dimColor> e.g. #FF5733</Text>
           </Box>
         );
       default:
@@ -266,12 +266,12 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   if (step === 'confirm') {
     return (
       <ConfirmScreen
-        title="新建友情链接"
+        title="Create new friend link"
         steps={STEP_CONFIGS.map((c) => ({
           label: c.label,
           value: getStepDisplayValue(c.id),
         }))}
-        confirmText="确认添加?"
+        confirmText="Confirm add?"
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
@@ -279,22 +279,22 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
   }
 
   if (step === 'creating') {
-    return <CreatingScreen title="新建友情链接" message="正在添加友链..." />;
+    return <CreatingScreen title="Create new friend link" message="Adding friend link..." />;
   }
 
   if (step === 'done') {
     return (
       <DoneScreen
-        title="新建友情链接"
-        message="友链添加成功!"
-        detail="已添加到 config/site.yaml"
+        title="Create new friend link"
+        message="Friend link added successfully!"
+        detail="Added to config/site.yaml"
         showReturnHint={showReturnHint}
       />
     );
   }
 
   if (step === 'error') {
-    return <ErrorScreen title="新建友情链接" error={operationError} showReturnHint={showReturnHint} />;
+    return <ErrorScreen title="Create new friend link" error={operationError} showReturnHint={showReturnHint} />;
   }
 
   const normalizedStep = step === 'color-custom' ? 'color' : step;
@@ -304,7 +304,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
     <Box flexDirection="column">
       <Box marginBottom={1}>
         <Text bold color="cyan">
-          新建友情链接
+          Create new friend link
         </Text>
       </Box>
 
@@ -322,7 +322,7 @@ export function FriendCreator({ onComplete, showReturnHint = false }: CreatorPro
 
       {showBackHint && (
         <Box marginTop={1}>
-          <Text dimColor>按 Esc 返回上一步，首步按 Esc 退出</Text>
+          <Text dimColor>Press Esc to go back; on first step, Esc exits</Text>
         </Box>
       )}
     </Box>

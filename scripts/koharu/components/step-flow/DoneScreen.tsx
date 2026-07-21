@@ -21,7 +21,7 @@ export function DoneScreen({ title, message, detail, showReturnHint }: DoneScree
       {detail && <Text dimColor>{detail}</Text>}
       {showReturnHint && (
         <Box marginTop={1}>
-          <Text dimColor>按任意键返回主菜单...</Text>
+          <Text dimColor>Press any key to return to main menu...</Text>
         </Box>
       )}
     </Box>

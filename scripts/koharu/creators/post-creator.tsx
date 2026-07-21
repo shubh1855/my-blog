@@ -16,12 +16,12 @@ interface StepConfig {
 }
 
 const STEP_CONFIGS: StepConfig[] = [
-  { id: 'title', label: '标题' },
+  { id: 'title', label: 'Title' },
   { id: 'slug', label: 'Slug' },
-  { id: 'description', label: '描述' },
-  { id: 'category', label: '分类' },
-  { id: 'tags', label: '标签' },
-  { id: 'draft', label: '草稿' },
+  { id: 'description', label: 'Description' },
+  { id: 'category', label: 'Category' },
+  { id: 'tags', label: 'Tags' },
+  { id: 'draft', label: 'Draft' },
 ];
 
 export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps) {
@@ -64,15 +64,15 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
         case 'title':
           return title;
         case 'slug':
-          return slug || '(无)';
+          return slug || '(none)';
         case 'description':
-          return description || '(无)';
+          return description || '(none)';
         case 'category':
           return category?.path.join(' → ') || '';
         case 'tags':
-          return tags.length > 0 ? tags.join(', ') : '(无)';
+          return tags.length > 0 ? tags.join(', ') : '(none)';
         case 'draft':
-          return draft ? '是' : '否';
+          return draft ? 'Yes' : 'No';
         default:
           return '';
       }
@@ -83,7 +83,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
   const handleTitleSubmit = useCallback(
     (value: string) => {
       if (!value.trim()) {
-        setInputError('标题不能为空');
+        setInputError('Title is required');
         return;
       }
       const trimmedTitle = value.trim();
@@ -149,7 +149,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
 
   const handleConfirm = useCallback(async () => {
     if (!category) {
-      setOperationError('未选择分类');
+      setOperationError('No category selected');
       setStep('error');
       return;
     }
@@ -157,7 +157,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
     const linkValue = slug || undefined;
     if (await postExists(linkValue, title, category.path)) {
       const filename = slug || generateSlug(title);
-      setOperationError(`文章已存在: ${filename}.md`);
+      setOperationError(`Post already exists: ${filename}.md`);
       setStep('error');
       return;
     }
@@ -208,7 +208,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
               <Text dimColor>{'> '}</Text>
               <TextInput defaultValue={slug || autoSlug} onSubmit={handleSlugSubmit} />
             </Box>
-            <Text dimColor> 直接回车使用，清空后回车则不生成 link 字段</Text>
+            <Text dimColor> Press Enter to use it; clear then Enter to omit link field</Text>
           </Box>
         );
       case 'description':
@@ -227,15 +227,15 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
               <Text dimColor>{'> '}</Text>
               <TextInput defaultValue={tags.join(', ')} onSubmit={handleTagsSubmit} />
             </Box>
-            <Text dimColor> 逗号分隔多个标签，如: 标签1, 标签2</Text>
+            <Text dimColor> Separate tags with commas, e.g. tag1, tag2</Text>
           </Box>
         );
       case 'draft':
         return (
           <Select
             options={[
-              { label: '否 - 立即发布', value: 'no' },
-              { label: '是 - 保存为草稿', value: 'yes' },
+              { label: 'No - publish now', value: 'no' },
+              { label: 'Yes - save as draft', value: 'yes' },
             ]}
             onChange={handleDraftSelect}
           />
@@ -248,12 +248,12 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
   if (step === 'confirm') {
     return (
       <ConfirmScreen
-        title="新建博客文章"
+        title="Create new blog post"
         steps={STEP_CONFIGS.map((c) => ({
           label: c.label,
           value: getStepDisplayValue(c.id),
         }))}
-        confirmText="确认创建?"
+        confirmText="Confirm create?"
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
@@ -261,22 +261,22 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
   }
 
   if (step === 'creating') {
-    return <CreatingScreen title="新建博客文章" message="正在创建文章..." />;
+    return <CreatingScreen title="Create new blog post" message="Creating post..." />;
   }
 
   if (step === 'done') {
     return (
       <DoneScreen
-        title="新建博客文章"
-        message="文章创建成功!"
-        detail={`路径: ${createdPath}`}
+        title="Create new blog post"
+        message="Post created successfully!"
+        detail={`Path: ${createdPath}`}
         showReturnHint={showReturnHint}
       />
     );
   }
 
   if (step === 'error') {
-    return <ErrorScreen title="新建博客文章" error={operationError} showReturnHint={showReturnHint} />;
+    return <ErrorScreen title="Create new blog post" error={operationError} showReturnHint={showReturnHint} />;
   }
 
   const showBackHint = INPUT_STEPS.includes(step);
@@ -285,7 +285,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
     <Box flexDirection="column">
       <Box marginBottom={1}>
         <Text bold color="cyan">
-          新建博客文章
+          Create new blog post
         </Text>
       </Box>
 
@@ -303,7 +303,7 @@ export function PostCreator({ onComplete, showReturnHint = false }: CreatorProps
 
       {showBackHint && (
         <Box marginTop={1}>
-          <Text dimColor>按 Esc 返回上一步，首步按 Esc 退出</Text>
+          <Text dimColor>Press Esc to go back; on first step, Esc exits</Text>
         </Box>
       )}
     </Box>

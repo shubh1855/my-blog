@@ -13,14 +13,14 @@ import type { ContentCreator } from './types';
 export const CREATORS: ContentCreator[] = [
   {
     id: 'post',
-    label: '博客文章',
-    description: '创建新的博客文章',
+    label: 'Blog posts',
+    description: 'Create a new blog post',
     Component: PostCreator,
   },
   {
     id: 'friend',
-    label: '友情链接',
-    description: '添加新的友情链接',
+    label: 'Friend link',
+    description: 'Add a new friend link',
     Component: FriendCreator,
   },
 ];

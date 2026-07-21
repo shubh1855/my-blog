@@ -9,7 +9,7 @@ export interface ConfirmScreenProps {
   onCancel: () => void;
 }
 
-export function ConfirmScreen({ title, steps, confirmText = '确认创建?', onConfirm, onCancel }: ConfirmScreenProps) {
+export function ConfirmScreen({ title, steps, confirmText = 'Confirm create?', onConfirm, onCancel }: ConfirmScreenProps) {
   return (
     <Box flexDirection="column">
       <Box marginBottom={1}>

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { isValidBackupFile, validatePathInBackupDir } from './validation';
 
 /**
- * 删除结果
+ * Internal implementation note.
  */
 export interface DeleteResult {
   deletedCount: number;
@@ -12,9 +12,9 @@ export interface DeleteResult {
 }
 
 /**
- * 删除备份文件
- * @param paths 要删除的文件路径列表
- * @returns 删除结果
+ * Internal implementation note.
+ * Internal implementation note.
+ * Internal implementation note.
  */
 export function deleteBackups(paths: string[]): DeleteResult {
   let freedSpace = 0;
@@ -23,7 +23,7 @@ export function deleteBackups(paths: string[]): DeleteResult {
 
   for (const filePath of paths) {
     try {
-      // 验证路径是否在备份目录内
+      // Internal implementation note.
       const validatedPath = validatePathInBackupDir(filePath);
 
       if (!isValidBackupFile(validatedPath)) {

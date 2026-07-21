@@ -25,7 +25,7 @@ export interface ParsedArgs {
 }
 
 /**
- * 解析命令行参数
+ * Parse command-line arguments
  */
 const GENERATE_TYPES = ['lqips', 'similarities', 'summaries', 'all'] as const;
 const NEW_TYPES = ['post', 'friend'] as const;

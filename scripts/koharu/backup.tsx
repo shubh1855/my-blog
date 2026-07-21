@@ -68,7 +68,7 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
   const successCount = results.filter((r) => r.success).length;
   const skippedCount = results.filter((r) => r.skipped).length;
 
-  // 监听按键返回主菜单
+  // Listen for any key to return to main menu
   usePressAnyKey((status === 'done' || status === 'error') && showReturnHint, () => {
     onComplete?.();
   });
@@ -77,12 +77,12 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
     <Box flexDirection="column">
       {status === 'selecting' && (
         <Box flexDirection="column" marginBottom={1}>
-          <Text>选择备份模式:</Text>
+          <Text>Select backup mode:</Text>
           <Select
             options={[
-              { label: '基础备份（博客、配置、独立页面、.env）', value: 'basic' },
-              { label: '完整备份（包含所有图片和生成的资产）', value: 'full' },
-              { label: '取消', value: 'cancel' },
+              { label: 'Basic backup (blog, config, standalone pages, .env)', value: 'basic' },
+              { label: 'Full backup (includes all images and generated assets)', value: 'full' },
+              { label: 'Cancel', value: 'cancel' },
             ]}
             onChange={handleModeSelect}
           />
@@ -92,9 +92,9 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
       {status !== 'selecting' && (
         <Box marginBottom={1}>
           <Text>
-            模式:{' '}
+            Mode:{' '}
             <Text color="yellow" bold>
-              {isFullBackup ? '完整备份' : '基础备份'}
+              {isFullBackup ? 'Full backup' : 'Basic backup'}
             </Text>
           </Text>
         </Box>
@@ -102,7 +102,7 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
 
       {(status === 'backing' || status === 'compressing') && (
         <Box marginBottom={1}>
-          <Spinner label={status === 'backing' ? '正在备份文件...' : '正在创建压缩包...'} />
+          <Spinner label={status === 'backing' ? 'Backing up files...' : 'Creating archive...'} />
         </Box>
       )}
 
@@ -113,7 +113,7 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
               <Text>
                 {result.success ? <Text color="green">{'  '}+ </Text> : <Text color="yellow">{'  '}- </Text>}
                 <Text>{result.item.label}</Text>
-                {result.skipped && <Text dimColor> (不存在，跳过)</Text>}
+                {result.skipped && <Text dimColor> (not found, skipped)</Text>}
               </Text>
             </Box>
           ))}
@@ -124,29 +124,29 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
         <Box flexDirection="column">
           <Box marginBottom={1}>
             <Text bold color="green">
-              备份完成
+              Backup complete
             </Text>
           </Box>
           <Text>
-            备份文件: <Text color="cyan">{path.basename(backupFile)}</Text>
+            Backup file: <Text color="cyan">{path.basename(backupFile)}</Text>
           </Text>
           <Text>
-            文件大小: <Text color="yellow">{fileSize}</Text>
+            File size: <Text color="yellow">{fileSize}</Text>
           </Text>
           <Text>
-            备份项目: <Text color="green">{successCount}</Text> 个
+            Backup items: <Text color="green">{successCount}</Text>
           </Text>
           {skippedCount > 0 && (
             <Text>
-              跳过项目: <Text color="yellow">{skippedCount}</Text> 个
+              Skipped items: <Text color="yellow">{skippedCount}</Text>
             </Text>
           )}
           <Box marginTop={1}>
-            <Text dimColor>提示: 更新主题后使用 'pnpm koharu restore' 还原备份</Text>
+            <Text dimColor>Tip: after updating theme, use 'pnpm koharu restore' to restore backup</Text>
           </Box>
           {showReturnHint && (
             <Box marginTop={1}>
-              <Text dimColor>按任意键返回主菜单...</Text>
+              <Text dimColor>Press any key to return to main menu...</Text>
             </Box>
           )}
         </Box>
@@ -155,12 +155,12 @@ export function BackupApp({ initialFull = false, showReturnHint = false, onCompl
       {status === 'error' && (
         <Box flexDirection="column">
           <Text bold color="red">
-            备份失败
+            Backup failed
           </Text>
           <Text color="red">{error}</Text>
           {showReturnHint && (
             <Box marginTop={1}>
-              <Text dimColor>按任意键返回主菜单...</Text>
+              <Text dimColor>Press any key to return to main menu...</Text>
             </Box>
           )}
         </Box>

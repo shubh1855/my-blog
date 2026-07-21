@@ -90,7 +90,7 @@ export function GenerateApp({
         // Check if any failed
         const failed = [...allResults.entries()].find(([, r]) => !r.success);
         if (failed) {
-          setError(`生成 ${GENERATE_ITEMS.find((i) => i.id === failed[0])?.label} 失败`);
+          setError(`Failed to generate ${GENERATE_ITEMS.find((i) => i.id === failed[0])?.label}`);
           setStatus('error');
         } else {
           setStatus('done');
@@ -108,7 +108,7 @@ export function GenerateApp({
         setResults(new Map([[selectedType, result]]));
 
         if (!result.success) {
-          setError(`生成失败 (exit code: ${result.code})`);
+          setError(`Generation failed (exit code: ${result.code})`);
           setStatus('error');
         } else {
           setStatus('done');
@@ -140,7 +140,7 @@ export function GenerateApp({
         if (cancelled) return;
 
         if (!llmAvailable) {
-          setError('LLM 服务器未运行。请先启动 LM Studio、Ollama 或其他 LLM 服务。');
+          setError('LLM server is not running. Start LM Studio, Ollama, or another LLM service first.');
           setStatus('error');
           if (!showReturnHint) {
             retimer(setTimeout(() => onComplete?.(), AUTO_EXIT_DELAY));
@@ -172,15 +172,15 @@ export function GenerateApp({
     <Box flexDirection="column">
       {status === 'selecting' && (
         <Box flexDirection="column">
-          <Text>选择要生成的内容:</Text>
+          <Text>Select content to generate:</Text>
           <Select
             options={[
               ...GENERATE_ITEMS.map((item) => ({
                 label: `${item.label} (${item.description})`,
                 value: item.id,
               })),
-              { label: '全部生成', value: 'all' },
-              { label: '返回', value: 'cancel' },
+              { label: 'Generate all', value: 'all' },
+              { label: 'Back', value: 'cancel' },
             ]}
             onChange={handleTypeSelect}
           />
@@ -189,29 +189,29 @@ export function GenerateApp({
 
       {status === 'model-input' && (
         <Box flexDirection="column">
-          <Text>请输入 LLM 模型名称:</Text>
+          <Text>Enter LLM model name:</Text>
           <Box marginTop={1}>
             <Text dimColor>{'> '}</Text>
             <TextInput defaultValue={DEFAULT_LLM_MODEL} onSubmit={handleModelSubmit} />
           </Box>
           <Box marginTop={1}>
-            <Text dimColor>(按回车使用默认模型: {DEFAULT_LLM_MODEL})</Text>
+            <Text dimColor>(Press Enter to use default model: {DEFAULT_LLM_MODEL})</Text>
           </Box>
         </Box>
       )}
 
       {status === 'checking' && (
         <Box>
-          <Spinner label={needsLlm ? '正在检查 LLM 服务器...' : '准备中...'} />
+          <Spinner label={needsLlm ? 'Checking LLM server...' : 'Preparing...'} />
         </Box>
       )}
 
       {status === 'generating' && (
         <Box flexDirection="column">
           <Box marginBottom={1}>
-            <Spinner label={`正在生成 ${currentTask}...`} />
+            <Spinner label={`Generating ${currentTask}...`} />
           </Box>
-          <Text dimColor>子进程输出将显示在下方:</Text>
+          <Text dimColor>Subprocess output will appear below:</Text>
           <Text dimColor>─────────────────────────────────</Text>
         </Box>
       )}
@@ -220,7 +220,7 @@ export function GenerateApp({
         <Box flexDirection="column">
           <Box marginBottom={1}>
             <Text bold color="green">
-              生成完成
+              Generation complete
             </Text>
           </Box>
           {[...results.entries()].map(([type, result]) => {
@@ -234,18 +234,18 @@ export function GenerateApp({
           })}
           <Box marginTop={1}>
             <Text>
-              成功: <Text color="green">{successCount}</Text>
+              Succeeded: <Text color="green">{successCount}</Text>
               {failedCount > 0 && (
                 <>
                   {' '}
-                  失败: <Text color="red">{failedCount}</Text>
+                  Failed: <Text color="red">{failedCount}</Text>
                 </>
               )}
             </Text>
           </Box>
           {showReturnHint && (
             <Box marginTop={1}>
-              <Text dimColor>按任意键返回主菜单...</Text>
+              <Text dimColor>Press any key to return to main menu...</Text>
             </Box>
           )}
         </Box>
@@ -254,19 +254,19 @@ export function GenerateApp({
       {status === 'error' && (
         <Box flexDirection="column">
           <Text bold color="red">
-            生成失败
+            Generation failed
           </Text>
           <Text color="red">{error}</Text>
           {needsLlm && error.includes('LLM') && (
             <Box marginTop={1} flexDirection="column">
-              <Text dimColor>提示: 启动 LLM 服务后重试</Text>
-              <Text dimColor>{'  '}• LM Studio: 启动应用并加载模型</Text>
+              <Text dimColor>Tip: start LLM service and retry</Text>
+              <Text dimColor>{'  '}• LM Studio: start app and load model</Text>
               <Text dimColor>{'  '}• Ollama: ollama serve</Text>
             </Box>
           )}
           {showReturnHint && (
             <Box marginTop={1}>
-              <Text dimColor>按任意键返回主菜单...</Text>
+              <Text dimColor>Press any key to return to main menu...</Text>
             </Box>
           )}
         </Box>

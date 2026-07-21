@@ -6,7 +6,7 @@ import { formatSize } from './format';
 import { tarExtractManifest } from './tar';
 
 /**
- * 备份信息接口
+ * Internal implementation note.
  */
 export interface BackupInfo {
   name: string;
@@ -18,7 +18,7 @@ export interface BackupInfo {
 }
 
 /**
- * 解析备份 manifest
+ * Internal implementation note.
  */
 export function parseBackupManifest(manifest: string): { type: string; timestamp: string } {
   try {
@@ -33,7 +33,7 @@ export function parseBackupManifest(manifest: string): { type: string; timestamp
 }
 
 /**
- * 获取备份列表
+ * Internal implementation note.
  */
 export function getBackupList(): BackupInfo[] {
   if (!fs.existsSync(BACKUP_DIR)) {
@@ -50,7 +50,7 @@ export function getBackupList(): BackupInfo[] {
     const filePath = path.join(BACKUP_DIR, name);
     const stats = fs.statSync(filePath);
 
-    // 尝试读取 manifest
+    // Internal implementation note.
     let type = 'unknown';
     let timestamp = '';
     try {

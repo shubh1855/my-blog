@@ -7,7 +7,7 @@ const DEFAULT_VERSION = 'unknown';
 let cachedVersion: string | null = null;
 
 /**
- * 获取 package.json 版本号（带缓存）
+ * Get package.json version (cached)
  */
 export function getVersion(): string {
   if (cachedVersion !== null) {

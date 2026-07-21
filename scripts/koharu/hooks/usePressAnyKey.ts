@@ -1,6 +1,6 @@
 import { useInput } from 'ink';
 
-/** 按任意键继续的 hook */
+/** Hook for pressing any key to continue */
 export function usePressAnyKey(enabled: boolean, onPress: () => void) {
   useInput(
     () => {

@@ -39,14 +39,14 @@ export function NewApp({ initialType, showReturnHint = false, onComplete }: NewA
     <Box flexDirection="column">
       {status === 'selecting' && (
         <Box flexDirection="column">
-          <Text>选择要创建的内容类型:</Text>
+          <Text>Select content type to create:</Text>
           <Select
             options={[
               ...CREATORS.map((creator) => ({
                 label: `${creator.label} - ${creator.description}`,
                 value: creator.id,
               })),
-              { label: '返回', value: 'cancel' },
+              { label: 'Back', value: 'cancel' },
             ]}
             onChange={handleTypeSelect}
           />

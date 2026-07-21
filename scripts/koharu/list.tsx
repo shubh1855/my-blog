@@ -11,12 +11,12 @@ export function ListApp({ showReturnHint = false, onComplete }: ListAppProps) {
   const [backups] = useState<BackupInfo[]>(() => getBackupList());
   const retimer = useRetimer();
 
-  // 监听按键返回主菜单
+  // Listen for any key to return to main menu
   usePressAnyKey(showReturnHint, () => {
     onComplete?.();
   });
 
-  // 如果不显示返回提示，直接退出
+  // Exit directly if return hint is hidden
   useEffect(() => {
     if (!showReturnHint) {
       retimer(setTimeout(() => onComplete?.(), AUTO_EXIT_DELAY));
@@ -27,14 +27,14 @@ export function ListApp({ showReturnHint = false, onComplete }: ListAppProps) {
   if (backups.length === 0) {
     return (
       <Box flexDirection="column">
-        <Text color="yellow">没有找到备份文件</Text>
+        <Text color="yellow">No backup files found</Text>
         <Box marginTop={1}>
-          <Text dimColor>备份目录: {BACKUP_DIR}</Text>
+          <Text dimColor>Backup directory: {BACKUP_DIR}</Text>
         </Box>
-        <Text dimColor>使用 'pnpm koharu backup' 创建备份</Text>
+        <Text dimColor>Use 'pnpm koharu backup' to create a backup</Text>
         {showReturnHint && (
           <Box marginTop={1}>
-            <Text dimColor>按任意键返回主菜单...</Text>
+            <Text dimColor>Press any key to return to main menu...</Text>
           </Box>
         )}
       </Box>
@@ -49,17 +49,17 @@ export function ListApp({ showReturnHint = false, onComplete }: ListAppProps) {
             <Text color="green">{'  '}* </Text>
             <Text>{backup.name}</Text>
             <Text color="yellow"> {backup.sizeFormatted}</Text>
-            {backup.type === 'full' && <Text color="cyan"> [完整]</Text>}
-            {backup.type === 'basic' && <Text color="green"> [基础]</Text>}
+            {backup.type === 'full' && <Text color="cyan"> [full]</Text>}
+            {backup.type === 'basic' && <Text color="green"> [basic]</Text>}
           </Box>
         ))}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>共 {backups.length} 个备份</Text>
+        <Text dimColor>Total backups: {backups.length}</Text>
       </Box>
       {showReturnHint && (
         <Box marginTop={1}>
-          <Text dimColor>按任意键返回主菜单...</Text>
+          <Text dimColor>Press any key to return to main menu...</Text>
         </Box>
       )}
     </Box>
