@@ -1,179 +1,40 @@
-import geassSymbol from '@assets/svg/geass-symbol.svg?url';
-import { friendsIntro } from '@constants/friends-config';
-import { useTranslation } from '@hooks/useTranslation';
+import { siteConfig, socialConfig } from '@constants/site-config';
+import { Icon } from '@iconify/react';
 import { useClipboard } from 'foxact/use-clipboard';
-import { useCallback, useState } from 'react';
-
-interface FormData {
-  site: string;
-  owner: string;
-  url: string;
-  desc: string;
-  image: string;
-  color: string;
-}
+import { useCallback } from 'react';
 
 export default function FriendRequestForm() {
-  const { t } = useTranslation();
-  const [formData, setFormData] = useState<FormData>({
-    site: '',
-    owner: '',
-    url: '',
-    desc: '',
-    image: '',
-    color: '#ffc0cb',
-  });
-
   const { copied, copy } = useClipboard({ timeout: 2000 });
 
-  const generateText = useCallback(() => {
-    return `site: ${formData.site || t('friends.sitePlaceholder')}
-url: ${formData.url || 'https://example.com'}
-owner: ${formData.owner || t('friends.ownerPlaceholder')}
-desc: ${formData.desc || t('friends.descPlaceholder')}
-image: ${formData.image || 'https://example.com/avatar.jpg'}`;
-  }, [formData, t]);
+  const yamlConfig = `name: ${siteConfig.name || 'Your Name'}
+site: ${siteConfig.title || 'Your Site Title'}
+url: ${siteConfig.site || 'https://yoursite.com'}
+description: ${siteConfig.description || 'Your site description'}
+avatar: ${siteConfig.site}${siteConfig.avatar?.startsWith('/') ? '' : '/'}${siteConfig.avatar || '/avatar.png'}
+color: #ffc0cb`;
 
   const handleCopy = useCallback(() => {
-    const yaml = generateText();
-    copy(yaml);
-  }, [copy, generateText]);
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    },
-    [], // 空依赖 - 使用函数式更新
-  );
+    copy(yamlConfig);
+  }, [copy, yamlConfig]);
 
   return (
     <div className="mb-4 w-full">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-sm md:p-3 dark:border-gray-800 dark:bg-gray-900">
-        {/* Cute Corner Decor */}
-        <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-pink-100/50 dark:bg-pink-900/20" />
-        <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-blue-100/50 dark:bg-blue-900/20" />
+      <div className="relative overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-8 shadow-sm md:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="mb-6">
+          <h2 className="flex items-center gap-3 font-bold text-2xl text-gray-800 dark:text-white">🤝 Want to be friends</h2>
+        </div>
 
-        <div className="grid grid-cols-2 gap-12 md:grid-cols-1 md:gap-8">
-          {/* Left Side: Form */}
-          <div className="relative z-10">
-            <div className="mb-6">
-              <h2 className="mb-2 flex items-center gap-2 font-black text-2xl text-gray-800 dark:text-white">
-                <img src={geassSymbol} alt="geass" className="size-6" />
-                {t('friends.applyTitle')}
-              </h2>
-              <p className="font-medium text-gray-500 text-sm dark:text-gray-400">{friendsIntro.applyDesc}</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="group relative">
-                  <label htmlFor="friend-site" className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide">
-                    {t('friends.siteName')}
-                  </label>
-                  <input
-                    id="friend-site"
-                    type="text"
-                    name="site"
-                    value={formData.site}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                    placeholder={t('friends.sitePlaceholder')}
-                  />
-                </div>
-                <div className="group relative">
-                  <label
-                    htmlFor="friend-owner"
-                    className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide"
-                  >
-                    {t('friends.ownerName')}
-                  </label>
-                  <input
-                    id="friend-owner"
-                    type="text"
-                    name="owner"
-                    value={formData.owner}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                    placeholder={t('friends.ownerPlaceholder')}
-                  />
-                </div>
-              </div>
-
-              <div className="group relative">
-                <label htmlFor="friend-url" className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide">
-                  {t('friends.siteUrl')}
-                </label>
-                <input
-                  id="friend-url"
-                  type="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                  placeholder="https://your-site.com"
-                />
-              </div>
-
-              <div className="group relative">
-                <label htmlFor="friend-desc" className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide">
-                  {t('friends.siteDesc')}
-                </label>
-                <textarea
-                  id="friend-desc"
-                  name="desc"
-                  value={formData.desc}
-                  onChange={handleChange}
-                  rows={2}
-                  className="w-full resize-none rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                  placeholder={t('friends.descPlaceholder')}
-                />
-              </div>
-
-              <div className="group relative">
-                <label htmlFor="friend-image" className="mb-1.5 block font-bold text-gray-400 text-xs uppercase tracking-wide">
-                  {t('friends.avatarUrl')}
-                </label>
-                <input
-                  id="friend-image"
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 px-4 py-2.5 font-bold text-gray-700 text-sm transition-all focus:border-pink-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-pink-100 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-pink-700 dark:focus:bg-gray-800 dark:focus:ring-pink-900/30"
-                  placeholder="https://..."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side: Preview / Code */}
-          <div className="relative flex flex-col justify-center rounded-xl bg-gray-50 p-6 md:p-3 dark:bg-gray-800/50">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-bold text-xl uppercase tracking-wider">{t('friends.previewTitle')}</h3>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="group relative px-3 py-2 font-bold text-base transition-transform hover:-translate-y-1 dark:text-white"
-              >
-                <div className="absolute inset-0 rotate-[1deg] rounded-lg border-2 border-foreground border-dashed transition-all group-hover:rotate-0 dark:border-white"></div>
-                {copied ? t('friends.copiedConfig') : t('friends.copyConfig')}
-              </button>
-            </div>
-
-            <div className="relative flex-1 overflow-hidden rounded-xl border-2 border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-950/50">
-              <pre className="whitespace-pre-wrap font-mono text-gray-600 text-xs leading-relaxed dark:text-gray-300">
-                {generateText()}
-              </pre>
-            </div>
-
-            <div className="mt-6 flex items-center gap-3 rounded-xl bg-pink-50 p-4 font-medium text-pink-600 text-xs dark:bg-pink-900/20 dark:text-pink-300">
-              {t('friends.hint')}
-            </div>
-          </div>
+        <div className="relative mb-8 overflow-hidden rounded-2xl border-2 border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-950/50">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="absolute top-4 right-4 rounded-lg bg-gray-200/50 px-4 py-2 font-bold text-gray-600 text-sm transition-colors hover:bg-gray-300/50 hover:text-gray-900 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+          <pre className="whitespace-pre-wrap font-mono text-gray-600 text-sm leading-relaxed dark:text-gray-300">
+            {yamlConfig}
+          </pre>
         </div>
       </div>
     </div>
