@@ -42,7 +42,7 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
       <source media="(max-width: 768px)" srcset={(siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" />
       <img
         transition:persist="page-home-info-avatar"
-        class="shadow-card-darker hover:animate-shake h-full w-full rounded-lg object-cover transition"
+        class="shadow-card-darker h-full w-full rounded-lg object-cover transition"
         src={(siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg)$/i, '.webp')}
         alt={`${siteConfig.name ?? ''} avatar`}
         loading="eager"
