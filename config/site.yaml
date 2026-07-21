@@ -31,15 +31,15 @@ site:
     # breadcrumbHome: Home
     # Enable slug transliteration (converts CJK characters to pinyin/romaji)
     # enableSlugTransliteration: true
-# =============================================================================
-# Internationalization (i18n)
-# 国际化配置 - 控制多语言支持
-# =============================================================================
-# defaultLocale: 默认语言代码（URL 不带前缀）
-# locales: 支持的语言列表
-#   - code: 语言代码（BCP 47 短格式，如 'zh', 'en', 'ja'）
-#   - label: 语言显示名称（如 '中文', 'English'）
-# -----------------------------------------------------------------------------
+    # =============================================================================
+    # Internationalization (i18n)
+    # 国际化配置 - 控制多语言支持
+    # =============================================================================
+    # defaultLocale: 默认语言代码（URL 不带前缀）
+    # locales: 支持的语言列表
+    #   - code: 语言代码（BCP 47 短格式，如 'zh', 'en', 'ja'）
+    #   - label: 语言显示名称（如 '中文', 'English'）
+    # -----------------------------------------------------------------------------
 i18n:
   defaultLocale: en
   locales:
@@ -66,16 +66,16 @@ categoryMap:
   # 后端: back-end
   # 算法: algorithm
   # 项目: project
-# =============================================================================
-# Featured Categories (Homepage)
-# 首页精选分类 - 在首页以卡片形式展示的分类入口
-# =============================================================================
-# 字段说明：
-#   link: 分类链接路径，对应 categoryMap 中的英文 slug
-#   label: 卡片上显示的分类名称
-#   image: 封面图片路径（相对于 public 目录）
-#   description: 分类描述文字，显示在卡片上
-# -----------------------------------------------------------------------------
+  # =============================================================================
+  # Featured Categories (Homepage)
+  # 首页精选分类 - 在首页以卡片形式展示的分类入口
+  # =============================================================================
+  # 字段说明：
+  #   link: 分类链接路径，对应 categoryMap 中的英文 slug
+  #   label: 卡片上显示的分类名称
+  #   image: 封面图片路径（相对于 public 目录）
+  #   description: 分类描述文字，显示在卡片上
+  # -----------------------------------------------------------------------------
 featuredCategories:
   - link: note
     label: Notes
@@ -168,24 +168,24 @@ social:
     #   url: https://music.163.com/#/user/home?id=your-id
     #   icon: ri:netease-cloud-music-line
     #   color: '#e60026'
-# =============================================================================
-# Friends Links
-# 友情链接页面配置 - 展示友链列表和申请说明
-# =============================================================================
-# intro: 页面介绍文字配置
-#   title: 页面标题
-#   subtitle: 页面副标题
-#   applyTitle: 申请区块标题
-#   applyDesc: 申请说明文字
-#   exampleYaml: 申请格式示例（YAML 格式）
-# data: 友链列表数组
-#   - site: 站点名称
-#   - url: 站点地址
-#   - owner: 站长昵称
-#   - desc: 站点描述/简介
-#   - image: 头像图片 URL
-#   - color: (可选) 卡片背景色，十六进制格式
-# -----------------------------------------------------------------------------
+    # =============================================================================
+    # Friends Links
+    # 友情链接页面配置 - 展示友链列表和申请说明
+    # =============================================================================
+    # intro: 页面介绍文字配置
+    #   title: 页面标题
+    #   subtitle: 页面副标题
+    #   applyTitle: 申请区块标题
+    #   applyDesc: 申请说明文字
+    #   exampleYaml: 申请格式示例（YAML 格式）
+    # data: 友链列表数组
+    #   - site: 站点名称
+    #   - url: 站点地址
+    #   - owner: 站长昵称
+    #   - desc: 站点描述/简介
+    #   - image: 头像图片 URL
+    #   - color: (可选) 卡片背景色，十六进制格式
+    # -----------------------------------------------------------------------------
 friends:
   intro:
     title: Friends
@@ -205,6 +205,24 @@ friends:
       desc: Cybersecurity and comfy tech posts
       image: https://yashfren.net/memes/apu-profile-picture.png
       color: '#88c999'
+    - site: Breachforce
+      url: https://breachforce.net/
+      owner: Breachforce
+      desc: A cybersecurity community based in Mumbai
+      image: https://breachforce.net/_next/image?url=https%3A%2F%2Fcdn.hashnode.com%2Fuploads%2Flogos%2F65b618fc35b9d2122652b543%2F384d3d43-bd39-4376-abfc-c58f541f7b3c.png&w=1080&q=75
+      color: "#e0e0e0"
+    - site: Ayush
+      url: https://ayushshukla.vercel.app/
+      owner: Awwwyush
+      desc: Math, Development and Low level blogs
+      image: https://ayushshukla.vercel.app/img/avatar.webp
+      color: "#297d7e"
+    - site: The Pensive
+      url: https://www.thepensieve.in/
+      owner: Alpy
+      desc: Security related blogs and essential writeups
+      image: https://www.thepensieve.in/mystic-logo.png
+      color: "#60328d"
 # =============================================================================
 # Announcements
 # 公告系统 - 在页面顶部显示重要通知
@@ -226,8 +244,8 @@ friends:
 # -----------------------------------------------------------------------------
 # 取消下方注释即可启用公告示例：
 # -----------------------------------------------------------------------------
-announcements:
-# - id: welcome-2026 # 唯一标识符
+announcements: # - id: welcome-2026 # 唯一标识符
+
 #   title: 2026 年新年快乐! # 公告标题
 #   content: 新年快乐! 感谢大家一直以来的支持~ # 公告内容
 #   type: success # 类型: info/success/warning/error
@@ -348,7 +366,8 @@ navigation:
   - name: 文章 # 有子菜单时，path 可省略
     nameKey: nav.posts
     icon: ri:quill-pen-ai-fill
-    children: # 子菜单列表
+    children:
+      # 子菜单列表
       - name: 分类
         nameKey: nav.categories
         path: /categories
@@ -392,69 +411,69 @@ navigation:
     #   maxIterations: 最大迭代次数，影响雪花数量
     #   mobileMaxLayers: 移动端最大层数
     #   mobileMaxIterations: 移动端最大迭代次数
-# =============================================================================
-# Comment System
-# =============================================================================
-# provider: 评论系统提供商 ('remark42' | 'giscus' | 'waline' | 'twikoo' | 'none')
-#           设为 'none' 或不设置时禁用评论系统
-# 各提供商配置：
-# -----------------------------------------------------------------------------
-#   remark42: 自托管轻量级评论系统 (https://remark42.com/docs/getting-started/installation/)
-#     host: https://comment.example.com/ # Remark42 服务器地址
-#     siteId: your-site-id # 站点 ID
-#   giscus: 基于 GitHub Discussions 的评论系统 (https://giscus.app)（介绍文章 https://zhuanlan.zhihu.com/p/693434928）
-#     repo: GitHub 仓库名 (owner/repo 格式)
-#     repoId: 仓库 ID (从 giscus.app 获取)
-#     category: Discussion 分类名称
-#     categoryId: 分类 ID (从 giscus.app 获取)
-#     mapping: 映射方式 ('pathname' | 'url' | 'title' | 'og:title'……)
-#     reactionsEnabled: 启用 reactions (默认: '1') # 仅支持 '0' | '1'
-#     emitMetadata: 发送元数据 (默认: '0') # 仅支持 '0' | '1'
-#     inputPosition: 输入框位置 ('top' | 'bottom', 默认: 'top')
-#     lang: 语言 (默认: 'zh-CN')
-#     host: 自定义 giscus 主机 (可选) 'https://giscus.app' | '...'
-#     theme: 主题 (可选) 'light' | 'dark' | '...'
-#     loading: 加载方式 (可选) 'lazy' | 'eager';
-#   waline: 简洁安全的评论系统 (https://waline.js.org)
-#     serverURL: Waline 服务端地址 (必填)
-#     lang: 语言 (默认: 'zh-CN')
-#     dark: 暗黑模式支持 (默认: 'html.dark')
-#           - 字符串: CSS 选择器，当该选择器生效时启用暗黑模式
-#           - true: 根据设备自适应
-#           - false: 禁用暗黑模式
-#     meta: 评论者信息字段 (默认: ['nick', 'mail', 'link'])
-#     requiredMeta: 必填字段 (默认: [])
-#     login: 登录模式 ('enable' | 'disable' | 'force', 默认: 'enable')
-#     wordLimit: 评论字数限制
-#           - 单个数字: 最大字数限制
-#           - 数组 [min, max]: 最小和最大字数限制
-#           - 0: 无限制 (默认: 0)
-#     pageSize: 每页评论数 (默认: 10)
-#     imageUploader: 图片上传功能 (默认: false)
-#     highlighter: 代码高亮 (默认: true)
-#     texRenderer: LaTeX 渲染 (默认: false)
-#     search: 搜索功能 (默认: false)
-#     reaction: 文章反应功能
-#           - false: 禁用 (默认)
-#           - true: 启用默认反应
-#           - 数组: 自定义反应图标 URL 列表
-#     emoji: 表情包配置
-#           - false: 禁用表情包
-#           - true: 使用默认表情包
-#           - 数组: 自定义表情包列表 (默认: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
-#     commentSorting: 评论排序方式 ('latest' | 'oldest' | 'hottest', 默认: 'latest')
-#     noCopyright: 隐藏页脚版权信息 (默认: false)
-#     comment: 评论数统计 (默认: true)
-#     pageview: 页面访问量统计 (默认: true)
-#     recaptchaV3Key: reCAPTCHA v3 Key (可选)
-#     turnstileKey: Cloudflare Turnstile Key (可选)
-#     locale: 自定义语言显示 (可选)
+    # =============================================================================
+    # Comment System
+    # =============================================================================
+    # provider: 评论系统提供商 ('remark42' | 'giscus' | 'waline' | 'twikoo' | 'none')
+    #           设为 'none' 或不设置时禁用评论系统
+    # 各提供商配置：
+    # -----------------------------------------------------------------------------
+    #   remark42: 自托管轻量级评论系统 (https://remark42.com/docs/getting-started/installation/)
+    #     host: https://comment.example.com/ # Remark42 服务器地址
+    #     siteId: your-site-id # 站点 ID
+    #   giscus: 基于 GitHub Discussions 的评论系统 (https://giscus.app)（介绍文章 https://zhuanlan.zhihu.com/p/693434928）
+    #     repo: GitHub 仓库名 (owner/repo 格式)
+    #     repoId: 仓库 ID (从 giscus.app 获取)
+    #     category: Discussion 分类名称
+    #     categoryId: 分类 ID (从 giscus.app 获取)
+    #     mapping: 映射方式 ('pathname' | 'url' | 'title' | 'og:title'……)
+    #     reactionsEnabled: 启用 reactions (默认: '1') # 仅支持 '0' | '1'
+    #     emitMetadata: 发送元数据 (默认: '0') # 仅支持 '0' | '1'
+    #     inputPosition: 输入框位置 ('top' | 'bottom', 默认: 'top')
+    #     lang: 语言 (默认: 'zh-CN')
+    #     host: 自定义 giscus 主机 (可选) 'https://giscus.app' | '...'
+    #     theme: 主题 (可选) 'light' | 'dark' | '...'
+    #     loading: 加载方式 (可选) 'lazy' | 'eager';
+    #   waline: 简洁安全的评论系统 (https://waline.js.org)
+    #     serverURL: Waline 服务端地址 (必填)
+    #     lang: 语言 (默认: 'zh-CN')
+    #     dark: 暗黑模式支持 (默认: 'html.dark')
+    #           - 字符串: CSS 选择器，当该选择器生效时启用暗黑模式
+    #           - true: 根据设备自适应
+    #           - false: 禁用暗黑模式
+    #     meta: 评论者信息字段 (默认: ['nick', 'mail', 'link'])
+    #     requiredMeta: 必填字段 (默认: [])
+    #     login: 登录模式 ('enable' | 'disable' | 'force', 默认: 'enable')
+    #     wordLimit: 评论字数限制
+    #           - 单个数字: 最大字数限制
+    #           - 数组 [min, max]: 最小和最大字数限制
+    #           - 0: 无限制 (默认: 0)
+    #     pageSize: 每页评论数 (默认: 10)
+    #     imageUploader: 图片上传功能 (默认: false)
+    #     highlighter: 代码高亮 (默认: true)
+    #     texRenderer: LaTeX 渲染 (默认: false)
+    #     search: 搜索功能 (默认: false)
+    #     reaction: 文章反应功能
+    #           - false: 禁用 (默认)
+    #           - true: 启用默认反应
+    #           - 数组: 自定义反应图标 URL 列表
+    #     emoji: 表情包配置
+    #           - false: 禁用表情包
+    #           - true: 使用默认表情包
+    #           - 数组: 自定义表情包列表 (默认: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
+    #     commentSorting: 评论排序方式 ('latest' | 'oldest' | 'hottest', 默认: 'latest')
+    #     noCopyright: 隐藏页脚版权信息 (默认: false)
+    #     comment: 评论数统计 (默认: true)
+    #     pageview: 页面访问量统计 (默认: true)
+    #     recaptchaV3Key: reCAPTCHA v3 Key (可选)
+    #     turnstileKey: Cloudflare Turnstile Key (可选)
+    #     locale: 自定义语言显示 (可选)
 
-# twikoo:
-# envId: # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
-# region: # 环境地域，默认为 ap-shanghai
-# path: # 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
-# lang: # 语言 (默认: 'zh-CN')
+    # twikoo:
+    # envId: # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
+    # region: # 环境地域，默认为 ap-shanghai
+    # path: # 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
+    # lang: # 语言 (默认: 'zh-CN')
 comment:
   provider: none # 'remark42' | 'giscus' | 'waline' | 'twikoo' | 'none'
   # remark42:
@@ -513,17 +532,17 @@ comment:
     # region: ap-shanghai              # 环境地域，默认为 ap-shanghai
     # path: location.pathname          # 用于区分不同文章的自定义 js 路径
     # lang: zh-CN                     # 语言 (默认: 'zh-CN')
-# =============================================================================
-# Analytics (Umami)
-# =============================================================================
-# id: Umami 网站 ID
-# endpoint: Umami 服务器地址
-# enabled: 是否启用统计
-# statistics_display: 统计信息显示配置
-#   token: Umami 分享链接令牌（只读，可安全暴露到客户端）
-#   article_page_views: 在文章详情页显示访问量
-#   footer_site_stats: 在页脚 Site Stats 中显示全站访问量
-# -----------------------------------------------------------------------------
+    # =============================================================================
+    # Analytics (Umami)
+    # =============================================================================
+    # id: Umami 网站 ID
+    # endpoint: Umami 服务器地址
+    # enabled: 是否启用统计
+    # statistics_display: 统计信息显示配置
+    #   token: Umami 分享链接令牌（只读，可安全暴露到客户端）
+    #   article_page_views: 在文章详情页显示访问量
+    #   footer_site_stats: 在页脚 Site Stats 中显示全站访问量
+    # -----------------------------------------------------------------------------
 analytics:
   umami:
     enabled: false
@@ -531,28 +550,28 @@ analytics:
     #   token: your-umami-share-token
     #   article_page_views: true
     #   footer_site_stats: true
-# =============================================================================
-# SEO Configuration
-# =============================================================================
-# https://github.com/alextim/astro-lib/tree/main/packages/astro-robots-txt#readme
-# robots: robots.txt 配置 (由 astro-robots-txt 自动生成)
-#   policy: 爬虫策略数组（可选，默认允许所有）
-#     - userAgent: 爬虫名称，'*' 表示所有
-#       allow: 允许路径（可为字符串或数组）
-#       disallow: 禁止路径（可为字符串或数组）
-#   host: 是否添加 Host 指令（可选，适用于 Yandex）
-# -----------------------------------------------------------------------------
+    # =============================================================================
+    # SEO Configuration
+    # =============================================================================
+    # https://github.com/alextim/astro-lib/tree/main/packages/astro-robots-txt#readme
+    # robots: robots.txt 配置 (由 astro-robots-txt 自动生成)
+    #   policy: 爬虫策略数组（可选，默认允许所有）
+    #     - userAgent: 爬虫名称，'*' 表示所有
+    #       allow: 允许路径（可为字符串或数组）
+    #       disallow: 禁止路径（可为字符串或数组）
+    #   host: 是否添加 Host 指令（可选，适用于 Yandex）
+    # -----------------------------------------------------------------------------
 seo:
   robots:
-  # policy:                          # 爬虫策略（可选，取消注释并配置）
-  #   - userAgent: '*'
-  #     allow: '/'
-  #     disallow:
-  #       - '/api/'
-  # host: true                       # 可选：添加 Host 指令（Yandex）
-# =============================================================================
-# Christmas/Seasonal Features
-# =============================================================================
+    # policy:                          # 爬虫策略（可选，取消注释并配置）
+    #   - userAgent: '*'
+    #     allow: '/'
+    #     disallow:
+    #       - '/api/'
+    # host: true                       # 可选：添加 Host 指令（Yandex）
+    # =============================================================================
+    # Christmas/Seasonal Features
+    # =============================================================================
 bgm:
   enabled: true
   audio:
@@ -583,33 +602,33 @@ christmas:
   #   maxIterations: 8 # 最大迭代次数
   #   mobileMaxLayers: 4 # 移动端最大层数
   #   mobileMaxIterations: 6 # 移动端最大迭代次数
-# =============================================================================
-# Bangumi (Media Tracking)
-# 追番页面 - 注释掉整个 bangumi 段即可关闭（页面 + 导航自动隐藏）
-# =============================================================================
-# 字段说明：
-#   userId: Bangumi 用户名或数字 ID（必填）
-#   label: 导航显示名称（可选，默认：追番）
-#   icon: 导航图标，Iconify 格式（可选，默认：ri:bilibili-fill）
-# -----------------------------------------------------------------------------
-# bangumi:
-#   userId: cosine
-#   # label: 追番
-#   # icon: ri:bilibili-fill
-# =============================================================================
-# Development Tools (Dev Only)
-# 开发工具配置 - 仅在开发环境（pnpm dev）生效
-# =============================================================================
-# 配置后，开发环境下文章页会显示编辑按钮，可快速打开本地编辑器
-# 字段说明：
-#   localProjectPath: 本地项目的绝对路径（用于生成文件完整路径）
-#   contentRelativePath: 博客内容相对于项目根目录的路径（默认: 'src/content/blog'）
-#   editors: 编辑器列表
-#     - id: 编辑器唯一标识符
-#     - name: 编辑器显示名称
-#     - icon: Iconify 图标标识（可从 https://icon-sets.iconify.design/ 中搜寻）
-#     - urlTemplate: URL 模板，支持占位符 {path}（文件绝对路径）
-# -----------------------------------------------------------------------------
+  # =============================================================================
+  # Bangumi (Media Tracking)
+  # 追番页面 - 注释掉整个 bangumi 段即可关闭（页面 + 导航自动隐藏）
+  # =============================================================================
+  # 字段说明：
+  #   userId: Bangumi 用户名或数字 ID（必填）
+  #   label: 导航显示名称（可选，默认：追番）
+  #   icon: 导航图标，Iconify 格式（可选，默认：ri:bilibili-fill）
+  # -----------------------------------------------------------------------------
+  # bangumi:
+  #   userId: cosine
+  #   # label: 追番
+  #   # icon: ri:bilibili-fill
+  # =============================================================================
+  # Development Tools (Dev Only)
+  # 开发工具配置 - 仅在开发环境（pnpm dev）生效
+  # =============================================================================
+  # 配置后，开发环境下文章页会显示编辑按钮，可快速打开本地编辑器
+  # 字段说明：
+  #   localProjectPath: 本地项目的绝对路径（用于生成文件完整路径）
+  #   contentRelativePath: 博客内容相对于项目根目录的路径（默认: 'src/content/blog'）
+  #   editors: 编辑器列表
+  #     - id: 编辑器唯一标识符
+  #     - name: 编辑器显示名称
+  #     - icon: Iconify 图标标识（可从 https://icon-sets.iconify.design/ 中搜寻）
+  #     - urlTemplate: URL 模板，支持占位符 {path}（文件绝对路径）
+  # -----------------------------------------------------------------------------
 dev:
   localProjectPath: '/home/shubh/Project/astro-koharu'
   contentRelativePath: 'src/content/blog'
