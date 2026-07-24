@@ -16,7 +16,7 @@ site:
   name: Shubh
   description: "I write about development, tech, security, and little trinkets of what I enjoy"
   avatar: /img/avatar.png
-  showLogo: false
+  showLogo: true
   author: Shubh
   url: https://shubhsec.dev
   defaultOgImage: /img/avatar.png
