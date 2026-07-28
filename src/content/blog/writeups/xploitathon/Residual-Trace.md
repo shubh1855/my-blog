@@ -2,7 +2,6 @@
 title: "Residual Trace - Xploitathon CTF"
 description: "Writeup for Residual Trace from Xploitathon."
 date: 2026-03-06 16:15:00
-cover: "/img/cover/writeups-mobile.webp"
 categories:
   - [Writeups, Xploitathon CTF]
 tags: [Xploitathon, OSINT]

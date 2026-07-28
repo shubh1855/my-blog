@@ -2,7 +2,6 @@
 title: "Mega Steel Mountain - Xploitathon CTF"
 description: "Writeup for Mega Steel Mountain from Xploitathon."
 date: 2026-03-06 15:30:00
-cover: "/img/cover/writeups-mobile.webp"
 categories:
   - [Writeups, Xploitathon CTF]
 tags:
