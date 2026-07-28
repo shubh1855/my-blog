@@ -289,9 +289,7 @@ defaultCoverList:
   - /img/cover/mechs-tired.webp
   - /img/cover/suzaku-dejected.webp
   - /img/cover/lelouch-on-sees-laptop.webp
-  - /img/cover/notes.webp
-  - /img/cover/writeups.webp
-  - /img/cover/tools.webp
+
 # =============================================================================
 # Content Processing Options
 # 内容处理选项 - 控制文章渲染和交互行为
