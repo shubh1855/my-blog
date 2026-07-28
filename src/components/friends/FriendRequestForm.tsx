@@ -1,5 +1,4 @@
-import { siteConfig, socialConfig } from '@constants/site-config';
-import { Icon } from '@iconify/react';
+import { siteConfig } from '@constants/site-config';
 import { useClipboard } from 'foxact/use-clipboard';
 import { useCallback } from 'react';
 

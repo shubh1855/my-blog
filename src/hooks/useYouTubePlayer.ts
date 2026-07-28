@@ -67,14 +67,52 @@ if (typeof window !== 'undefined' && !window.globalYtListeners) {
   window.globalYtListeners = new Set();
 }
 
+// Minimal type definitions for YouTube IFrame API
+interface YTPlayerEvent {
+  data: number;
+  target: YTPlayerInstance;
+}
+
+interface YTPlayerInstance {
+  loadVideoById: (videoId: string) => void;
+  playVideo: () => void;
+  pauseVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
+  setVolume: (volume: number) => void;
+  getVolume: () => number;
+  mute: () => void;
+  unMute: () => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getPlayerState: () => number;
+  destroy: () => void;
+}
+
+interface YTPlayerConstructor {
+  new (elementId: string, config: Record<string, unknown>): YTPlayerInstance;
+}
+
+interface YTNamespace {
+  Player: YTPlayerConstructor;
+  PlayerState: {
+    UNSTARTED: number;
+    ENDED: number;
+    PLAYING: number;
+    PAUSED: number;
+    BUFFERING: number;
+    CUED: number;
+  };
+}
+
+type YTEventListener = (event: YTPlayerEvent, type: string) => void;
+
 // Need to declare YT namespace for TypeScript
 declare global {
-  // biome-ignore lint/suspicious/noExplicitAny: YouTube IFrame API is untyped
   interface Window {
-    YT: any;
+    YT: YTNamespace;
     onYouTubeIframeAPIReady: () => void;
-    globalYtPlayer: any;
-    globalYtListeners: Set<(event: any, type: string) => void>;
+    globalYtPlayer: YTPlayerInstance | null;
+    globalYtListeners: Set<YTEventListener>;
   }
 }
 
@@ -108,7 +146,7 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  const ytPlayerRef = useRef<any>(null);
+  const ytPlayerRef = useRef<YTPlayerInstance | null>(null);
   const isReadyRef = useRef(false);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -119,7 +157,7 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
     let unmounted = false;
 
     // Create local listener
-    const handleYtEvent = (event: any, type: string) => {
+    const handleYtEvent: YTEventListener = (event, type) => {
       // Only process events if this player is the active one,
       // EXCEPT onReady which everyone should know about.
       if (type !== 'onReady' && $activePlayerId.get() !== playerId) {
@@ -205,8 +243,7 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
             rel: 0,
           },
           events: {
-            // biome-ignore lint/suspicious/noExplicitAny: YouTube IFrame API is untyped
-            onReady: (event: any) => {
+            onReady: (event: YTPlayerEvent) => {
               // Set initial volume and unmute
               const vol = getStoredVolume();
               event.target.setVolume(vol * 100);
@@ -217,14 +254,12 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
                 l(event, 'onReady');
               });
             },
-            // biome-ignore lint/suspicious/noExplicitAny: YouTube IFrame API is untyped
-            onStateChange: (event: any) => {
+            onStateChange: (event: YTPlayerEvent) => {
               window.globalYtListeners.forEach((l) => {
                 l(event, 'onStateChange');
               });
             },
-            // biome-ignore lint/suspicious/noExplicitAny: YouTube IFrame API is untyped
-            onError: (event: any) => {
+            onError: (event: YTPlayerEvent) => {
               window.globalYtListeners.forEach((l) => {
                 l(event, 'onError');
               });

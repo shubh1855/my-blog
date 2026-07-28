@@ -42,7 +42,7 @@ async function optimizeImages() {
       const metadata = await image.metadata();
 
       // 1. Optimize base image (Convert to WebP if not already, or re-compress)
-      await image.webp({ quality: 80, effort: 6 }).toFile(baseWebpPath + '.tmp');
+      await image.webp({ quality: 80, effort: 6 }).toFile(`${baseWebpPath}.tmp`);
 
       // 2. Generate mobile variant (max width 800px)
       if (metadata.width && metadata.width > 800) {
@@ -52,11 +52,11 @@ async function optimizeImages() {
           .toFile(mobileWebpPath);
       } else {
         // If it's already small, just copy the optimized base
-        await fs.copyFile(baseWebpPath + '.tmp', mobileWebpPath);
+        await fs.copyFile(`${baseWebpPath}.tmp`, mobileWebpPath);
       }
 
       // 3. Replace original file with optimized base
-      await fs.rename(baseWebpPath + '.tmp', baseWebpPath);
+      await fs.rename(`${baseWebpPath}.tmp`, baseWebpPath);
 
       // 4. Cleanup old file if it wasn't WebP
       if (!isWebp) {
