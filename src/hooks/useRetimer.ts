@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 /**
  * A hook that manages a single timer, automatically clearing the previous one
@@ -8,6 +8,15 @@ import { useCallback, useRef } from 'react';
  */
 export function useRetimer() {
   const timerIdRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Clear timer on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (timerIdRef.current !== undefined) {
+        clearTimeout(timerIdRef.current);
+      }
+    };
+  }, []);
 
   return useCallback((timerId?: ReturnType<typeof setTimeout> | null) => {
     if (timerIdRef.current !== undefined) {
