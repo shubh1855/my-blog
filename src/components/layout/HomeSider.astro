@@ -37,7 +37,7 @@ const nextPost = adjacentPosts.nextPost ? toPostRef(adjacentPosts.nextPost) : nu
 <div
   class={cn(
     'page-home-sider shadow-home-sider sticky top-0 tablet:overscroll-none self-start flex min-w-64 max-w-64 flex-col items-stretch tablet:hidden px-2',
-    isDrawer ? 'flex-1 min-h-0 overflow-hidden' : 'h-screen overflow-auto',
+    isDrawer ? 'flex-1 min-h-0 overflow-auto' : 'h-screen overflow-auto',
     className,
   )}
   transition:name={isDrawer ? 'page-home-sider-drawer' : 'page-home-sider'}
