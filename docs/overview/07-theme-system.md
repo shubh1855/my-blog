@@ -1,77 +1,77 @@
-# 主题系统实现
+# Theme System Implementation
 
-## 概述
+## Overview
 
-astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
+astro-koharu implements complete dark/light theme switching functionality, including:
 
-1. **FOUC 防护**：防止页面加载时的主题闪烁
-2. **localStorage 持久化**：记住用户偏好
-3. **系统主题跟随**：默认跟随系统设置
-4. **View Transitions 动画**：主题切换的圆形扩散动画
-5. **Astro 页面过渡兼容**：确保主题在页面切换后保持
-
----
-
-## 主题切换原理
-
-### 整体流程
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    主题系统工作流程                          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│  1. 页面加载（HTML 解析阶段）                                │
-│     - 内联脚本立即执行                                       │
-│     - 检查 localStorage.theme                               │
-│     - 检查 prefers-color-scheme                             │
-│     - 设置 <html class="dark/light">                        │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│  2. 页面渲染                                                 │
-│     - CSS 变量根据 .dark/.light 类生效                       │
-│     - ThemeToggle 组件初始化                                 │
-│     - checkbox 状态同步                                      │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│  3. 用户切换主题                                             │
-│     - checkbox 状态改变                                      │
-│     - View Transitions API 触发                             │
-│     - 圆形扩散动画                                           │
-│     - localStorage 更新                                      │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│  4. Astro 页面过渡                                           │
-│     - astro:page-load 事件                                   │
-│     - 重新检查主题                                           │
-│     - 重新绑定事件                                           │
-└─────────────────────────────────────────────────────────────┘
-```
+1. **FOUC Prevention**: Prevents theme flickering during page load
+2. **localStorage Persistence**: Remembers user preferences
+3. **System Theme Sync**: Defaults to following system settings
+4. **View Transitions Animation**: Circular expansion animation for theme toggling
+5. **Astro Page Transition Compatibility**: Ensures theme persists across page navigation
 
 ---
 
-## FOUC 防护
+## Theme Switching Principle
 
-### 什么是 FOUC？
+### Overall Workflow
 
-**FOUC**（Flash of Unstyled Content）是指页面加载时，由于主题状态未及时应用，导致页面短暂显示错误主题的现象。
+```plain
+┌─────────────────────────────────────────────────────────────┐
+│                   Theme System Workflow                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Page Load (HTML parsing phase)                          │
+│     - Inline script executes immediately                    │
+│     - Checks localStorage.theme                             │
+│     - Checks prefers-color-scheme                           │
+│     - Sets <html class="dark/light">                        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Page Render                                             │
+│     - CSS variables take effect based on .dark/.light class │
+│     - ThemeToggle component initializes                     │
+│     - Checkbox state syncs                                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. User Toggles Theme                                      │
+│     - Checkbox state changes                                │
+│     - View Transitions API triggers                         │
+│     - Circular expansion animation                          │
+│     - localStorage updates                                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Astro Page Transition                                   │
+│     - astro:page-load event                                 │
+│     - Re-checks theme                                       │
+│     - Re-binds events                                       │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### 解决方案：内联脚本
+---
 
-在 `Layout.astro` 的 `<head>` 中使用 `is:inline` 脚本：
+## FOUC Prevention
+
+### What is FOUC?
+
+**FOUC** (Flash of Unstyled Content) refers to the phenomenon where, during page load, the page briefly displays the wrong theme because the theme state has not been applied in time.
+
+### Solution: Inline Script
+
+Use an `is:inline` script in the `<head>` of `Layout.astro`:
 
 ```astro
 <!-- src/layouts/Layout.astro -->
 <head>
-  <!-- 立即执行，在 DOM 渲染前完成 -->
+  <!-- Executes immediately, completes before DOM renders -->
   <script is:inline>
     if (
       localStorage.theme === 'dark' ||
@@ -88,25 +88,25 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
 </head>
 ```
 
-### 为什么使用 `is:inline`？
+### Why use `is:inline`?
 
-| 特性 | 普通脚本 | `is:inline` 脚本 |
+| Feature | Regular Script | `is:inline` Script |
 |------|---------|-----------------|
-| 执行时机 | 延迟执行 | 立即执行 |
-| 打包处理 | 会被打包 | 保持原样 |
-| 阻塞渲染 | 否 | 是（短暂） |
-| 适用场景 | 功能脚本 | 关键初始化 |
+| Execution Timing | Deferred execution | Immediate execution |
+| Bundling | Bundled | Kept as-is |
+| Render Blocking | No | Yes (briefly) |
+| Applicable Scenarios | Feature scripts | Critical initialization |
 
 ---
 
-## ThemeToggle 组件
+## ThemeToggle Component
 
-### 完整实现
+### Complete Implementation
 
 ```astro
 <!-- src/components/theme/ThemeToggle.astro -->
 
-<!-- 切换按钮 UI -->
+<!-- Toggle button UI -->
 <div
   class="theme-toggle scale-80 cursor-pointer transition duration-300 hover:scale-90"
   id="theme-toggle-btn"
@@ -126,12 +126,12 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
     const checkbox = document.getElementById('theme-checkbox') as HTMLInputElement | null;
     if (!toggleBtn || !checkbox) return;
 
-    // 防止重复绑定事件（Astro 页面过渡时会重新执行）
+    // Prevent duplicate event binding (re-executes during Astro page transitions)
     if (toggleBtn.dataset.listenerAttached === 'true') return;
 
     const rootElement = document.documentElement;
 
-    // 同步 checkbox 状态与当前主题
+    // Sync checkbox state with current theme
     const isDarkMode = rootElement.classList.contains('dark');
     checkbox.checked = isDarkMode;
 
@@ -139,7 +139,7 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
       if (!checkbox) return;
       const isDark = checkbox.checked;
 
-      // 获取按钮位置作为动画起点
+      // Get button position as animation origin point
       const toggleElement = document.querySelector('.theme-toggle');
       let x = window.innerWidth / 2;
       let y = window.innerHeight / 2;
@@ -150,12 +150,12 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
         y = rect.top + rect.height / 2;
       }
 
-      // 添加主题过渡类
+      // Add theme transition class
       rootElement.classList.add('theme-transition');
 
-      // 检查浏览器是否支持 View Transitions API
+      // Check if browser supports View Transitions API
       if (!document.startViewTransition) {
-        // 降级处理
+        // Fallback processing
         applyTheme(isDark);
         setTimeout(() => {
           rootElement.classList.remove('theme-transition');
@@ -163,12 +163,12 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
         return;
       }
 
-      // 使用 View Transitions API
+      // Use View Transitions API
       const transition = document.startViewTransition(() => {
         applyTheme(isDark);
       });
 
-      // 设置动画起点
+      // Set animation origin point
       transition.ready
         .then(() => {
           rootElement.style.setProperty('--x', `${x}px`);
@@ -176,7 +176,7 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
         })
         .catch(console.error);
 
-      // 清理
+      // Cleanup
       transition.finished
         .then(() => rootElement.classList.remove('theme-transition'))
         .catch(() => rootElement.classList.remove('theme-transition'));
@@ -198,17 +198,17 @@ astro-koharu 实现了完整的深色/浅色主题切换功能，包括：
     toggleBtn.dataset.listenerAttached = 'true';
   }
 
-  // 首次加载
+  // Initial load
   setupThemeToggle();
 
-  // Astro 页面过渡后重新设置
+  // Re-setup after Astro page transition
   document.addEventListener('astro:page-load', setupThemeToggle);
 </script>
 ```
 
-### 关键代码解析
+### Key Code Analysis
 
-#### 1. 防止重复绑定
+#### 1. Prevent Duplicate Binding
 
 ```javascript
 if (toggleBtn.dataset.listenerAttached === 'true') return;
@@ -216,7 +216,7 @@ if (toggleBtn.dataset.listenerAttached === 'true') return;
 toggleBtn.dataset.listenerAttached = 'true';
 ```
 
-Astro 页面过渡时会重新执行脚本，需要防止事件重复绑定。
+Astro page transitions re-execute scripts, requiring duplicate event binding prevention.
 
 #### 2. View Transitions API
 
@@ -231,30 +231,30 @@ transition.ready.then(() => {
 });
 ```
 
-View Transitions API 允许在 DOM 变化时创建平滑过渡动画。
+View Transitions API allows creating smooth transition animations when the DOM changes.
 
-#### 3. Astro 页面过渡兼容
+#### 3. Astro Page Transition Compatibility
 
 ```javascript
 document.addEventListener('astro:page-load', setupThemeToggle);
 ```
 
-每次 Astro 页面过渡完成后，重新初始化组件。
+Re-initializes the component whenever an Astro page transition finishes.
 
 ---
 
-## 太阳/月亮动画
+## Sun / Moon Animation
 
-### CSS 实现
+### CSS Implementation
 
 ```css
-/* 默认状态（浅色模式）：太阳 */
+/* Default state (Light mode): Sun */
 .toggle input + div {
   border-radius: 50%;
   width: 36px;
   height: 36px;
   position: relative;
-  /* 使用 box-shadow 创建太阳主体 */
+  /* Uses box-shadow to create main sun body */
   box-shadow: inset 16px -16px 0 0 var(--theme-toggle-color, #ffbb52);
   transform: scale(1) rotate(-2deg);
   transition:
@@ -262,7 +262,7 @@ document.addEventListener('astro:page-load', setupThemeToggle);
     transform 0.4s ease 0.1s;
 }
 
-/* 太阳光线（8条） */
+/* Sun rays (8 rays) */
 .toggle input + div:after {
   content: '';
   width: 8px;
@@ -271,76 +271,76 @@ document.addEventListener('astro:page-load', setupThemeToggle);
   position: absolute;
   top: 50%;
   left: 50%;
-  /* 使用多重 box-shadow 创建光线 */
+  /* Uses multiple box-shadows to create rays */
   box-shadow:
-    0 -23px 0 var(--theme-toggle-color),     /* 上 */
-    0 23px 0 var(--theme-toggle-color),      /* 下 */
-    23px 0 0 var(--theme-toggle-color),      /* 右 */
-    -23px 0 0 var(--theme-toggle-color),     /* 左 */
-    15px 15px 0 var(--theme-toggle-color),   /* 右下 */
-    -15px 15px 0 var(--theme-toggle-color),  /* 左下 */
-    15px -15px 0 var(--theme-toggle-color),  /* 右上 */
-    -15px -15px 0 var(--theme-toggle-color); /* 左上 */
-  transform: scale(0);  /* 初始隐藏 */
+    0 -23px 0 var(--theme-toggle-color),     /* Top */
+    0 23px 0 var(--theme-toggle-color),      /* Bottom */
+    23px 0 0 var(--theme-toggle-color),      /* Right */
+    -23px 0 0 var(--theme-toggle-color),     /* Left */
+    15px 15px 0 var(--theme-toggle-color),   /* Bottom-right */
+    -15px 15px 0 var(--theme-toggle-color),  /* Bottom-left */
+    15px -15px 0 var(--theme-toggle-color),  /* Top-right */
+    -15px -15px 0 var(--theme-toggle-color); /* Top-left */
+  transform: scale(0);  /* Initially hidden */
   transition: all 0.3s ease;
 }
 
-/* 选中状态（深色模式）：月亮 */
+/* Checked state (Dark mode): Moon */
 .toggle input:checked + div {
-  /* 更大的 inset shadow 形成月亮形状 */
+  /* Larger inset shadow forms moon shape */
   box-shadow: inset 32px -32px 0 0 var(--theme-background-color, #17181c);
   transform: scale(0.5) rotate(0deg);
 }
 
-/* 月亮的圆形背景 */
+/* Moon circular background */
 .toggle input:checked + div:before {
   background: var(--theme-toggle-color, #ffbb52);
 }
 
-/* 深色模式下光线放大 */
+/* Rays expand in dark mode */
 .toggle input:checked + div:after {
   transform: scale(1.5);
 }
 ```
 
-### 动画效果图
+### Animation Diagram
 
-```
-浅色模式（太阳）              深色模式（月亮）
+```plain
+Light Mode (Sun)                   Dark Mode (Moon)
     ·  ·  ·                     ╭──────╮
    ·  ╭──╮  ·                  │      │
   ·  │    │  ·       ──→      │   ○  │
    ·  ╰──╯  ·                  │      │
     ·  ·  ·                     ╰──────╯
 
-  黄色圆 + 8条光线             圆形 + 内凹阴影
+  Yellow circle + 8 rays       Circle + inset shadow
 ```
 
 ---
 
-## View Transitions 圆形扩散动画
+## View Transitions Circular Expansion Animation
 
-### CSS 配置
+### CSS Configuration
 
 ```css
 /* src/styles/theme/theme-transition.css */
 
-/* 主题切换时的特殊动画 */
+/* Special animation during theme toggle */
 .theme-transition::view-transition-old(root),
 .theme-transition::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* 旧视图淡出 */
+/* Old view fades out */
 .theme-transition::view-transition-old(root) {
   z-index: 1;
 }
 
-/* 新视图圆形扩散 */
+/* New view circular expansion */
 .theme-transition::view-transition-new(root) {
   z-index: 9999;
-  /* 从按钮位置开始的圆形 clip-path */
+  /* Circular clip-path starting from button position */
   clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
   animation: theme-clip 0.5s ease-out forwards;
 }
@@ -355,31 +355,31 @@ document.addEventListener('astro:page-load', setupThemeToggle);
 }
 ```
 
-### 动画原理
+### Animation Principle
 
-```
-1. 点击切换按钮
+```plain
+1. Click toggle button
    ┌─────────────────────┐
    │                     │
-   │         ●          │  ← 点击位置 (--x, --y)
+   │         ●          │  ← Click position (--x, --y)
    │                     │
    └─────────────────────┘
 
-2. 圆形开始扩散
+2. Circle begins expanding
    ┌─────────────────────┐
    │      ╭────╮         │
    │     │  ●  │        │  ← circle(10%)
    │      ╰────╯         │
    └─────────────────────┘
 
-3. 继续扩大
+3. Continues expanding
    ┌─────────────────────┐
    │ ╭──────────────╮    │
    │ │       ●      │    │  ← circle(50%)
    │ ╰──────────────╯    │
    └─────────────────────┘
 
-4. 覆盖整个页面
+4. Covers entire page
    ┌─────────────────────┐
    │                     │
    │         ●          │  ← circle(150%)
@@ -389,18 +389,18 @@ document.addEventListener('astro:page-load', setupThemeToggle);
 
 ---
 
-## Astro 页面过渡兼容
+## Astro Page Transition Compatibility
 
-### 问题
+### Problem
 
-Astro 的 View Transitions 不会触发完整页面刷新，导致：
-- 主题状态可能不同步
-- 事件监听器可能丢失
+Astro's View Transitions do not trigger a full page refresh, leading to:
+- Theme state potentially out of sync
+- Event listeners potentially being lost
 
-### 解决方案
+### Solution
 
 ```javascript
-// Layout.astro - 每次页面加载后检查主题
+// Layout.astro - Check theme after every page load
 <script>
   function checkTheme() {
     if (
@@ -416,51 +416,51 @@ Astro 的 View Transitions 不会触发完整页面刷新，导致：
     }
   }
 
-  // 每次页面加载（包括过渡后）检查主题
+  // Check theme on every page load (including post-transition)
   document.addEventListener('astro:page-load', checkTheme);
 </script>
 ```
 
 ---
 
-## localStorage 持久化
+## localStorage Persistence
 
-### 存储结构
+### Storage Structure
 
 ```javascript
-// 键: 'theme'
-// 值: 'dark' | 'light' | undefined
+// Key: 'theme'
+// Value: 'dark' | 'light' | undefined
 
-localStorage.setItem('theme', 'dark');   // 深色模式
-localStorage.setItem('theme', 'light');  // 浅色模式
-localStorage.removeItem('theme');         // 跟随系统
+localStorage.setItem('theme', 'dark');   // Dark mode
+localStorage.setItem('theme', 'light');  // Light mode
+localStorage.removeItem('theme');         // Follow system
 ```
 
-### 优先级
+### Priority Order
 
 ```javascript
-// 检查顺序
+// Check sequence
 if (localStorage.theme === 'dark') {
-  // 1. 用户明确选择深色
+  // 1. User explicitly selected dark
 } else if (localStorage.theme === 'light') {
-  // 2. 用户明确选择浅色
+  // 2. User explicitly selected light
 } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  // 3. 系统偏好深色
+  // 3. System prefers dark
 } else {
-  // 4. 默认浅色
+  // 4. Default light
 }
 ```
 
 ---
 
-## CSS 变量系统
+## CSS Variable System
 
-### 主题变量定义
+### Theme Variable Definitions
 
 ```css
 /* src/styles/theme/index.css */
 
-/* 浅色模式变量 */
+/* Light mode variables */
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -468,10 +468,10 @@ if (localStorage.theme === 'dark') {
   --card-foreground: 222.2 84% 4.9%;
   --primary: 222.2 47.4% 11.2%;
   --primary-foreground: 210 40% 98%;
-  /* ... 更多变量 */
+  /* ... more variables */
 }
 
-/* 深色模式变量 */
+/* Dark mode variables */
 .dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
@@ -479,14 +479,14 @@ if (localStorage.theme === 'dark') {
   --card-foreground: 210 40% 98%;
   --primary: 210 40% 98%;
   --primary-foreground: 222.2 47.4% 11.2%;
-  /* ... 更多变量 */
+  /* ... more variables */
 }
 ```
 
-### 使用变量
+### Using Variables
 
 ```css
-/* Tailwind CSS 中使用 */
+/* Usage in Tailwind CSS */
 .bg-background {
   background-color: hsl(var(--background));
 }
@@ -495,7 +495,7 @@ if (localStorage.theme === 'dark') {
   color: hsl(var(--foreground));
 }
 
-/* 自定义 CSS 中使用 */
+/* Usage in custom CSS */
 .custom-element {
   background: hsl(var(--card));
   color: hsl(var(--card-foreground));
@@ -504,9 +504,9 @@ if (localStorage.theme === 'dark') {
 
 ---
 
-## 无障碍支持
+## Accessibility Support
 
-### ARIA 属性
+### ARIA Attributes
 
 ```html
 <div
@@ -520,10 +520,10 @@ if (localStorage.theme === 'dark') {
 </div>
 ```
 
-### 键盘支持
+### Keyboard Support
 
 ```javascript
-// 支持 Enter 和 Space 键切换
+// Supports Enter and Space key toggling
 toggleBtn.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
@@ -534,23 +534,23 @@ toggleBtn.addEventListener('keydown', (e) => {
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **FOUC 防护**：使用 `is:inline` 脚本在渲染前设置主题
-2. **View Transitions API**：实现圆形扩散动画效果
-3. **localStorage**：持久化用户主题偏好
-4. **系统主题跟随**：使用 `prefers-color-scheme` 媒体查询
-5. **Astro 兼容**：监听 `astro:page-load` 事件
-6. **CSS box-shadow**：创建太阳/月亮图标动画
-7. **CSS 变量**：实现主题色统一管理
+1. **FOUC Prevention**: Use `is:inline` script to set theme before rendering.
+2. **View Transitions API**: Achieves circular expansion animation effect.
+3. **localStorage**: Persists user theme preference.
+4. **System Theme Sync**: Uses `prefers-color-scheme` media query.
+5. **Astro Compatibility**: Listens to `astro:page-load` event.
+6. **CSS box-shadow**: Creates sun/moon icon animation.
+7. **CSS Variables**: Manages theme colors in a unified way.
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `src/components/theme/ThemeToggle.astro` | 主题切换组件 |
-| `src/layouts/Layout.astro` | 主题初始化脚本 |
-| `src/styles/theme/index.css` | 主题 CSS 变量 |
-| `src/styles/theme/theme-transition.css` | 主题过渡动画 |
+| File | Description |
+|------|-------------|
+| `src/components/theme/ThemeToggle.astro` | Theme Toggle Component |
+| `src/layouts/Layout.astro` | Theme Initialization Script |
+| `src/styles/theme/index.css` | Theme CSS Variables |
+| `src/styles/theme/theme-transition.css` | Theme Transition Animation |

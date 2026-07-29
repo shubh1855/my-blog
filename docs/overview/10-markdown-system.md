@@ -1,32 +1,32 @@
-# Markdown 解析与样式系统
+# Markdown Parsing and Styling System
 
-本文档详细介绍 astro-koharu 博客项目中的 Markdown 解析、渲染和样式美化系统。
+This document details the Markdown parsing, rendering, and style enhancement system in the astro-koharu blog project.
 
-## 目录
+## Table of Contents
 
-- [Markdown 配置](#markdown-配置)
-- [语法高亮](#语法高亮)
-- [样式系统](#样式系统)
-- [内容增强](#内容增强)
-- [目录导航](#目录导航)
-- [扩展功能](#扩展功能)
+- [Markdown Configuration](#markdown-configuration)
+- [Syntax Highlighting](#syntax-highlighting)
+- [Style System](#style-system)
+- [Content Enhancement](#content-enhancement)
+- [Table of Contents Navigation](#table-of-contents-navigation)
+- [Extended Features](#extended-features)
 
-## Markdown 配置
+## Markdown Configuration
 
-### Astro Markdown 设置
+### Astro Markdown Settings
 
-项目使用 Astro 内置的 Markdown 处理能力，配置位于 `astro.config.mjs:15-37`：
+The project uses Astro's built-in Markdown processing capabilities, configured in `astro.config.mjs:15-37`:
 
 ```javascript
 markdown: {
-  // 启用 GitHub Flavored Markdown
+  // Enable GitHub Flavored Markdown
   gfm: true,
 
-  // Rehype 插件配置
+  // Rehype plugin configuration
   rehypePlugins: [
-    rehypeSlug,                    // 自动为标题生成 ID
+    rehypeSlug,                    // Automatically generate IDs for headings
     [
-      rehypeAutolinkHeadings,      // 自动为标题生成锚点链接
+      rehypeAutolinkHeadings,      // Automatically generate anchor links for headings
       {
         behavior: 'append',
         properties: {
@@ -36,7 +36,7 @@ markdown: {
     ],
   ],
 
-  // Shiki 语法高亮配置
+  // Shiki syntax highlighting configuration
   shikiConfig: {
     themes: {
       light: 'github-light',
@@ -46,29 +46,29 @@ markdown: {
 }
 ```
 
-**关键特性：**
+**Key Features:**
 
-- **GFM 支持**：启用 GitHub Flavored Markdown，支持表格、任务列表、删除线等扩展语法
-- **自动 ID 生成**：使用 `rehype-slug` 为所有标题（h1-h6）自动生成 URL 友好的 ID
-- **自动锚点链接**：使用 `rehype-autolink-headings` 在标题后追加可点击的锚点图标
+- **GFM Support**: Enables GitHub Flavored Markdown, supporting tables, task lists, strikethrough, and other extended syntax.
+- **Automatic ID Generation**: Uses `rehype-slug` to automatically generate URL-friendly IDs for all headings (h1-h6).
+- **Automatic Anchor Links**: Uses `rehype-autolink-headings` to append clickable anchor icons after headings.
 
-### Content Collections 配置
+### Content Collections Configuration
 
-博客文章使用 Astro Content Collections 管理，Schema 定义在 `src/content/config.ts:4-21`：
+Blog posts are managed using Astro Content Collections. The schema is defined in `src/content/config.ts:4-21`:
 
 ```typescript
 const blogCollection = defineCollection({
   schema: z.object({
-    title: z.string(),                       // 文章标题
-    description: z.string().optional(),      // 描述
-    link: z.string().optional(),             // 自定义链接
-    date: z.date(),                          // 发布日期
-    cover: z.string().optional(),            // 封面图片
-    tags: z.array(z.string()).optional(),    // 标签
-    categories: z.array(z.string())          // 分类（支持嵌套）
+    title: z.string(),                       // Post title
+    description: z.string().optional(),      // Description
+    link: z.string().optional(),             // Custom link
+    date: z.date(),                          // Publication date
+    cover: z.string().optional(),            // Cover image
+    tags: z.array(z.string()).optional(),    // Tags
+    categories: z.array(z.string())          // Categories (nested support)
       .or(z.array(z.array(z.string())))
       .optional(),
-    // Hexo 兼容性字段
+    // Hexo compatibility fields
     subtitle: z.string().optional(),
     catalog: z.boolean().optional(),
     sticky: z.boolean().optional(),
@@ -76,34 +76,34 @@ const blogCollection = defineCollection({
 });
 ```
 
-**特点：**
+**Characteristics:**
 
-- 类型安全的 frontmatter 验证
-- 支持分层分类结构
-- 保持与 Hexo 博客的兼容性
+- Type-safe frontmatter validation
+- Support for hierarchical category structures
+- Maintained compatibility with Hexo blogs
 
-## 语法高亮
+## Syntax Highlighting
 
-### Shiki 集成
+### Shiki Integration
 
-项目使用 Shiki 进行代码语法高亮，支持明暗双主题：
+The project uses Shiki for code syntax highlighting, supporting dual light/dark themes:
 
-- **浅色主题**：`github-light` - 适合白天阅读
-- **深色主题**：`github-dark` - 适合夜间阅读
+- **Light Theme**: `github-light` - suitable for daytime reading
+- **Dark Theme**: `github-dark` - suitable for nighttime reading
 
-Shiki 在构建时进行语法高亮，生成的 HTML 包含内联样式，无需运行时 JavaScript。
+Shiki performs syntax highlighting at build time. The generated HTML contains inline styles with zero runtime JavaScript requirement.
 
-**优势：**
+**Advantages:**
 
-- 零运行时开销
-- 精准的语法高亮（基于 VSCode 的 TextMate 语法）
-- 主题自动跟随系统/用户偏好切换
+- Zero runtime overhead
+- Accurate syntax highlighting (based on VSCode TextMate grammars)
+- Automatic theme switching following system/user preferences
 
-## 样式系统
+## Style System
 
 ### Tailwind Typography
 
-项目使用 `@tailwindcss/typography` 插件提供基础排版样式，配置在 `tailwind.config.mjs:138`：
+The project uses the `@tailwindcss/typography` plugin to provide base typography styles, configured in `tailwind.config.mjs:138`:
 
 ```javascript
 plugins: [
@@ -112,36 +112,36 @@ plugins: [
 ];
 ```
 
-文章内容应用 `.prose` 类来获得优雅的排版效果（见 `src/pages/post/[...slug].astro:96`）：
+Article content applies the `.prose` class to achieve elegant layout effects (see `src/pages/post/[...slug].astro:96`):
 
 ```html
 <article class="prose md:prose-sm dark:prose-invert">
-  <CustomContent Content="{Content}" />
+  <CustomContent Content={Content} />
 </article>
 ```
 
-**Typography 提供的样式：**
+**Styles Provided by Typography:**
 
-- 合理的字体大小和行高
-- 段落间距和列表缩进
-- 链接、引用、代码块的默认样式
-- 响应式排版（通过 `md:prose-sm` 修饰符）
-- 深色模式支持（`dark:prose-invert`）
+- Appropriate font sizes and line heights
+- Paragraph spacing and list indentation
+- Default styles for links, blockquotes, and code blocks
+- Responsive typography (via `md:prose-sm` modifier)
+- Dark mode support (`dark:prose-invert`)
 
-### 自定义 Markdown 样式
+### Custom Markdown Styles
 
-在 `src/styles/theme/markdown.css` 中对 `.prose` 进行了深度定制：
+In `src/styles/theme/markdown.css`, deep customizations have been applied to `.prose`:
 
-#### 1. 全局设置
+#### 1. Global Settings
 
 ```css
 .prose {
-  /* 移除默认最大宽度限制 */
+  /* Remove default max-width restriction */
   max-width: none;
 }
 ```
 
-#### 2. 链接样式
+#### 2. Link Styles
 
 ```css
 .prose a {
@@ -149,16 +149,16 @@ plugins: [
 }
 ```
 
-**特点：**
+**Characteristics:**
 
-- 使用主题色 `text-primary`
-- Hover 时变为蓝色并显示下划线
-- 300ms 平滑过渡动画
+- Uses theme color `text-primary`
+- Turns blue with an underline on hover
+- Smooth 300ms transition animation
 
-#### 3. 标题锚点链接
+#### 3. Heading Anchor Links
 
 ```css
-/* 标题滚动偏移，避免被固定头部遮挡 */
+/* Heading scroll offset to prevent being hidden under sticky headers */
 .prose h1,
 h2,
 h3,
@@ -166,10 +166,10 @@ h4,
 h5,
 h6 {
   position: relative;
-  scroll-margin-top: 4rem; /* 64px 偏移 */
+  scroll-margin-top: 4rem; /* 64px offset */
 }
 
-/* 锚点图标 */
+/* Anchor icon */
 .prose a.anchor-link > span::before {
   content: '';
   width: 1em;
@@ -180,32 +180,32 @@ h6 {
   opacity: 0;
   transition: opacity 0.3s;
 
-  /* 使用 SVG mask 显示 # 图标 */
+  /* Use SVG mask to display # icon */
   background-color: currentColor;
   mask-image: url('data:image/svg+xml,...');
   /* ... */
 }
 
-/* 标题 hover 时显示锚点图标 */
+/* Show anchor icon when hovering heading */
 .prose h1:hover .anchor-link > span::before,
 .prose h2:hover .anchor-link > span::before {
   opacity: 1;
 }
 ```
 
-**工作原理：**
+**How It Works:**
 
-1. `rehype-autolink-headings` 在每个标题后插入 `<a class="anchor-link">` 元素
-2. 使用 CSS `::before` 伪元素在标题右侧显示 # 图标
-3. 默认透明，鼠标悬停时渐显
-4. `scroll-margin-top` 确保点击锚点后标题不会被固定头部遮挡
+1. `rehype-autolink-headings` inserts an `<a class="anchor-link">` element after each heading.
+2. CSS `::before` pseudo-element displays a # icon on the right side of the heading.
+3. Transparent by default, gradually appears on mouse hover.
+4. `scroll-margin-top` ensures headings are not obscured by the fixed header when anchor links are clicked.
 
-### 文章组件样式
+### Post Component Styles
 
-`src/styles/components/post.css` 提供目录（TOC）相关样式：
+`src/styles/components/post.css` provides Table of Contents (TOC) related styles:
 
 ```css
-/* 自定义滚动条 */
+/* Custom scrollbar */
 .toc-container::-webkit-scrollbar {
   width: 4px;
 }
@@ -214,7 +214,7 @@ h6 {
   border-radius: 2px;
 }
 
-/* 目录项 hover 效果 */
+/* TOC item hover effect */
 .toc-item::before {
   content: '';
   position: absolute;
@@ -229,22 +229,22 @@ h6 {
 }
 ```
 
-## 内容增强
+## Content Enhancement
 
-### CustomContent 组件
+### CustomContent Component
 
-`src/components/common/CustomContent.astro` 负责渲染 Markdown 内容并提供运行时增强功能。
+`src/components/common/CustomContent.astro` is responsible for rendering Markdown content and providing runtime enhancement features.
 
-#### 组件配置
+#### Component Configuration
 
 ```typescript
 interface ContentConfig {
-  addBlankTarget: boolean;   // 为外部链接添加 target="_blank"
-  smoothScroll: boolean;      // 启用平滑滚动
+  addBlankTarget: boolean;   // Add target="_blank" to external links
+  smoothScroll: boolean;      // Enable smooth scrolling
 }
 ```
 
-默认配置（`src/constants/content-config.ts:8-11`）：
+Default configuration (`src/constants/content-config.ts:8-11`):
 
 ```typescript
 export const defaultContentConfig: ContentConfig = {
@@ -253,12 +253,12 @@ export const defaultContentConfig: ContentConfig = {
 };
 ```
 
-#### 功能实现
+#### Feature Implementation
 
-1. **外部链接处理**（`CustomContent.astro:37-49`）
+1. **External Link Handling** (`CustomContent.astro:37-49`)
 
 ```javascript
-// 为所有外部链接添加 target="_blank"
+// Add target="_blank" to all external links
 if (config.addBlankTarget) {
   const links = contentContainer.querySelectorAll('a[href]');
   links.forEach((link) => {
@@ -270,7 +270,7 @@ if (config.addBlankTarget) {
 }
 ```
 
-2. **平滑滚动**（`CustomContent.astro:52-76`）
+2. **Smooth Scroll** (`CustomContent.astro:52-76`)
 
 ```javascript
 if (config.smoothScroll) {
@@ -286,7 +286,7 @@ if (config.smoothScroll) {
           behavior: 'smooth',
           block: 'start',
         });
-        // 更新 URL hash
+        // Update URL hash
         history.pushState(null, '', `#${targetId}`);
       }
     });
@@ -294,19 +294,19 @@ if (config.smoothScroll) {
 }
 ```
 
-**优点：**
+**Benefits:**
 
-- 平滑滚动到目标标题
-- 更新 URL 但不触发页面跳转
-- 更好的用户体验
+- Smooth scrolling to the target heading
+- Updates URL without triggering a page reload
+- Better user experience
 
-#### 生命周期
+#### Lifecycle
 
 ```javascript
-// Astro 页面切换时重新运行
+// Re-run on Astro page switch
 document.addEventListener('astro:page-load', enhanceContent);
 
-// 初次加载时运行
+// Run on initial load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', enhanceContent);
 } else {
@@ -314,58 +314,58 @@ if (document.readyState === 'loading') {
 }
 ```
 
-## 目录导航
+## Table of Contents Navigation
 
-### TableOfContents 组件
+### TableOfContents Component
 
-`src/components/layout/TableOfContents/index.tsx` 提供智能目录导航功能。
+`src/components/layout/TableOfContents/index.tsx` provides smart TOC navigation.
 
-#### 核心特性
+#### Core Features
 
-1. **自动提取标题树**
+1. **Automatic Heading Tree Extraction**
 
-使用自定义 Hook `useHeadingTree()` 从文档中提取所有标题并构建层次结构。
+Uses custom Hook `useHeadingTree()` to extract all headings from the document and build a hierarchical structure.
 
-2. **活跃标题检测**
+2. **Active Heading Detection**
 
 ```typescript
 const activeId = useActiveHeading({ offsetTop: 120 });
 ```
 
-- 滚动时自动检测当前可见的标题
-- 考虑固定头部高度偏移（120px）
-- 在目录中高亮当前标题
+- Automatically detects currently visible heading during scroll
+- Accounts for sticky header offset (120px)
+- Highlights current heading in the TOC
 
-3. **手风琴式展开**（`TableOfContents/index.tsx:40-98`）
+3. **Accordion Expansion** (`TableOfContents/index.tsx:40-98`)
 
 ```typescript
 const handleHeadingClick = useCallback((id: string) => {
-  // 滚动到目标标题
+  // Scroll to target heading
   element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  // 手风琴逻辑：
-  // 1. 关闭同级其他标题
-  // 2. 打开父级标题链
-  // 3. 如果有子标题则展开
+  // Accordion logic:
+  // 1. Close sibling headings
+  // 2. Open parent heading chain
+  // 3. Expand if child headings exist
   setExpandedIds((prev) => {
-    // ... 复杂的状态管理逻辑
+    // ... complex state management logic
   });
 }, [headings, setExpandedIds]);
 ```
 
-**用户体验：**
+**User Experience:**
 
-- 点击标题时，只展开该标题及其父级
-- 自动折叠同级其他标题，保持界面简洁
-- 平滑滚动到目标位置
+- Clicking a heading expands only that heading and its parents
+- Automatically collapses other sibling headings to keep UI clean
+- Smoothly scrolls to target location
 
-4. **分层渲染**
+4. **Hierarchical Rendering**
 
-通过 `HeadingList` 子组件递归渲染嵌套的标题结构，支持任意深度的标题层级。
+Recursively renders nested heading structures using `HeadingList` sub-components, supporting arbitrary heading depths.
 
-### 集成到侧边栏
+### Sidebar Integration
 
-目录在文章详情页的侧边栏中显示（`src/components/layout/HomeSider.astro:56`）：
+The TOC is displayed in the sidebar on post detail pages (`src/components/layout/HomeSider.astro:56`):
 
 ```html
 <div slot="directory" class="sider-slot" data-slot-type="directory">
@@ -373,22 +373,22 @@ const handleHeadingClick = useCallback((id: string) => {
 </div>
 ```
 
-**侧边栏功能：**
+**Sidebar Features:**
 
-- 分段控制（信息、目录、系列）
-- 平滑切换动画
-- 响应式：移动端隐藏，桌面端固定显示
-- 自定义滚动条样式
+- Segmented controls (Info, TOC, Series)
+- Smooth switching animations
+- Responsive: hidden on mobile, fixed display on desktop
+- Custom scrollbar styling
 
-## 扩展功能
+## Extended Features
 
-### 1. 阅读时间计算
+### 1. Reading Time Calculation
 
-虽然本文档聚焦 Markdown 解析和样式，但值得一提的是项目还包含阅读时间估算功能。
+While this document focuses on Markdown parsing and styling, it is worth noting that the project also includes reading time estimation capabilities.
 
-依赖：`reading-time` 包（`package.json:54`）
+Dependency: `reading-time` package (`package.json:54`)
 
-用法示例：
+Example usage:
 
 ```typescript
 import readingTime from 'reading-time';
@@ -398,14 +398,14 @@ console.log(stats.text); // "5 min read"
 
 ### 2. RSS Feed
 
-项目生成 RSS feed，使用 Markdown 渲染后的内容。
+The project generates an RSS feed using content rendered from Markdown.
 
-位置：`src/pages/rss.xml.ts`
-依赖：`@astrojs/rss` 包（`package.json:20`）
+Location: `src/pages/rss.xml.ts`
+Dependency: `@astrojs/rss` package (`package.json:20`)
 
-### 3. SEO 优化
+### 3. SEO Optimization
 
-文章详情页（`src/pages/post/[...slug].astro:29-41`）包含结构化数据（JSON-LD）：
+Post detail pages (`src/pages/post/[...slug].astro:29-41`) include structured data (JSON-LD):
 
 ```javascript
 const jsonLd = {
@@ -419,53 +419,53 @@ const jsonLd = {
 };
 ```
 
-**好处：**
+**Benefits:**
 
-- 帮助搜索引擎理解文章内容
-- 可能在搜索结果中显示富文本片段
-- 改善 SEO 和社交媒体分享效果
+- Helps search engines understand post content
+- May display rich text snippets in search results
+- Improves SEO and social media sharing effectiveness
 
-## 最佳实践
+## Best Practices
 
-### 编写 Markdown
+### Writing Markdown
 
-1. **使用语义化标题**
-
-   ```markdown
-   # 文章标题（仅一个 h1）
-
-   ## 主要章节
-
-   ### 小节
-
-   #### 细节
-   ```
-
-2. **利用 GFM 扩展**
+1. **Use Semantic Headings**
 
    ```markdown
-   | 表头 1 | 表头 2 |
-   | ------ | ------ |
-   | 内容   | 内容   |
+   # Post Title (only one h1)
 
-   - [x] 已完成任务
-   - [ ] 待办任务
+   ## Main Section
 
-   ~~删除线文本~~
+   ### Subsection
+
+   #### Details
    ```
 
-3. **代码块指定语言**
+2. **Leverage GFM Extensions**
+
+   ```markdown
+   | Header 1 | Header 2 |
+   | -------- | -------- |
+   | Content  | Content  |
+
+   - [x] Completed task
+   - [ ] Todo task
+
+   ~~Strikethrough text~~
+   ```
+
+3. **Specify Language for Code Blocks**
    ````markdown
    ```typescript
    const hello: string = "world";
    ```
    ````
 
-### 样式定制
+### Style Customization
 
-1. **扩展 prose 样式**
+1. **Extend Prose Styles**
 
-   在 `src/styles/theme/markdown.css` 中添加自定义规则：
+   Add custom rules in `src/styles/theme/markdown.css`:
 
    ```css
    .prose blockquote {
@@ -473,58 +473,58 @@ const jsonLd = {
    }
    ```
 
-2. **添加自定义组件**
+2. **Add Custom Components**
 
-   在 Markdown 中使用 MDX 组件：
+   Use MDX components in Markdown:
 
    ```markdown
    import { Callout } from '@components/ui/Callout';
 
    <Callout type="warning">
-   这是一个警告提示框
+   This is a warning alert box
    </Callout>
    ```
 
-3. **调整 Shiki 主题**
+3. **Adjust Shiki Themes**
 
-   修改 `astro.config.mjs` 中的 `shikiConfig.themes` 以使用不同的代码高亮主题。
+   Modify `shikiConfig.themes` in `astro.config.mjs` to use different code highlighting themes.
 
-## 文件索引
+## File Index
 
-**配置文件：**
+**Configuration Files:**
 
-- `astro.config.mjs:15-37` - Markdown 主配置
-- `tailwind.config.mjs:138` - Typography 插件
+- `astro.config.mjs:15-37` - Main Markdown configuration
+- `tailwind.config.mjs:138` - Typography plugin
 - `src/content/config.ts` - Content Collections Schema
 
-**样式文件：**
+**Style Files:**
 
-- `src/styles/theme/markdown.css` - Markdown 自定义样式
-- `src/styles/components/post.css` - 文章组件样式
-- `src/styles/global/tailwind.css` - Tailwind 基础配置
+- `src/styles/theme/markdown.css` - Custom Markdown styles
+- `src/styles/components/post.css` - Post component styles
+- `src/styles/global/tailwind.css` - Base Tailwind config
 
-**组件文件：**
+**Component Files:**
 
-- `src/components/common/CustomContent.astro` - 内容增强组件
-- `src/components/layout/TableOfContents/index.tsx` - 目录导航组件
-- `src/components/layout/HomeSider.astro` - 侧边栏容器
+- `src/components/common/CustomContent.astro` - Content enhancement component
+- `src/components/layout/TableOfContents/index.tsx` - TOC navigation component
+- `src/components/layout/HomeSider.astro` - Sidebar container
 
-**页面文件：**
+**Page Files:**
 
-- `src/pages/post/[...slug].astro` - 文章详情页模板
+- `src/pages/post/[...slug].astro` - Post detail page template
 
-**常量配置：**
+**Constant Configurations:**
 
-- `src/constants/content-config.ts` - 内容增强配置
+- `src/constants/content-config.ts` - Content enhancement configuration
 
-## 总结
+## Summary
 
-astro-koharu 的 Markdown 系统通过以下技术栈提供了强大而优雅的内容渲染能力：
+astro-koharu's Markdown system provides powerful and elegant content rendering capabilities through the following technology stack:
 
-- **Astro + Rehype** - 灵活的 Markdown 处理管线
-- **Shiki** - 高质量的语法高亮
-- **Tailwind Typography** - 专业的排版基础
-- **自定义 CSS** - 精细的样式控制
-- **React 增强组件** - 动态交互功能（目录、平滑滚动）
+- **Astro + Rehype** - Flexible Markdown processing pipeline
+- **Shiki** - High-quality syntax highlighting
+- **Tailwind Typography** - Professional typography foundation
+- **Custom CSS** - Fine-grained style control
+- **React Enhancement Components** - Dynamic interactive features (TOC, smooth scroll)
 
-这套系统在保持简洁易用的同时，为读者提供了出色的阅读体验，为作者提供了强大的内容表达能力。
+While keeping the system clean and easy to use, it delivers an outstanding reading experience for readers and powerful content expression capabilities for authors.

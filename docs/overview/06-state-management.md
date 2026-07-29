@@ -1,67 +1,67 @@
-# 状态管理（Nanostores）
+# State Management (Nanostores)
 
-## 为什么选择 Nanostores？
+## Why Nanostores?
 
-astro-koharu 使用 **Nanostores** 进行全局状态管理，而非更流行的 Redux 或 Zustand。原因如下：
+astro-koharu uses **Nanostores** for global state management instead of more popular choices like Redux or Zustand. Here is why:
 
-| 特性 | Nanostores | Redux | Zustand |
+| Feature | Nanostores | Redux | Zustand |
 |------|-----------|-------|---------|
-| 体积 | ~1KB | ~7KB | ~3KB |
-| 框架无关 | 是 | 否 | 否 |
-| Astro 支持 | 原生 | 需要适配 | 需要适配 |
-| 学习曲线 | 极低 | 高 | 中 |
-| 样板代码 | 几乎没有 | 大量 | 少量 |
+| Size | ~1KB | ~7KB | ~3KB |
+| Framework-agnostic | Yes | No | No |
+| Astro Support | Native | Needs adapter | Needs adapter |
+| Learning Curve | Very low | High | Medium |
+| Boilerplate Code | Almost none | Heavy | Light |
 
-### 核心优势
+### Core Advantages
 
-1. **极轻量**：压缩后不到 1KB
-2. **框架无关**：在 Astro 和 React 中都能使用
-3. **简单 API**：只需 `atom` 和 `useStore`
-4. **无 Provider**：不需要包裹根组件
-5. **TypeScript 友好**：完整的类型推导
+1. **Extremely Lightweight**: Less than 1KB gzipped.
+2. **Framework-agnostic**: Works seamlessly in both Astro and React.
+3. **Simple API**: Just `atom` and `useStore`.
+4. **No Provider Needed**: No wrapping of root components required.
+5. **TypeScript Friendly**: Full type inference.
 
 ---
 
-## 基础概念
+## Basic Concepts
 
-### Atom（原子状态）
+### Atom (Atomic State)
 
-Atom 是最基础的状态单元，存储单个值：
+Atom is the most basic state unit, storing a single value:
 
 ```typescript
 import { atom } from 'nanostores';
 
-// 创建一个 atom
+// Create an atom
 const count = atom<number>(0);
 
-// 读取值
+// Read value
 console.log(count.get());  // 0
 
-// 设置值
+// Set value
 count.set(1);
 
-// 订阅变化
+// Subscribe to changes
 const unsubscribe = count.subscribe((value) => {
-  console.log('新值:', value);
+  console.log('New value:', value);
 });
 
-// 取消订阅
+// Unsubscribe
 unsubscribe();
 ```
 
-### 在 React 中使用
+### Usage in React
 
 ```tsx
 import { useStore } from '@nanostores/react';
 import { count } from './store';
 
 function Counter() {
-  // useStore 会在 atom 变化时触发重渲染
+  // useStore triggers re-render when atom changes
   const value = useStore(count);
 
   return (
     <div>
-      <p>计数: {value}</p>
+      <p>Count: {value}</p>
       <button onClick={() => count.set(value + 1)}>+1</button>
     </div>
   );
@@ -70,19 +70,19 @@ function Counter() {
 
 ---
 
-## 项目中的状态架构
+## Project State Architecture
 
-```
+```plain
 src/store/
-├── app.ts      # 应用状态（侧边栏类型等）
-└── ui.ts       # UI 状态（抽屉、菜单、搜索等）
+├── app.ts      # Application state (sidebar types, etc.)
+└── ui.ts       # UI state (drawers, menus, search, etc.)
 ```
 
-### 架构图
+### Architecture Diagram
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                     Nanostores 状态层                        │
+│                    Nanostores State Layer                   │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │   app.ts                         ui.ts                      │
@@ -99,7 +99,7 @@ src/store/
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   React 组件                    Astro 组件                  │
+│   React Components              Astro Components            │
 │   ┌─────────────────────┐       ┌─────────────────────┐    │
 │   │ MenuIcon.tsx        │       │ HomeSider.astro     │    │
 │   │ DropdownNav.tsx     │       │ MobileDrawer.astro  │    │
@@ -114,100 +114,100 @@ src/store/
 
 ---
 
-## UI 状态详解
+## UI State Details
 
 ### `src/store/ui.ts`
 
 ```typescript
 /**
- * 全局 UI 状态管理
+ * Global UI State Management
  *
- * 基于 Nanostores 的全局状态，用于需要跨 Astro/React 边界通信的 UI 组件。
- * 替代了之前的 CustomEvent 模式，提供更好的类型安全和响应性。
+ * Global state based on Nanostores, used for UI components needing cross Astro/React boundary communication.
+ * Replaces the previous CustomEvent pattern, providing better type safety and reactivity.
  */
 
 import { atom } from 'nanostores';
 
 /**
- * 移动端抽屉状态
- * 控制侧边栏的显示/隐藏
- * 被 MenuIcon、HomeSider、FloatingGroup 使用
+ * Mobile drawer state
+ * Controls sidebar visibility
+ * Used by MenuIcon, HomeSider, FloatingGroup
  */
 export const drawerOpen = atom<boolean>(false);
 
 /**
- * 移动端菜单状态
- * 控制响应式导航菜单的显示/隐藏
+ * Mobile menu state
+ * Controls responsive navigation menu visibility
  */
 export const mobileMenuOpen = atom<boolean>(false);
 
 /**
- * 模态框状态
- * 通用模态框状态，供未来使用
+ * Modal state
+ * Generic modal state reserved for future use
  */
 export const modalOpen = atom<boolean>(false);
 
 /**
- * 搜索模态框状态
- * 控制搜索框的显示/隐藏
+ * Search modal state
+ * Controls search dialog visibility
  */
 export const searchOpen = atom<boolean>(false);
 
 /**
- * 便捷函数 - 切换抽屉状态
+ * Helper function - Toggle drawer state
  */
 export function toggleDrawer(): void {
   drawerOpen.set(!drawerOpen.get());
 }
 
 /**
- * 便捷函数 - 打开抽屉
+ * Helper function - Open drawer
  */
 export function openDrawer(): void {
   drawerOpen.set(true);
 }
 
 /**
- * 便捷函数 - 关闭抽屉
+ * Helper function - Close drawer
  */
 export function closeDrawer(): void {
   drawerOpen.set(false);
 }
 
 /**
- * 便捷函数 - 切换移动菜单
+ * Helper function - Toggle mobile menu
  */
 export function toggleMobileMenu(): void {
   mobileMenuOpen.set(!mobileMenuOpen.get());
 }
 
 /**
- * 便捷函数 - 切换模态框
+ * Helper function - Toggle modal
  */
 export function toggleModal(): void {
   modalOpen.set(!modalOpen.get());
 }
 
 /**
- * 便捷函数 - 切换搜索框
+ * Helper function - Toggle search
  */
 export function toggleSearch(): void {
   searchOpen.set(!searchOpen.get());
 }
 ```
 
-### 状态说明
+### State Details
 
-| 状态 | 类型 | 用途 |
+| State | Type | Purpose |
 |------|------|------|
-| `drawerOpen` | `boolean` | 移动端侧边栏抽屉 |
-| `mobileMenuOpen` | `boolean` | 移动端导航菜单 |
-| `modalOpen` | `boolean` | 通用模态框 |
-| `searchOpen` | `boolean` | 搜索对话框 |
+| `drawerOpen` | `boolean` | Mobile sidebar drawer |
+| `mobileMenuOpen` | `boolean` | Mobile navigation menu |
+| `modalOpen` | `boolean` | Generic modal |
+| `searchOpen` | `boolean` | Search dialog |
 
 ---
 
-## 应用状态详解
+## Application State Details
 
 ### `src/store/app.ts`
 
@@ -216,43 +216,43 @@ import { HomeSiderSegmentType, HomeSiderType } from '@constants/enum';
 import { atom } from 'nanostores';
 
 /**
- * 侧边栏分段类型
- * 控制侧边栏显示的内容类型（信息/目录/系列）
+ * Sidebar segment type
+ * Controls content type displayed in sidebar (info/directory/series)
  */
 export const homeSiderSegmentType = atom<HomeSiderSegmentType>(
   HomeSiderSegmentType.INFO
 );
 
 /**
- * 侧边栏类型
- * 控制侧边栏的整体模式（首页/文章页/无）
+ * Sidebar type
+ * Controls overall sidebar mode (home/post/none)
  */
 export const homeSiderType = atom<HomeSiderType>(HomeSiderType.HOME);
 ```
 
-### 枚举定义
+### Enum Definitions
 
 ```typescript
 // src/constants/enum.ts
 
 export enum HomeSiderSegmentType {
-  INFO = 'INFO',           // 信息面板
-  DIRECTORY = 'DIRECTORY', // 目录导航
-  SERIES = 'SERIES',       // 系列文章
+  INFO = 'INFO',           // Info panel
+  DIRECTORY = 'DIRECTORY', // Directory TOC navigation
+  SERIES = 'SERIES',       // Series posts
 }
 
 export enum HomeSiderType {
-  HOME = 'HOME',  // 首页模式
-  POST = 'POST',  // 文章页模式
-  NONE = 'NONE',  // 无侧边栏
+  HOME = 'HOME',  // Home page mode
+  POST = 'POST',  // Post page mode
+  NONE = 'NONE',  // No sidebar
 }
 ```
 
 ---
 
-## 在 React 组件中使用
+## Usage in React Components
 
-### MenuIcon 组件示例
+### MenuIcon Component Example
 
 ```tsx
 // src/components/ui/MenuIcon.tsx
@@ -264,16 +264,16 @@ import { useStore } from '@nanostores/react';
 import { drawerOpen, toggleDrawer } from '@store/ui';
 
 const MenuIcon = ({ className, id }: MenuIconProps) => {
-  // 1. 订阅状态
+  // 1. Subscribe to state
   const isOpen = useStore(drawerOpen);
   const controls = useAnimation();
 
-  // 2. 状态变化时触发动画
+  // 2. Trigger animation on state change
   useEffect(() => {
     controls.start(isOpen ? 'opened' : 'closed');
   }, [isOpen, controls]);
 
-  // 3. 点击时切换状态
+  // 3. Toggle state on click
   const handleToggle = () => {
     toggleDrawer();
   };
@@ -281,42 +281,42 @@ const MenuIcon = ({ className, id }: MenuIconProps) => {
   return (
     <button
       onClick={handleToggle}
-      aria-label={isOpen ? '关闭菜单' : '打开菜单'}
+      aria-label={isOpen ? 'Close menu' : 'Open menu'}
       aria-expanded={isOpen}
     >
       <svg>
         <motion.g variants={lineVariants} animate={controls} custom={1}>
           <line x1="3" y1="6" x2="21" y2="6" />
         </motion.g>
-        {/* 更多线条... */}
+        {/* More lines... */}
       </svg>
     </button>
   );
 };
 ```
 
-### 关键点
+### Key Points
 
-1. **`useStore`**：自动订阅 atom 变化，状态更新时组件重渲染
-2. **`toggleDrawer()`**：使用便捷函数而非直接 `set`
-3. **双向绑定**：UI 反映状态，点击改变状态
+1. **`useStore`**: Automatically subscribes to atom changes, re-rendering component when state updates.
+2. **`toggleDrawer()`**: Uses helper functions instead of calling `set` directly.
+3. **Two-way binding**: UI reflects state; clicks change state.
 
 ---
 
-## 在 Astro 组件中使用
+## Usage in Astro Components
 
-### 使用 `<script>` 标签
+### Using `<script>` Tags
 
 ```astro
 <!-- src/components/layout/MobileDrawer.astro -->
 <div id="mobile-drawer" class="hidden">
-  <!-- 抽屉内容 -->
+  <!-- Drawer content -->
 </div>
 
 <script>
   import { drawerOpen } from '@store/ui';
 
-  // 订阅状态变化
+  // Subscribe to state changes
   drawerOpen.subscribe((isOpen) => {
     const drawer = document.getElementById('mobile-drawer');
     if (drawer) {
@@ -326,7 +326,7 @@ const MenuIcon = ({ className, id }: MenuIconProps) => {
 </script>
 ```
 
-### 使用 React 岛屿
+### Using React Islands
 
 ```astro
 <!-- src/components/layout/HomeSider.astro -->
@@ -335,13 +335,13 @@ import { HomeSiderSegmented } from './HomeSiderSegmented';
 ---
 
 <div class="sider-container">
-  <!-- React 组件处理交互 -->
+  <!-- React component handles interaction -->
   <HomeSiderSegmented
     client:load
     defaultValue={defaultSegmentType}
   />
 
-  <!-- 静态内容 -->
+  <!-- Static content -->
   <div class="sider-content">
     <slot />
   </div>
@@ -350,103 +350,104 @@ import { HomeSiderSegmented } from './HomeSiderSegmented';
 
 ---
 
-## 状态通信流程
+## State Communication Flow
 
-### 场景：点击菜单图标打开抽屉
+### Scenario: Click Menu Icon to Open Drawer
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│  1. 用户点击 MenuIcon                                        │
+│  1. User clicks MenuIcon                                    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  2. toggleDrawer() 被调用                                    │
+│  2. toggleDrawer() is called                                │
 │     drawerOpen.set(!drawerOpen.get())                       │
 │     drawerOpen: false → true                                │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  3. 所有订阅者收到通知                                        │
+│  3. All subscribers receive notification                     │
 │                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐                  │
 │  │ MenuIcon.tsx    │  │ MobileDrawer    │                  │
-│  │ useStore() 触发 │  │ subscribe() 触发│                  │
-│  │ 重渲染          │  │ DOM 更新        │                  │
+│  │ useStore()      │  │ subscribe()     │                  │
+│  │ triggers        │  │ triggers DOM    │                  │
+│  │ re-render       │  │ update          │                  │
 │  └─────────────────┘  └─────────────────┘                  │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  4. UI 更新                                                  │
-│  - MenuIcon 动画切换到 X 形状                                │
-│  - MobileDrawer 滑入显示                                     │
+│  4. UI Updates                                              │
+│  - MenuIcon animates into X shape                           │
+│  - MobileDrawer slides into view                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 最佳实践
+## Best Practices
 
-### 1. 状态粒度
+### 1. State Granularity
 
-每个 atom 只存储一个关注点：
+Each atom stores only a single concern:
 
 ```typescript
-// ✅ 好：细粒度状态
+// ✅ Good: Fine-grained state
 export const drawerOpen = atom<boolean>(false);
 export const searchOpen = atom<boolean>(false);
 
-// ❌ 差：粗粒度状态
+// ❌ Bad: Coarse-grained state
 export const uiState = atom({
   drawerOpen: false,
   searchOpen: false,
-  // 更多...
+  // More...
 });
 ```
 
-### 2. 便捷函数
+### 2. Helper Functions
 
-为常用操作提供便捷函数：
+Provide helper functions for common operations:
 
 ```typescript
-// ✅ 好：提供语义化函数
+// ✅ Good: Provide semantic functions
 export function toggleDrawer(): void {
   drawerOpen.set(!drawerOpen.get());
 }
 
-// 使用
+// Usage
 toggleDrawer();
 
-// ❌ 差：直接操作
+// ❌ Bad: Direct manipulation
 drawerOpen.set(!drawerOpen.get());
 ```
 
-### 3. 类型安全
+### 3. Type Safety
 
-利用 TypeScript 泛型确保类型安全：
+Leverage TypeScript generics to ensure type safety:
 
 ```typescript
-// 带泛型的 atom
+// Atom with generic type
 export const homeSiderType = atom<HomeSiderType>(HomeSiderType.HOME);
 
-// 类型检查
+// Type checking
 homeSiderType.set(HomeSiderType.POST);  // ✅
-homeSiderType.set('invalid');           // ❌ 类型错误
+homeSiderType.set('invalid');           // ❌ Type error
 ```
 
-### 4. 组件解耦
+### 4. Component Decoupling
 
-状态逻辑与组件逻辑分离：
+Separate state logic from component logic:
 
 ```typescript
-// store/ui.ts - 状态定义
+// store/ui.ts - State definition
 export const drawerOpen = atom<boolean>(false);
 export function toggleDrawer(): void { /* ... */ }
 
-// MenuIcon.tsx - 只关心 UI
+// MenuIcon.tsx - Only cares about UI
 const MenuIcon = () => {
   const isOpen = useStore(drawerOpen);
   return <button onClick={toggleDrawer}>...</button>;
@@ -455,62 +456,62 @@ const MenuIcon = () => {
 
 ---
 
-## 与之前方案的对比
+## Comparison with Previous Approaches
 
-### CustomEvent 模式（旧）
+### CustomEvent Pattern (Old)
 
 ```javascript
-// 发送事件
+// Dispatch event
 window.dispatchEvent(new CustomEvent('drawer-toggle', { detail: true }));
 
-// 监听事件
+// Listen for event
 window.addEventListener('drawer-toggle', (e) => {
   const isOpen = e.detail;
-  // 更新 UI
+  // Update UI
 });
 ```
 
-**问题**：
-- 无类型安全
-- 难以追踪状态
-- 容易产生内存泄漏
+**Issues**:
+- No type safety
+- Difficult to trace state
+- Prone to memory leaks
 
-### Nanostores 模式（新）
+### Nanostores Pattern (New)
 
 ```typescript
-// 更新状态
+// Update state
 drawerOpen.set(true);
 
-// 订阅状态
+// Subscribe to state
 const unsubscribe = drawerOpen.subscribe((isOpen) => {
-  // 更新 UI
+  // Update UI
 });
 ```
 
-**优势**：
-- 完整类型推导
-- 状态可追踪
-- 自动清理订阅
+**Advantages**:
+- Full type inference
+- Traceable state
+- Automatic subscription cleanup
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **Nanostores 基础**：`atom` 创建状态，`useStore` 订阅状态
-2. **跨框架通信**：React 用 `useStore`，Astro 用 `subscribe`
-3. **状态粒度**：每个 atom 只存一个值
-4. **便捷函数**：封装常用操作，提高可读性
-5. **类型安全**：利用泛型确保状态类型正确
-6. **替代方案**：比 CustomEvent 更安全、更易维护
+1. **Nanostores Basics**: `atom` creates state, `useStore` subscribes to state.
+2. **Cross-Framework Communication**: Use `useStore` in React, `subscribe` in Astro.
+3. **State Granularity**: Each atom stores a single value.
+4. **Helper Functions**: Encapsulate common operations for better readability.
+5. **Type Safety**: Leverage generics to ensure correct state types.
+6. **Alternatives**: Safer and easier to maintain than CustomEvents.
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `src/store/app.ts` | 应用状态 |
-| `src/store/ui.ts` | UI 状态 |
-| `src/constants/enum.ts` | 状态枚举 |
-| `src/components/ui/MenuIcon.tsx` | 使用状态的组件示例 |
-| `src/components/layout/MobileDrawer.astro` | Astro 中使用状态 |
+| File | Description |
+|------|-------------|
+| `src/store/app.ts` | Application State |
+| `src/store/ui.ts` | UI State |
+| `src/constants/enum.ts` | State Enums |
+| `src/components/ui/MenuIcon.tsx` | Component Example using State |
+| `src/components/layout/MobileDrawer.astro` | Using State in Astro |

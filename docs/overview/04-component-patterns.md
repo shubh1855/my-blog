@@ -1,92 +1,92 @@
-# 组件模式与最佳实践
+# Component Patterns and Best Practices
 
-## 组件类型选择
+## Component Type Selection
 
-在 astro-koharu 中，组件分为两大类：**Astro 组件**和 **React 组件**。选择哪种类型取决于组件的功能需求。
+In astro-koharu, components are divided into two main categories: **Astro components** and **React components**. Choosing which type to use depends on the functional requirements of the component.
 
-### 选择指南
+### Selection Guide
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                     需要交互/状态吗？                        │
+│             Needs interactivity/state management?           │
 └─────────────────────────────────────────────────────────────┘
                     │
         ┌───────────┴───────────┐
         │                       │
-       否                      是
+       No                      Yes
         │                       │
         ▼                       ▼
 ┌───────────────────┐   ┌───────────────────┐
-│   Astro 组件      │   │   React 组件      │
+│   Astro Component │   │   React Component │
 │   (.astro)        │   │   (.tsx)          │
 │                   │   │                   │
-│ - 静态内容        │   │ - 交互功能        │
-│ - 布局           │   │ - 状态管理        │
-│ - SEO 元数据     │   │ - 动画           │
-│ - 服务端数据获取  │   │ - 实时更新        │
+│ - Static content  │   │ - Interactive     │
+│ - Layout          │   │ - State mgmt      │
+│ - SEO metadata    │   │ - Animation       │
+│ - Server data     │   │ - Real-time update│
 └───────────────────┘   └───────────────────┘
 ```
 
-### 实际对比
+### Practical Comparison
 
-| 场景 | 组件类型 | 示例 |
+| Scenario | Component Type | Example |
 |------|---------|------|
-| 页面布局 | Astro | `Layout.astro` |
-| 文章列表（静态） | Astro | `PostList.astro` |
-| 导航菜单 | Astro + React | `Navigator.astro` + `DropdownNav.tsx` |
-| 主题切换 | Astro（内联脚本） | `ThemeToggle.astro` |
-| 搜索对话框 | React | `SearchDialog.tsx` |
-| 侧边栏目录 | React | `TableOfContents.tsx` |
-| 分页器 | Astro | `Paginator.astro` |
+| Page layout | Astro | `Layout.astro` |
+| Post list (static) | Astro | `PostList.astro` |
+| Navigation menu | Astro + React | `Navigator.astro` + `DropdownNav.tsx` |
+| Theme toggle | Astro (inline script) | `ThemeToggle.astro` |
+| Search dialog | React | `SearchDialog.tsx` |
+| Sidebar TOC | React | `TableOfContents.tsx` |
+| Paginator | Astro | `Paginator.astro` |
 
 ---
 
-## 客户端指令详解
+## Client Directives Detailed
 
-当 React 组件需要在 Astro 页面中使用时，必须添加 `client:*` 指令来激活 JavaScript。
+When a React component needs to be used in an Astro page, a `client:*` directive must be added to activate JavaScript.
 
-### 指令类型
+### Directive Types
 
 ```astro
-<!-- 页面加载时立即激活 -->
+<!-- Hydrate immediately on page load -->
 <ThemeToggle client:load />
 
-<!-- 浏览器空闲时激活 -->
+<!-- Hydrate once browser is idle -->
 <MenuIcon client:idle />
 
-<!-- 组件可见时激活 -->
+<!-- Hydrate once component is visible in viewport -->
 <SearchDialog client:visible />
 
-<!-- 媒体查询匹配时激活 -->
+<!-- Hydrate when media query matches -->
 <MobileNav client:media="(max-width: 768px)" />
 
-<!-- 仅客户端渲染（跳过 SSR） -->
+<!-- Client-only render (skips SSR) -->
 <ClientOnlyComponent client:only="react" />
 ```
 
-### 选择策略
+### Selection Strategy
 
 ```typescript
-// 1. 关键交互 - 使用 client:load
-// 用户需要立即使用的功能
+// 1. Critical interaction - Use client:load
+// Features users need to use immediately
 <ThemeToggle client:load />
 <Navigator client:load />
 
-// 2. 非关键功能 - 使用 client:idle
-// 可以延迟加载的功能
+// 2. Non-critical features - Use client:idle
+// Features that can be lazily loaded
 <MenuIcon client:idle />
 
-// 3. 视口外内容 - 使用 client:visible
-// 需要滚动才能看到的内容
+// 3. Off-screen content - Use client:visible
+// Content visible only after scrolling
 <Comments client:visible />
 <FooterLinks client:visible />
 
-// 4. 依赖浏览器 API - 使用 client:only
-// 无法在服务端渲染的组件
+// 4. Dependent on browser APIs - Use client:only
+// Components that cannot be rendered on the server
 <WindowSizeDisplay client:only="react" />
 ```
 
-### 在项目中的应用
+### Application in Project
 
 ```astro
 <!-- src/components/layout/Header.astro -->
@@ -95,10 +95,10 @@ import { MenuIcon } from '@components/ui/MenuIcon';
 import Navigator from './Navigator.astro';
 ---
 
-<!-- 静态导航栏 -->
+<!-- Static navbar -->
 <Navigator transition:name="page-header" />
 
-<!-- 移动端菜单按钮 - 需要交互 -->
+<!-- Mobile menu button - Needs interaction -->
 <MenuIcon
   client:load
   className="tablet:flex fixed top-0 left-3 z-52 hidden"
@@ -108,33 +108,33 @@ import Navigator from './Navigator.astro';
 
 ---
 
-## 组件通信模式
+## Component Communication Patterns
 
-### 1. Props 传递（父 → 子）
+### 1. Props Passing (Parent → Child)
 
-最简单的通信方式，适用于简单的数据传递：
+The simplest communication method, suitable for simple data passing:
 
 ```astro
-<!-- 父组件：PostPage.astro -->
+<!-- Parent Component: PostPage.astro -->
 ---
 const post = await getPost(slug);
 ---
 <PostContent post={post} />
 <SeriesNavigation client:load post={post} />
 
-<!-- 子组件：SeriesNavigation.tsx -->
+<!-- Child Component: SeriesNavigation.tsx -->
 interface SeriesNavigationProps {
   post: BlogPost;
 }
 
 const SeriesNavigation = ({ post }: SeriesNavigationProps) => {
-  // 使用 post 数据
+  // Use post data
 };
 ```
 
-### 2. Nanostores（全局状态）
+### 2. Nanostores (Global State)
 
-跨 Astro/React 边界的状态共享：
+Cross Astro/React boundary state sharing:
 
 ```typescript
 // src/store/ui.ts
@@ -148,7 +148,7 @@ export function toggleDrawer(): void {
 ```
 
 ```tsx
-// React 组件中使用
+// Used in React Component
 import { useStore } from '@nanostores/react';
 import { drawerOpen, toggleDrawer } from '@store/ui';
 
@@ -164,7 +164,7 @@ const MenuIcon = () => {
 ```
 
 ```astro
-<!-- Astro 组件中监听 -->
+<!-- Listen in Astro Component -->
 <script>
   import { drawerOpen } from '@store/ui';
 
@@ -174,14 +174,14 @@ const MenuIcon = () => {
 </script>
 ```
 
-### 3. 自定义 Web Components
+### 3. Custom Web Components
 
-用于复杂的 Astro 组件内部状态管理：
+Used for complex internal state management inside Astro components:
 
 ```astro
 <!-- src/components/layout/HomeSider.astro -->
 <script>
-  // 定义 Web Component
+  // Define Web Component
   class SiderContent extends HTMLElement {
     private infoContent: HTMLElement | null = null;
     private directoryContent: HTMLElement | null = null;
@@ -208,11 +208,11 @@ const MenuIcon = () => {
 
 ---
 
-## 错误边界设计
+## Error Boundary Design
 
-### 基础错误边界
+### Basic Error Boundary
 
-用于捕获组件树中的 JavaScript 错误：
+Used to catch JavaScript errors in the component tree:
 
 ```tsx
 // src/components/common/ErrorBoundary.tsx
@@ -248,16 +248,16 @@ export const ErrorBoundary: FC<PropsWithChildren> = ({ children }) => {
 };
 ```
 
-### 浮动 UI 专用错误边界
+### Floating UI Dedicated Error Boundary
 
-针对 Popover、Tooltip 等浮动组件的错误处理：
+Error handling specifically tailored for floating components like Popover, Tooltip:
 
 ```tsx
 // src/components/common/FloatingErrorBoundary.tsx
 
 /**
- * 浮动组件错误边界
- * 特点：错误时静默降级（渲染 null），不影响主内容
+ * Error boundary for floating components
+ * Features: Silent fallback on error (renders null), without affecting main content
  */
 class FloatingErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
@@ -265,17 +265,17 @@ class FloatingErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // 开发环境打印错误
+    // Print error in dev environment
     if (process.env.NODE_ENV !== 'production') {
       console.error('FloatingErrorBoundary caught:', error, errorInfo);
     }
-    // 生产环境可发送到 Sentry
+    // Can report to Sentry in prod environment
     this.props.onError?.(error, errorInfo);
   }
 
   render(): ReactNode {
     if (this.state.hasError) {
-      // 浮动组件失败 → 静默返回 null
+      // Floating component failure → silently return null
       return this.props.fallback ?? null;
     }
     return this.props.children;
@@ -283,7 +283,7 @@ class FloatingErrorBoundary extends Component<Props, State> {
 }
 
 /**
- * HOC：快速包装组件
+ * HOC: Quickly wrap components
  */
 export function withFloatingErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
@@ -302,7 +302,7 @@ export function withFloatingErrorBoundary<P extends object>(
 }
 ```
 
-### 使用示例
+### Usage Example
 
 ```tsx
 // src/components/layout/DropdownNav.tsx
@@ -310,13 +310,13 @@ export function withFloatingErrorBoundary<P extends object>(
 import { withFloatingErrorBoundary } from '@components/common/FloatingErrorBoundary';
 
 const DropdownNavComponent = ({ item }: DropdownNavProps) => {
-  // 组件实现...
+  // Component implementation...
 };
 
-// 1. 性能优化：memo 防止不必要的重渲染
+// 1. Performance optimization: memo prevents unnecessary re-renders
 const DropdownNav = memo(DropdownNavComponent);
 
-// 2. 错误隔离：HOC 包装
+// 2. Error isolation: HOC wrapper
 const DropdownNavWithErrorBoundary = withFloatingErrorBoundary(
   DropdownNav,
   'DropdownNav'
@@ -327,19 +327,19 @@ export default DropdownNavWithErrorBoundary;
 
 ---
 
-## 性能优化技巧
+## Performance Optimization Techniques
 
 ### 1. React.memo
 
-防止不必要的重渲染：
+Prevent unnecessary re-renders:
 
 ```tsx
-// 优化前
+// Before optimization
 const DropdownNav = ({ item }: DropdownNavProps) => {
   // ...
 };
 
-// 优化后
+// After optimization
 const DropdownNavComponent = ({ item }: DropdownNavProps) => {
   // ...
 };
@@ -349,35 +349,35 @@ const DropdownNav = memo(DropdownNavComponent);
 
 ### 2. useCallback
 
-稳定函数引用：
+Stable function references:
 
 ```tsx
-// 优化前：每次渲染创建新函数
+// Before optimization: creates new function every render
 const handleClick = () => {
   setIsOpen(!isOpen);
 };
 
-// 优化后：函数引用稳定
+// After optimization: stable function reference
 const handleClick = useCallback(() => {
   setIsOpen((prev) => !prev);
 }, []);
 ```
 
-### 3. 懒加载指令
+### 3. Lazy Loading Directives
 
 ```astro
-<!-- 视口外组件延迟加载 -->
+<!-- Off-screen component lazy loading -->
 <Comments client:visible />
 
-<!-- 空闲时加载非关键组件 -->
+<!-- Load non-critical components when idle -->
 <Analytics client:idle />
 ```
 
-### 4. 条件渲染优化
+### 4. Conditional Rendering Optimization
 
 ```astro
 ---
-// 服务端条件渲染 - 不会产生额外 JS
+// Server-side conditional rendering - produces no extra JS
 const showSidebar = post.data.catalog;
 ---
 
@@ -386,9 +386,9 @@ const showSidebar = post.data.catalog;
 
 ---
 
-## 完整组件示例
+## Complete Component Example
 
-### DropdownNav 组件分析
+### DropdownNav Component Analysis
 
 ```tsx
 // src/components/layout/DropdownNav.tsx
@@ -407,19 +407,19 @@ interface DropdownNavProps {
 }
 
 const DropdownNavComponent = ({ item, className }: DropdownNavProps) => {
-  // 1. 使用自定义 Hook 管理开关状态
+  // 1. Use custom Hook to manage open/close state
   const { isOpen, setIsOpen } = useToggle({ defaultOpen: false });
   const { name, icon, children } = item;
 
   return (
-    // 2. 使用 Popover 组件实现下拉效果
+    // 2. Use Popover component to achieve dropdown effect
     <Popover
       open={isOpen}
       onOpenChange={setIsOpen}
       placement="bottom-start"
       trigger="hover"
       render={() => (
-        // 3. 下拉菜单内容
+        // 3. Dropdown menu content
         <div className="nav-dropdown flex flex-col items-center">
           {children?.map((child: Router, index) => (
             <a
@@ -428,10 +428,10 @@ const DropdownNavComponent = ({ item, className }: DropdownNavProps) => {
               className={cn(
                 'hover:bg-gradient-shoka-button px-4 py-2 transition-colors',
                 {
-                  // 4. 动态圆角
+                  // 4. Dynamic rounded corners
                   'rounded-ss-2xl': index === 0,
                   'rounded-ee-2xl': index === children.length - 1,
-                  // 5. 当前路由高亮
+                  // 5. Current route highlight
                   'bg-gradient-shoka-button': window.location.pathname === child.path,
                 },
               )}
@@ -443,16 +443,16 @@ const DropdownNavComponent = ({ item, className }: DropdownNavProps) => {
         </div>
       )}
     >
-      {/* 6. 触发按钮 */}
+      {/* 6. Trigger button */}
       <button
         className={cn('inline-flex items-center px-4 py-2', className)}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        aria-label={`${name}菜单`}
+        aria-label={`${name} Menu`}
       >
         {icon && <Icon icon={icon} />}
         {name}
-        {/* 7. 箭头旋转动画 */}
+        {/* 7. Arrow rotation animation */}
         <Icon
           icon="ri:arrow-drop-down-fill"
           className={cn('transition-transform', {
@@ -464,10 +464,10 @@ const DropdownNavComponent = ({ item, className }: DropdownNavProps) => {
   );
 };
 
-// 8. 性能优化：memo
+// 8. Performance optimization: memo
 const DropdownNav = memo(DropdownNavComponent);
 
-// 9. 错误隔离：HOC
+// 9. Error isolation: HOC
 const DropdownNavWithErrorBoundary = withFloatingErrorBoundary(
   DropdownNav,
   'DropdownNav'
@@ -476,81 +476,81 @@ const DropdownNavWithErrorBoundary = withFloatingErrorBoundary(
 export default DropdownNavWithErrorBoundary;
 ```
 
-### 关键设计点
+### Key Design Points
 
-1. **状态管理**：使用 `useToggle` 自定义 Hook
-2. **复合组件**：Popover + 触发器 + 内容
-3. **样式组合**：`cn()` 函数合并 Tailwind 类
-4. **无障碍**：ARIA 属性支持
-5. **动画**：CSS transition 实现箭头旋转
-6. **性能**：memo 防止重渲染
-7. **错误处理**：HOC 包装错误边界
+1. **State Management**: Using `useToggle` custom Hook
+2. **Compound Component**: Popover + Trigger + Content
+3. **Style Composition**: `cn()` function combining Tailwind classes
+4. **Accessibility**: ARIA attribute support
+5. **Animation**: CSS transition implementing arrow rotation
+6. **Performance**: memo prevents re-rendering
+7. **Error Handling**: HOC wrapper for error boundary
 
 ---
 
-## 组件组织结构
+## Component Directory Structure
 
-```
+```plain
 src/components/
-├── common/              # 通用工具组件
+├── common/              # Common utility components
 │   ├── ErrorBoundary.tsx
 │   └── FloatingErrorBoundary.tsx
 │
-├── layout/              # 布局组件
-│   ├── Header.astro         # 静态头部
-│   ├── Navigator.astro      # 导航容器
-│   ├── DropdownNav.tsx      # 下拉导航（交互）
-│   ├── HomeSider.astro      # 侧边栏
-│   └── MobileDrawer.astro   # 移动端抽屉
+├── layout/              # Layout components
+│   ├── Header.astro         # Static header
+│   ├── Navigator.astro      # Navigation container
+│   ├── DropdownNav.tsx      # Dropdown navigation (interactive)
+│   ├── HomeSider.astro      # Sidebar
+│   └── MobileDrawer.astro   # Mobile drawer
 │
-├── ui/                  # 基础 UI 组件
+├── ui/                  # Base UI components
 │   ├── button.tsx
 │   ├── popover.tsx
 │   ├── card.tsx
 │   └── ...
 │
-├── post/                # 文章相关
-│   ├── PostList.astro       # 静态列表
-│   ├── PostItemCard.astro   # 静态卡片
-│   └── SeriesNavigation.tsx # 系列导航（交互）
+├── post/                # Post related
+│   ├── PostList.astro       # Static list
+│   ├── PostItemCard.astro   # Static card
+│   └── SeriesNavigation.tsx # Series navigation (interactive)
 │
-└── theme/               # 主题组件
+└── theme/               # Theme components
     └── ThemeToggle.astro
 ```
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **组件类型选择**：
-   - 静态内容 → Astro 组件
-   - 交互功能 → React 组件
-2. **客户端指令**：
-   - `client:load` - 关键交互
-   - `client:idle` - 非关键功能
-   - `client:visible` - 懒加载
-3. **通信模式**：
-   - Props - 简单数据传递
-   - Nanostores - 跨组件状态
-   - Web Components - 复杂 Astro 内部状态
-4. **错误处理**：
-   - ErrorBoundary - 通用错误捕获
-   - FloatingErrorBoundary - 浮动 UI 静默降级
-5. **性能优化**：
-   - `memo()` - 防止重渲染
-   - `useCallback()` - 稳定函数引用
-   - 客户端指令 - 控制 JS 加载时机
+1. **Component Type Selection**:
+   - Static content → Astro component
+   - Interactive functionality → React component
+2. **Client Directives**:
+   - `client:load` - Critical interaction
+   - `client:idle` - Non-critical functionality
+   - `client:visible` - Lazy loading
+3. **Communication Patterns**:
+   - Props - Simple data passing
+   - Nanostores - Cross-component state
+   - Web Components - Complex internal Astro state
+4. **Error Handling**:
+   - ErrorBoundary - General error catching
+   - FloatingErrorBoundary - Floating UI silent fallback
+5. **Performance Optimization**:
+   - `memo()` - Prevents re-rendering
+   - `useCallback()` - Stable function reference
+   - Client Directives - Controls JS loading timing
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `src/components/common/ErrorBoundary.tsx` | 通用错误边界 |
-| `src/components/common/FloatingErrorBoundary.tsx` | 浮动 UI 错误边界 |
-| `src/components/layout/Header.astro` | 页头组件 |
-| `src/components/layout/DropdownNav.tsx` | 下拉导航 |
-| `src/components/layout/Navigator.astro` | 导航容器 |
-| `src/store/ui.ts` | UI 状态管理 |
-| `src/hooks/useToggle.ts` | 开关状态 Hook |
+| File | Description |
+|------|-------------|
+| `src/components/common/ErrorBoundary.tsx` | General Error Boundary |
+| `src/components/common/FloatingErrorBoundary.tsx` | Floating UI Error Boundary |
+| `src/components/layout/Header.astro` | Page Header Component |
+| `src/components/layout/DropdownNav.tsx` | Dropdown Navigation |
+| `src/components/layout/Navigator.astro` | Navigation Container |
+| `src/store/ui.ts` | UI State Management |
+| `src/hooks/useToggle.ts` | Toggle State Hook |

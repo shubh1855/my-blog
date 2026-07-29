@@ -1,44 +1,44 @@
-# UI 组件库实现
+# UI Component Library Implementation
 
-## 设计理念
+## Design Philosophy
 
-astro-koharu 的 UI 组件库遵循 **shadcn/ui** 的设计理念：
+astro-koharu's UI component library follows the design philosophy of **shadcn/ui**:
 
-1. **组件即代码**：组件直接存放在项目中，可完全自定义
-2. **CVA 变体系统**：使用 class-variance-authority 管理样式变体
-3. **Radix UI 基础**：底层使用无样式的 Radix UI 原语
-4. **Tailwind 样式**：使用 Tailwind CSS 原子类定义样式
-5. **类型安全**：完整的 TypeScript 支持
+1. **Components as Code**: Components reside directly in the project and can be fully customized.
+2. **CVA Variant System**: Uses class-variance-authority to manage style variants.
+3. **Radix UI Foundation**: Built on top of unstyled Radix UI primitives.
+4. **Tailwind Styling**: Uses Tailwind CSS atomic classes to define styles.
+5. **Type Safety**: Complete TypeScript support.
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                    组件层次结构                              │
+│                 Component Hierarchy Structure               │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   业务组件                                                   │
+│   Business Components                                       │
 │   ├── DropdownNav                                           │
 │   ├── SearchDialog                                          │
 │   └── SeriesNavigation                                      │
 │              │                                              │
 │              ▼                                              │
-│   UI 组件 (src/components/ui/)                              │
-│   ├── Button  ─────────┬──→ CVA 变体系统                    │
+│   UI Components (src/components/ui/)                        │
+│   ├── Button  ─────────┬──→ CVA Variant System              │
 │   ├── Popover ─────────┼──→ Floating UI                     │
 │   ├── Card    ─────────┼──→ Compound Components             │
 │   └── Dialog  ─────────┼──→ Radix UI                        │
 │              │         │                                    │
 │              ▼         ▼                                    │
-│   工具函数                                                   │
-│   └── cn() ← clsx + tailwind-merge                         │
+│   Utility Functions                                         │
+│   └── cn() ← clsx + tailwind-merge                          │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 核心工具函数
+## Core Utility Functions
 
-### `cn()` 函数
+### `cn()` Function
 
 ```typescript
 // src/lib/utils.ts
@@ -50,54 +50,54 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
-**功能说明**：
+**Function Description**:
 
-1. **`clsx`**：合并多个类名，支持条件类名
-2. **`twMerge`**：智能合并 Tailwind 类，避免冲突
+1. **`clsx`**: Merges multiple class names, supporting conditional class names.
+2. **`twMerge`**: Intelligently merges Tailwind classes, avoiding conflicts.
 
-**使用示例**：
+**Usage Examples**:
 
 ```tsx
-// 基础合并
+// Basic merge
 cn('px-4 py-2', 'text-white')
 // → 'px-4 py-2 text-white'
 
-// 条件类名
+// Conditional class names
 cn('base-class', {
   'active-class': isActive,
   'disabled-class': isDisabled,
 })
-// → 'base-class active-class' (当 isActive 为 true)
+// → 'base-class active-class' (when isActive is true)
 
-// 冲突解决（twMerge 的作用）
-cn('px-4', 'px-6')  // → 'px-6' (后者覆盖前者)
+// Conflict resolution (role of twMerge)
+cn('px-4', 'px-6')  // → 'px-6' (latter overrides former)
 cn('text-red-500', 'text-blue-500')  // → 'text-blue-500'
 
-// 实际使用
+// Practical usage
 <button className={cn(
   'px-4 py-2 rounded',
   variant === 'primary' && 'bg-blue-500 text-white',
-  className  // 允许外部覆盖
+  className  // Allows external overriding
 )}>
 ```
 
 ---
 
-## Button 组件
+## Button Component
 
-### CVA 变体系统
+### CVA Variant System
 
 ```tsx
 // src/components/ui/button.tsx
 import { cva, type VariantProps } from 'class-variance-authority';
 
-// 定义变体
+// Define variants
 const buttonVariants = cva(
-  // 基础样式（所有变体共享）
+  // Base styles (shared by all variants)
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
-      // 外观变体
+      // Appearance variants
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
@@ -107,7 +107,7 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         'gradient-shoka': 'bg-gradient-shoka-button text-primary-foreground',
       },
-      // 尺寸变体
+      // Size variants
       size: {
         default: 'h-10 px-4 py-2',
         sm: 'h-9 rounded-md px-3',
@@ -115,7 +115,7 @@ const buttonVariants = cva(
         icon: 'h-10 w-10',
       },
     },
-    // 默认变体
+    // Default variants
     defaultVariants: {
       variant: 'default',
       size: 'default',
@@ -124,7 +124,7 @@ const buttonVariants = cva(
 );
 ```
 
-### 组件实现
+### Component Implementation
 
 ```tsx
 import * as React from 'react';
@@ -134,15 +134,15 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   /**
-   * 使用 asChild 时，Button 的样式会应用到子元素上
-   * 常用于包装 Link 组件
+   * When asChild is true, Button styles are applied to the child element
+   * Commonly used to wrap Link components
    */
   asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    // asChild 为 true 时，使用 Slot 渲染子元素
+    // When asChild is true, use Slot to render child elements
     const Comp = asChild ? Slot : 'button';
 
     return (
@@ -159,47 +159,47 @@ Button.displayName = 'Button';
 export { Button, buttonVariants };
 ```
 
-### 使用示例
+### Usage Examples
 
 ```tsx
-// 基础用法
+// Basic usage
 <Button variant="default" size="md">
   Click me
 </Button>
 
-// 不同变体
+// Different variants
 <Button variant="outline">Outlined</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="destructive">Delete</Button>
-<Button variant="gradient-shoka">渐变按钮</Button>
+<Button variant="gradient-shoka">Gradient Button</Button>
 
-// 不同尺寸
+// Different sizes
 <Button size="sm">Small</Button>
 <Button size="lg">Large</Button>
 <Button size="icon"><Icon /></Button>
 
-// asChild 模式（包装 Link）
+// asChild mode (wrapping Link)
 <Button asChild>
   <a href="/about">About</a>
 </Button>
 
-// 禁用状态
+// Disabled state
 <Button disabled>Disabled</Button>
 ```
 
 ---
 
-## Popover 组件
+## Popover Component
 
-### 核心特性
+### Core Features
 
-Popover 是一个复杂的浮动 UI 组件，整合了多个库：
+Popover is a complex floating UI component integrating multiple libraries:
 
-- **Floating UI**：精准定位
-- **Motion**：动画效果
-- **自定义 Hooks**：状态管理
+- **Floating UI**: Precise positioning
+- **Motion**: Animation effects
+- **Custom Hooks**: State management
 
-### 完整实现
+### Complete Implementation
 
 ```tsx
 // src/components/ui/popover.tsx
@@ -221,23 +221,23 @@ import { animation } from '@constants/design-tokens';
 import { withFloatingErrorBoundary } from '@components/common/FloatingErrorBoundary';
 
 type PopoverProps = {
-  /** 受控模式：是否打开 */
+  /** Controlled mode: whether open */
   open?: boolean;
-  /** 状态变化回调 */
+  /** State change callback */
   onOpenChange?: (open: boolean) => void;
-  /** 渲染弹出内容 */
+  /** Render popover content */
   render: (data: { close: () => void }) => React.ReactNode;
-  /** 定位方向 */
+  /** Positioning placement */
   placement?: Placement;
-  /** 触发元素 */
+  /** Trigger element */
   children: React.JSX.Element;
-  /** 自定义样式 */
+  /** Custom styles */
   className?: string;
-  /** 偏移距离 */
+  /** Offset distance */
   offset?: number;
-  /** 自定义动画 */
+  /** Custom animation */
   motionProps?: MotionProps;
-  /** 触发方式 */
+  /** Trigger method */
   trigger?: 'click' | 'hover';
 };
 
@@ -252,14 +252,14 @@ function Popover({
   motionProps,
   trigger = 'click',
 }: React.PropsWithChildren<PopoverProps>) {
-  // 1. 状态管理（支持受控/非受控）
+  // 1. State management (supports controlled/uncontrolled)
   const [isOpen, setIsOpen] = useControlledState({
     value: passedOpen,
     defaultValue: false,
     onChange: onOpenChange,
   });
 
-  // 2. 浮动定位
+  // 2. Floating positioning
   const { refs, floatingStyles, context } = useFloatingUI({
     open: isOpen,
     onOpenChange: setIsOpen,
@@ -268,7 +268,7 @@ function Popover({
     transform: false,
   });
 
-  // 3. 交互处理
+  // 3. Interaction handling
   const hover = useHover(context, {
     enabled: trigger === 'hover',
     delay: { open: 0, close: animation.duration.fast },
@@ -280,19 +280,19 @@ function Popover({
   const { getReferenceProps, getFloatingProps } = useInteractions([
     hover,
     click,
-    useDismiss(context),  // 点击外部关闭
-    useRole(context),     // ARIA 角色
+    useDismiss(context),  // Close on clicking outside
+    useRole(context),     // ARIA role
   ]);
 
   return (
     <>
-      {/* 4. 触发元素 */}
+      {/* 4. Trigger element */}
       {cloneElement(
         children,
         getReferenceProps({ ref: refs.setReference, ...children.props })
       )}
 
-      {/* 5. 弹出内容（带动画） */}
+      {/* 5. Popover content (with animation) */}
       <AnimatePresence>
         {isOpen && (
           <FloatingPortal>
@@ -320,49 +320,49 @@ function Popover({
   );
 }
 
-// 6. 错误边界包装 + memo 优化
+// 6. Error boundary wrapper + memo optimization
 const PopoverWithErrorBoundary = withFloatingErrorBoundary(Popover, 'Popover');
 export default React.memo(PopoverWithErrorBoundary);
 ```
 
-### 架构分层
+### Architecture Layering
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                      Popover 组件                           │
+│                      Popover Component                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  状态层                                                      │
-│  └── useControlledState ─→ 支持受控/非受控模式               │
+│  State Layer                                                │
+│  └── useControlledState ─→ Supports controlled/uncontrolled │
 │                                                             │
-│  定位层                                                      │
-│  └── useFloatingUI ─→ Floating UI 配置                      │
-│      ├── 自动翻转                                            │
-│      ├── 边界检测                                            │
-│      └── 偏移计算                                            │
+│  Positioning Layer                                          │
+│  └── useFloatingUI ─→ Floating UI configuration             │
+│      ├── Auto flip                                          │
+│      ├── Boundary detection                                 │
+│      └── Offset calculation                                 │
 │                                                             │
-│  交互层                                                      │
+│  Interaction Layer                                          │
 │  └── useInteractions                                        │
-│      ├── useHover ─→ hover 触发                             │
-│      ├── useClick ─→ click 触发                             │
-│      ├── useDismiss ─→ 点击外部关闭                         │
-│      └── useRole ─→ ARIA 角色                               │
+│      ├── useHover ─→ hover trigger                          │
+│      ├── useClick ─→ click trigger                          │
+│      ├── useDismiss ─→ close on click outside               │
+│      └── useRole ─→ ARIA role                               │
 │                                                             │
-│  渲染层                                                      │
-│  ├── FloatingPortal ─→ 传送到 body                          │
-│  ├── FloatingFocusManager ─→ 焦点管理                       │
-│  └── motion.div ─→ 动画效果                                 │
+│  Rendering Layer                                            │
+│  ├── FloatingPortal ─→ Portals to body                      │
+│  ├── FloatingFocusManager ─→ Focus management               │
+│  └── motion.div ─→ Animation effects                        │
 │                                                             │
-│  安全层                                                      │
-│  └── withFloatingErrorBoundary ─→ 错误隔离                  │
+│  Safety Layer                                               │
+│  └── withFloatingErrorBoundary ─→ Error isolation           │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 使用示例
+### Usage Examples
 
 ```tsx
-// Hover 触发的下拉菜单
+// Dropdown menu triggered by Hover
 <Popover
   trigger="hover"
   placement="bottom-start"
@@ -376,47 +376,47 @@ export default React.memo(PopoverWithErrorBoundary);
   <button>Menu</button>
 </Popover>
 
-// Click 触发的弹出框
+// Popover triggered by Click
 <Popover
   trigger="click"
   placement="bottom"
   offset={15}
   render={({ close }) => (
     <div className="p-4">
-      <p>弹出内容</p>
-      <Button onClick={close}>关闭</Button>
+      <p>Popover content</p>
+      <Button onClick={close}>Close</Button>
     </div>
   )}
 >
-  <Button>打开弹出框</Button>
+  <Button>Open Popover</Button>
 </Popover>
 
-// 受控模式
+// Controlled mode
 const [isOpen, setIsOpen] = useState(false);
 
 <Popover
   open={isOpen}
   onOpenChange={setIsOpen}
-  render={() => <div>内容</div>}
+  render={() => <div>Content</div>}
 >
-  <Button>触发器</Button>
+  <Button>Trigger</Button>
 </Popover>
 ```
 
 ---
 
-## Card 组件
+## Card Component
 
-### Compound Component 模式
+### Compound Component Pattern
 
-Card 采用组合组件模式，将复杂组件拆分为多个子组件：
+Card adopts the compound component pattern, splitting a complex component into multiple child components:
 
 ```tsx
 // src/components/ui/card.tsx
 import * as React from 'react';
 import { cn } from '@lib/utils';
 
-// 主容器
+// Main container
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -431,7 +431,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 );
 Card.displayName = 'Card';
 
-// 头部区域
+// Header area
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -443,7 +443,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
 );
 CardHeader.displayName = 'CardHeader';
 
-// 标题
+// Title
 const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, ...props }, ref) => (
     <h3
@@ -458,7 +458,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
 );
 CardTitle.displayName = 'CardTitle';
 
-// 描述
+// Description
 const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className, ...props }, ref) => (
     <p
@@ -470,7 +470,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
 );
 CardDescription.displayName = 'CardDescription';
 
-// 内容区域
+// Content area
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
@@ -478,7 +478,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
 );
 CardContent.displayName = 'CardContent';
 
-// 底部区域
+// Footer area
 const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -500,37 +500,37 @@ export {
 };
 ```
 
-### 使用示例
+### Usage Examples
 
 ```tsx
-// 完整卡片
+// Complete card
 <Card>
   <CardHeader>
-    <CardTitle>文章标题</CardTitle>
-    <CardDescription>这是文章的简短描述</CardDescription>
+    <CardTitle>Post Title</CardTitle>
+    <CardDescription>This is a short description of the post</CardDescription>
   </CardHeader>
   <CardContent>
-    <p>文章内容在这里...</p>
+    <p>Post content goes here...</p>
   </CardContent>
   <CardFooter>
-    <Button>阅读更多</Button>
+    <Button>Read More</Button>
   </CardFooter>
 </Card>
 
-// 简洁卡片
+// Simple card
 <Card>
   <CardContent className="pt-6">
-    <p>简单内容</p>
+    <p>Simple content</p>
   </CardContent>
 </Card>
 
-// 自定义样式
+// Custom styling
 <Card className="border-primary">
   <CardHeader className="bg-primary/10">
-    <CardTitle className="text-primary">特色卡片</CardTitle>
+    <CardTitle className="text-primary">Featured Card</CardTitle>
   </CardHeader>
   <CardContent>
-    <p>内容</p>
+    <p>Content</p>
   </CardContent>
 </Card>
 ```
@@ -539,17 +539,17 @@ export {
 
 ## useControlledState Hook
 
-### 受控/非受控模式统一
+### Controlled/Uncontrolled Mode Unification
 
 ```tsx
 // src/hooks/useControlledState.ts
 
 export interface UseControlledStateOptions<T> {
-  /** 受控值 */
+  /** Controlled value */
   value?: T;
-  /** 非受控默认值 */
+  /** Uncontrolled default value */
   defaultValue?: T;
-  /** 值变化回调 */
+  /** Value change callback */
   onChange?: (value: T) => void;
 }
 
@@ -558,38 +558,38 @@ export function useControlledState<T>({
   defaultValue,
   onChange,
 }: UseControlledStateOptions<T>): [T | undefined, (value: T) => void] {
-  // 判断是否为受控模式
+  // Determine if controlled mode
   const isControlled = controlledValue !== undefined;
   const isControlledRef = useRef(isControlled);
 
-  // 开发环境警告：模式切换
+  // Dev environment warning: mode switching
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {
       if (isControlled !== isControlledRef.current) {
         console.warn(
-          'useControlledState: 组件从' +
-          `${isControlledRef.current ? '受控' : '非受控'}切换到` +
-          `${isControlled ? '受控' : '非受控'}模式，这是反模式。`
+          'useControlledState: Component switched from ' +
+          `${isControlledRef.current ? 'controlled' : 'uncontrolled'} to ` +
+          `${isControlled ? 'controlled' : 'uncontrolled'} mode, which is an anti-pattern.`
         );
       }
     }
     isControlledRef.current = isControlled;
   }, [isControlled]);
 
-  // 非受控模式的内部状态
+  // Internal state for uncontrolled mode
   const [internalValue, setInternalValue] = useState(defaultValue);
 
-  // 返回的值
+  // Returned value
   const value = isControlled ? controlledValue : internalValue;
 
-  // 设置值的函数
+  // Function to set value
   const setValue = useCallback(
     (newValue: T) => {
-      // 非受控模式：更新内部状态
+      // Uncontrolled mode: update internal state
       if (!isControlled) {
         setInternalValue(newValue);
       }
-      // 两种模式都调用 onChange
+      // Call onChange in both modes
       onChange?.(newValue);
     },
     [isControlled, onChange],
@@ -599,10 +599,10 @@ export function useControlledState<T>({
 }
 ```
 
-### 使用场景
+### Usage Scenarios
 
 ```tsx
-// 组件支持两种模式
+// Component supporting both modes
 function Dropdown({ value, defaultValue, onChange }) {
   const [selectedValue, setSelectedValue] = useControlledState({
     value,
@@ -620,21 +620,21 @@ function Dropdown({ value, defaultValue, onChange }) {
   );
 }
 
-// 非受控使用
+// Uncontrolled usage
 <Dropdown defaultValue="option1" />
 
-// 受控使用
+// Controlled usage
 const [value, setValue] = useState('option1');
 <Dropdown value={value} onChange={setValue} />
 ```
 
 ---
 
-## 组件设计原则
+## Component Design Principles
 
-### 1. forwardRef 模式
+### 1. forwardRef Pattern
 
-所有 UI 组件都使用 `forwardRef` 转发 ref：
+All UI components use `forwardRef` to forward refs:
 
 ```tsx
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -644,17 +644,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 ```
 
-### 2. displayName 设置
+### 2. displayName Setting
 
-便于 DevTools 调试：
+Facilitates DevTools debugging:
 
 ```tsx
 Button.displayName = 'Button';
 ```
 
-### 3. 类型导出
+### 3. Type Exports
 
-导出 Props 类型供外部使用：
+Export Props types for external use:
 
 ```tsx
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -664,9 +664,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 export { Button, type ButtonProps };
 ```
 
-### 4. 默认值处理
+### 4. Default Value Handling
 
-使用 `??` 或 `defaultVariants` 处理默认值：
+Use `??` or `defaultVariants` for default values:
 
 ```tsx
 const Comp = asChild ? Slot : 'button';
@@ -675,48 +675,48 @@ const offset = offsetNum ?? 10;
 
 ---
 
-## UI 组件列表
+## UI Component List
 
-```
+```plain
 src/components/ui/
-├── button.tsx      # 按钮组件（CVA 变体示例）
-├── card.tsx        # 卡片组件（组合组件示例）
-├── popover.tsx     # 弹出框（Floating UI 示例）
-├── tooltip.tsx     # 工具提示
-├── badge.tsx       # 徽章
-├── avatar.tsx      # 头像
-├── divider.tsx     # 分割线
-├── segmented.tsx   # 分段控制器
-├── MenuIcon.tsx    # 菜单图标（动画）
-├── dialog/         # 对话框
-├── cover/          # 封面组件
-├── loading/        # 加载组件
-├── navigator/      # 导航组件
-└── segmented/      # 分段控制器
+├── button.tsx      # Button component (CVA variant example)
+├── card.tsx        # Card component (compound component example)
+├── popover.tsx     # Popover (Floating UI example)
+├── tooltip.tsx     # Tooltip
+├── badge.tsx       # Badge
+├── avatar.tsx      # Avatar
+├── divider.tsx     # Divider
+├── segmented.tsx   # Segmented control
+├── MenuIcon.tsx    # Menu icon (animated)
+├── dialog/         # Dialog
+├── cover/          # Cover components
+├── loading/        # Loading components
+├── navigator/      # Navigator components
+└── segmented/      # Segmented controls
 ```
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **CVA 变体系统**：使用 class-variance-authority 管理样式变体
-2. **cn() 函数**：clsx + tailwind-merge 智能合并类名
-3. **组合组件模式**：Card 拆分为多个子组件，灵活组合
-4. **受控/非受控统一**：useControlledState 让组件支持两种模式
-5. **Floating UI 集成**：Popover 展示浮动定位的最佳实践
-6. **forwardRef**：所有 UI 组件都应转发 ref
-7. **错误边界**：浮动组件使用 withFloatingErrorBoundary 隔离错误
+1. **CVA Variant System**: Uses class-variance-authority to manage style variants.
+2. **cn() Function**: clsx + tailwind-merge intelligently merges class names.
+3. **Compound Component Pattern**: Card is split into multiple child components for flexible composition.
+4. **Controlled/Uncontrolled Unification**: useControlledState enables components to support both modes.
+5. **Floating UI Integration**: Popover demonstrates best practices for floating positioning.
+6. **forwardRef**: All UI components should forward refs.
+7. **Error Boundaries**: Floating components use withFloatingErrorBoundary to isolate errors.
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `src/components/ui/button.tsx` | 按钮组件 |
-| `src/components/ui/card.tsx` | 卡片组件 |
-| `src/components/ui/popover.tsx` | 弹出框组件 |
-| `src/lib/utils.ts` | cn() 工具函数 |
-| `src/hooks/useControlledState.ts` | 受控状态 Hook |
-| `src/hooks/useFloatingUI.ts` | 浮动定位 Hook |
-| `src/constants/design-tokens.ts` | 设计令牌 |
+| File | Description |
+|------|-------------|
+| `src/components/ui/button.tsx` | Button Component |
+| `src/components/ui/card.tsx` | Card Component |
+| `src/components/ui/popover.tsx` | Popover Component |
+| `src/lib/utils.ts` | cn() Utility Function |
+| `src/hooks/useControlledState.ts` | Controlled State Hook |
+| `src/hooks/useFloatingUI.ts` | Floating Positioning Hook |
+| `src/constants/design-tokens.ts` | Design Tokens |

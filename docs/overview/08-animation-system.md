@@ -1,54 +1,54 @@
-# 动画系统设计
+# Animation System Design
 
-## 概述
+## Overview
 
-astro-koharu 使用 **Motion**（Framer Motion 的继任者）作为动画库，结合设计令牌系统提供一致的动画体验。
+astro-koharu uses **Motion** (the successor to Framer Motion) as its animation library, combined with the design token system to provide a consistent animation experience.
 
-### 动画层次
+### Animation Layers
 
-```
+```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                      动画系统架构                            │
+│                 Animation System Architecture               │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   设计令牌层 (design-tokens.ts)                              │
-│   ├── duration - 持续时间                                   │
-│   ├── easing - 缓动函数                                     │
-│   └── spring - Spring 配置                                  │
+│   Design Tokens Layer (design-tokens.ts)                    │
+│   ├── duration - Animation duration                         │
+│   ├── easing - Easing functions                             │
+│   └── spring - Spring configurations                        │
 │              │                                              │
 │              ▼                                              │
-│   预设层 (anim/spring.ts)                                   │
-│   ├── microDampingPreset                                   │
-│   └── microReboundPreset                                   │
+│   Presets Layer (anim/spring.ts)                            │
+│   ├── microDampingPreset                                    │
+│   └── microReboundPreset                                    │
 │              │                                              │
 │              ▼                                              │
-│   组件层                                                     │
-│   ├── MenuIcon - 菜单图标动画                                │
-│   ├── Popover - 弹出框动画                                   │
-│   └── FlippedCard - 翻转卡片动画                            │
+│   Component Layer                                           │
+│   ├── MenuIcon - Menu icon animation                        │
+│   ├── Popover - Popover animation                           │
+│   └── FlippedCard - Flipped card animation                  │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Motion 库基础
+## Motion Library Basics
 
-### 什么是 Motion？
+### What is Motion?
 
-Motion 是 Framer Motion 的继任者，提供声明式动画 API：
+Motion is the successor to Framer Motion, providing a declarative animation API:
 
 ```tsx
 import { motion } from 'motion/react';
 
-// 基础动画
+// Basic animation
 <motion.div
   initial={{ opacity: 0 }}
   animate={{ opacity: 1 }}
   exit={{ opacity: 0 }}
 />
 
-// 使用 variants
+// Using variants
 const variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
@@ -61,85 +61,85 @@ const variants = {
 />
 ```
 
-### 核心概念
+### Core Concepts
 
-| 概念 | 说明 |
+| Concept | Description |
 |------|------|
-| `motion.div` | 可动画的 DOM 元素 |
-| `initial` | 初始状态 |
-| `animate` | 目标状态 |
-| `exit` | 退出状态（需要 AnimatePresence） |
-| `transition` | 过渡配置 |
-| `variants` | 命名状态集合 |
-| `whileHover` | 悬停状态 |
-| `whileTap` | 点击状态 |
+| `motion.div` | Animatable DOM element |
+| `initial` | Initial state |
+| `animate` | Target state |
+| `exit` | Exit state (requires AnimatePresence) |
+| `transition` | Transition configuration |
+| `variants` | Named set of states |
+| `whileHover` | Hover state |
+| `whileTap` | Tap / click state |
 
 ---
 
-## 设计令牌中的动画配置
+## Animation Configurations in Design Tokens
 
 ### `src/constants/design-tokens.ts`
 
 ```typescript
 export const animation = {
-  // 持续时间（毫秒）
+  // Duration (in milliseconds)
   duration: {
-    fast: 150,      // 快速反馈
-    tween: 200,     // 过渡
-    normal: 250,    // 标准动画
-    ui: 300,        // UI 交互
-    slow: 350,      // 慢速动画
-    slower: 500,    // 更慢
-    flipCard: 600,  // 卡片翻转
+    fast: 150,      // Quick feedback
+    tween: 200,     // Transition
+    normal: 250,    // Standard animation
+    ui: 300,        // UI interaction
+    slow: 350,      // Slow animation
+    slower: 500,    // Slower
+    flipCard: 600,  // Card flip
   },
 
-  // CSS 缓动函数
+  // CSS Easing functions
   easing: {
     linear: 'linear',
     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
     easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
     easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',  // 弹性效果
+    spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',  // Spring effect
   },
 
-  // Motion Spring 配置
+  // Motion Spring configurations
   spring: {
-    // 默认 Spring（平衡）
+    // Default Spring (balanced)
     default: {
       type: 'spring',
       stiffness: 300,
       damping: 30,
     },
 
-    // 柔和 Spring（平滑）
+    // Gentle Spring (smooth)
     gentle: {
       type: 'spring',
       stiffness: 200,
       damping: 25,
     },
 
-    // 弹性 Spring（有弹跳）
+    // Wobbly Spring (bouncy)
     wobbly: {
       type: 'spring',
       stiffness: 400,
       damping: 20,
     },
 
-    // 刚性 Spring（快速响应）
+    // Stiff Spring (fast response)
     stiff: {
       type: 'spring',
       stiffness: 500,
       damping: 35,
     },
 
-    // 慢速 Spring（放松）
+    // Slow Spring (relaxed)
     slow: {
       type: 'spring',
       stiffness: 150,
       damping: 20,
     },
 
-    // 微动画预设
+    // Micro-animation presets
     microDamping: {
       type: 'spring',
       stiffness: 200,
@@ -152,7 +152,7 @@ export const animation = {
       damping: 9,
     },
 
-    // 组件专用
+    // Component-specific
     menu: {
       type: 'spring',
       stiffness: 300,
@@ -166,7 +166,7 @@ export const animation = {
     },
   },
 
-  // CSS transition 字符串
+  // CSS transition strings
   transition: {
     fast: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
     normal: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
@@ -175,37 +175,37 @@ export const animation = {
 };
 ```
 
-### Spring 参数说明
+### Spring Parameters Explanation
 
-```
-                    Spring 物理模型
+```plain
+                    Spring Physics Model
 
                     ┌─────────┐
-                    │  质量   │
+                    │  Mass   │
                     └────┬────┘
                          │
                     ╭────┴────╮
-                    │  弹簧   │ ← stiffness（刚度）
-                    │  ~~~~   │   值越大，回弹越快
+                    │ Spring  │ ← stiffness
+                    │  ~~~~   │   Higher value = faster rebound
                     ╰────┬────╯
                          │
                     ┌────┴────┐
-                    │ 阻尼器  │ ← damping（阻尼）
-                    │  ≋≋≋≋  │   值越大，震荡越少
+                    │ Damper  │ ← damping
+                    │  ≋≋≋≋  │   Higher value = less oscillation
                     └─────────┘
 
-stiffness = 300, damping = 30  →  平衡的弹性动画
-stiffness = 500, damping = 35  →  快速响应，少弹跳
-stiffness = 400, damping = 20  →  有弹跳的动画
+stiffness = 300, damping = 30  →  Balanced spring animation
+stiffness = 500, damping = 35  →  Fast response, minimal bounce
+stiffness = 400, damping = 20  →  Bouncy animation
 ```
 
 ---
 
-## 常见动画模式
+## Common Animation Patterns
 
-### 1. 菜单图标动画 (MenuIcon)
+### 1. Menu Icon Animation (MenuIcon)
 
-三条线变成 X 的动画：
+Animation converting three lines into an X:
 
 ```tsx
 // src/components/ui/MenuIcon.tsx
@@ -219,7 +219,7 @@ const lineVariants: Variants = {
   opened: (lineIndex: number) => {
     switch (lineIndex) {
       case 1:
-        // 第一条线：旋转 45°，向下移动
+        // First line: rotate 45°, move down
         return {
           rotate: 45,
           y: 6,
@@ -227,7 +227,7 @@ const lineVariants: Variants = {
           transition: animation.spring.menu,
         };
       case 2:
-        // 第二条线：消失
+        // Second line: fade out
         return {
           rotate: 0,
           y: 0,
@@ -235,7 +235,7 @@ const lineVariants: Variants = {
           transition: animation.spring.menu,
         };
       case 3:
-        // 第三条线：旋转 -45°，向上移动
+        // Third line: rotate -45°, move up
         return {
           rotate: -45,
           y: -6,
@@ -246,29 +246,29 @@ const lineVariants: Variants = {
   },
 };
 
-// 使用 useAnimation 控制
+// Controlled using useAnimation
 const controls = useAnimation();
 
 useEffect(() => {
   controls.start(isOpen ? 'opened' : 'closed');
 }, [isOpen, controls]);
 
-// SVG 中使用
+// Used in SVG
 <motion.g variants={lineVariants} animate={controls} custom={1}>
   <line x1="3" y1="6" x2="21" y2="6" />
 </motion.g>
 ```
 
-**动画效果**：
+**Animation Effect**:
 
-```
-关闭状态（三条横线）          打开状态（X）
-    ─────────                    ╲
-    ─────────         →          ╱
+```plain
+Closed State (Three horizontal lines)       Open State (X)
+    ─────────                                     ╲
+    ─────────                    →                ╱
     ─────────
 ```
 
-### 2. 弹出框动画 (Popover)
+### 2. Popover Animation (Popover)
 
 ```tsx
 // src/components/ui/popover.tsx
@@ -287,22 +287,22 @@ useEffect(() => {
 </AnimatePresence>
 ```
 
-**动画效果**：
+**Animation Effect**:
 
-```
-进入动画：
+```plain
+Enter Animation:
 opacity: 0 → 1
 scale: 0.85 → 1
 
-退出动画：
+Exit Animation:
 opacity: 1 → 0
 scale: 1 → 0.85
 ```
 
-### 3. 翻转卡片动画
+### 3. Flipped Card Animation
 
 ```tsx
-// 使用 CSS 3D 变换
+// Using CSS 3D Transforms
 const flipCardStyle = {
   perspective: '1000px',
 };
@@ -320,10 +320,10 @@ const cardBackStyle = {
 };
 ```
 
-### 4. 悬停和点击效果
+### 4. Hover and Tap Effects
 
 ```tsx
-// 通用可点击元素动画
+// Generic clickable element animation
 <motion.button
   whileHover={{ scale: 1.05 }}
   whileTap={{ scale: 0.95 }}
@@ -335,11 +335,11 @@ const cardBackStyle = {
 
 ---
 
-## AnimatePresence 使用
+## Usage of AnimatePresence
 
-### 什么是 AnimatePresence？
+### What is AnimatePresence?
 
-`AnimatePresence` 允许组件在从 React 树中移除时执行退出动画：
+`AnimatePresence` allows components to execute exit animations when removed from the React tree:
 
 ```tsx
 import { AnimatePresence, motion } from 'motion/react';
@@ -351,7 +351,7 @@ function Modal({ isOpen }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}  // 退出时执行
+          exit={{ opacity: 0 }}  // Executed on exit
         >
           Modal content
         </motion.div>
@@ -361,10 +361,10 @@ function Modal({ isOpen }) {
 }
 ```
 
-### 在项目中的应用
+### Application in the Project
 
 ```tsx
-// Popover 组件
+// Popover Component
 <AnimatePresence>
   {isOpen && (
     <FloatingPortal>
@@ -382,9 +382,9 @@ function Modal({ isOpen }) {
 
 ---
 
-## Variants 模式
+## Variants Pattern
 
-### 定义 Variants
+### Defining Variants
 
 ```tsx
 const containerVariants: Variants = {
@@ -394,7 +394,7 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,  // 子元素依次出现
+      staggerChildren: 0.1,  // Child elements appear sequentially
     },
   },
 };
@@ -411,7 +411,7 @@ const itemVariants: Variants = {
 };
 ```
 
-### 使用 Variants
+### Using Variants
 
 ```tsx
 <motion.ul
@@ -427,12 +427,12 @@ const itemVariants: Variants = {
 </motion.ul>
 ```
 
-### Custom 参数
+### Custom Parameter
 
-用于为每个子元素传递不同参数：
+Used for passing different parameters to each child element:
 
 ```tsx
-// 定义时使用函数
+// Using a function when defining
 const lineVariants: Variants = {
   opened: (lineIndex: number) => ({
     rotate: lineIndex === 1 ? 45 : -45,
@@ -440,7 +440,7 @@ const lineVariants: Variants = {
   }),
 };
 
-// 使用时传递 custom
+// Passing custom when using
 <motion.g variants={lineVariants} custom={1}>...</motion.g>
 <motion.g variants={lineVariants} custom={2}>...</motion.g>
 <motion.g variants={lineVariants} custom={3}>...</motion.g>
@@ -450,7 +450,7 @@ const lineVariants: Variants = {
 
 ## useAnimation Hook
 
-### 手动控制动画
+### Manual Animation Control
 
 ```tsx
 import { useAnimation } from 'motion/react';
@@ -458,12 +458,12 @@ import { useAnimation } from 'motion/react';
 function Component() {
   const controls = useAnimation();
 
-  // 响应状态变化
+  // Respond to state changes
   useEffect(() => {
     controls.start(isOpen ? 'opened' : 'closed');
   }, [isOpen, controls]);
 
-  // 手动触发
+  // Manually trigger
   const handleClick = async () => {
     await controls.start('hover');
     await controls.start('normal');
@@ -479,12 +479,12 @@ function Component() {
 
 ---
 
-## CSS 动画与 Motion 的选择
+## Choosing Between CSS Animations and Motion
 
-### 何时使用 CSS 动画
+### When to Use CSS Animations
 
 ```css
-/* 简单的状态过渡 */
+/* Simple state transition */
 .button {
   transition: transform 0.2s ease-out, background-color 0.2s ease-out;
 }
@@ -495,15 +495,15 @@ function Component() {
 }
 ```
 
-适用场景：
-- 简单的 hover 效果
-- 颜色/透明度过渡
-- 不需要 JavaScript 控制
+Applicable scenarios:
+- Simple hover effects
+- Color/opacity transitions
+- No JavaScript control needed
 
-### 何时使用 Motion
+### When to Use Motion
 
 ```tsx
-// 复杂的序列动画
+// Complex sequence animation
 <motion.div
   initial={{ opacity: 0, y: 50 }}
   animate={{ opacity: 1, y: 0 }}
@@ -512,27 +512,27 @@ function Component() {
 />
 ```
 
-适用场景：
-- 需要退出动画
-- 复杂的序列/交错动画
-- 需要 JavaScript 控制
-- 布局动画（LayoutGroup）
-- 手势驱动动画
+Applicable scenarios:
+- Exit animations needed
+- Complex sequence/stagger animations
+- JavaScript control required
+- Layout animations (LayoutGroup)
+- Gesture-driven animations
 
-### 项目中的选择
+### Choices in the Project
 
-| 场景 | 选择 | 原因 |
+| Scenario | Choice | Reason |
 |------|------|------|
-| 按钮 hover | CSS | 简单过渡 |
-| 菜单图标 | Motion | 复杂的路径变换 |
-| Popover | Motion | 需要 exit 动画 |
-| 链接悬停 | CSS | 简单高亮 |
-| 卡片翻转 | CSS | 3D 变换 |
-| 列表过渡 | Motion | stagger 效果 |
+| Button hover | CSS | Simple transition |
+| Menu icon | Motion | Complex path transformation |
+| Popover | Motion | Exit animation required |
+| Link hover | CSS | Simple highlight |
+| Card flip | CSS | 3D transform |
+| List transition | Motion | Stagger effect |
 
 ---
 
-## 无障碍考虑
+## Accessibility Considerations
 
 ### prefers-reduced-motion
 
@@ -553,7 +553,7 @@ function Component() {
 }
 ```
 
-### CSS 媒体查询
+### CSS Media Query
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -569,24 +569,24 @@ function Component() {
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **Motion 基础**：`motion.div`、`initial`、`animate`、`exit`
-2. **Spring 动画**：理解 `stiffness` 和 `damping` 参数
-3. **设计令牌**：统一管理动画配置
-4. **Variants**：命名状态集合，支持 `staggerChildren`
-5. **AnimatePresence**：支持退出动画
-6. **useAnimation**：手动控制动画
-7. **无障碍**：使用 `useReducedMotion` 或 CSS 媒体查询
+1. **Motion Basics**: `motion.div`, `initial`, `animate`, `exit`
+2. **Spring Animations**: Understanding `stiffness` and `damping` parameters
+3. **Design Tokens**: Unified management of animation configurations
+4. **Variants**: Named state collections, supporting `staggerChildren`
+5. **AnimatePresence**: Support for exit animations
+6. **useAnimation**: Manual control over animations
+7. **Accessibility**: Using `useReducedMotion` or CSS media queries
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
+| File | Description |
 |------|------|
-| `src/constants/design-tokens.ts` | 动画设计令牌 |
-| `src/constants/anim/spring.ts` | Spring 预设 |
-| `src/components/ui/MenuIcon.tsx` | 菜单图标动画 |
-| `src/components/ui/popover.tsx` | 弹出框动画 |
-| `src/components/post/FlippedCard.astro` | 翻转卡片 |
+| `src/constants/design-tokens.ts` | Animation design tokens |
+| `src/constants/anim/spring.ts` | Spring presets |
+| `src/components/ui/MenuIcon.tsx` | Menu icon animation |
+| `src/components/ui/popover.tsx` | Popover animation |
+| `src/components/post/FlippedCard.astro` | Flipped card |

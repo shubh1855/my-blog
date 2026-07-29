@@ -1,125 +1,125 @@
 # Deployment Adapters
 
-astro-koharu 支持自动检测部署平台并选择对应的适配器。
+astro-koharu supports automatically detecting the deployment platform and selecting the corresponding adapter.
 
-## 支持的平台
+## Supported Platforms
 
-| 平台              | 适配器            | 环境变量检测     |
-| ----------------- | ----------------- | ---------------- |
-| **Vercel**        | `@astrojs/vercel` | `VERCEL=1`       |
-| **Netlify**       | `@astrojs/netlify`| `NETLIFY=true`   |
-| **自托管/Docker** | `@astrojs/node`   | 其他情况（保底） |
+| Platform | Adapter | Environment Variable Detection |
+| --- | --- | --- |
+| **Vercel** | `@astrojs/vercel` | `VERCEL=1` |
+| **Netlify** | `@astrojs/netlify` | `NETLIFY=true` |
+| **Self-hosted / Docker** | `@astrojs/node` | Other cases (fallback) |
 
-## 部署说明
+## Deployment Guide
 
 ### Vercel
 
-1. 连接 GitHub 仓库到 Vercel
-2. 自动检测并使用 `@astrojs/vercel` 适配器
-3. 一键部署：[Deploy with Vercel](https://vercel.com/new/clone?repository-url=https://github.com/cosZone/astro-koharu)
+1. Connect GitHub repository to Vercel
+2. Automatically detects and uses `@astrojs/vercel` adapter
+3. One-click deployment: [Deploy with Vercel](https://vercel.com/new/clone?repository-url=https://github.com/cosZone/astro-koharu)
 
 ### Netlify
 
-1. 连接 GitHub 仓库到 Netlify
-2. 构建命令：`pnpm build`
-3. 发布目录：`dist`
-4. 自动使用 `@astrojs/netlify` 适配器
+1. Connect GitHub repository to Netlify
+2. Build command: `pnpm build`
+3. Publish directory: `dist`
+4. Automatically uses `@astrojs/netlify` adapter
 
-### 自托管（Node.js）
+### Self-Hosted (Node.js)
 
 ```bash
-# 构建
+# Build
 pnpm build
 
-# 运行
+# Run
 node dist/server/entry.mjs
 ```
 
-### Docker 部署
+### Docker Deployment
 
-项目提供了完整的 Docker 部署方案：多阶段构建（`node:22-alpine` 构建静态文件 → `nginx:alpine` 托管服务），最终镜像仅包含 nginx + 静态资源。
+The project provides a complete Docker deployment solution: multi-stage build (`node:22-alpine` builds static files → `nginx:alpine` hosts service), resulting in a final image containing only nginx + static assets.
 
-#### 前置要求
+#### Prerequisites
 
 - Docker Engine 20.10+
-- Docker Compose V2 (`docker compose` 命令)
+- Docker Compose V2 (`docker compose` command)
 
-#### 快速开始
+#### Quick Start
 
-**1. 配置环境变量**
+**1. Configure Environment Variables**
 
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 填入你的配置：
+Edit `.env` and fill in your configuration:
 
 ```bash
-# 博客端口（默认 4321）
+# Blog port (default 4321)
 BLOG_PORT=4321
 ```
 
-> 评论系统和统计分析等配置已迁移到 `config/site.yaml`，无需通过环境变量注入。
+> Comment system and analytics configurations have been migrated to `config/site.yaml` and no longer require injection via environment variables.
 
-**2. 构建并启动**
+**2. Build and Start**
 
 ```bash
-# 使用 pnpm 快捷命令
+# Use pnpm shortcut command
 pnpm docker:up
 
-# 或手动执行完整命令
+# Or manually execute full command
 docker compose --env-file ./.env -f docker/docker-compose.yml up -d --build
 ```
 
-访问 `http://localhost:4321`（或你配置的 `BLOG_PORT`）。
+Access `http://localhost:4321` (or your configured `BLOG_PORT`).
 
-**3. 日常管理**
+**3. Daily Management**
 
 ```bash
-pnpm docker:logs      # 查看实时日志
-pnpm docker:down      # 停止并移除容器
-pnpm docker:rebuild   # 完整重建（停旧容器 → 重新构建 → 启动）
+pnpm docker:logs      # View real-time logs
+pnpm docker:down      # Stop and remove containers
+pnpm docker:rebuild   # Full rebuild (stop old container → rebuild → start)
 ```
 
-#### 更新内容后重新部署
+#### Redeploying After Content Updates
 
-当修改了博客内容、`config/site.yaml` 或 `.env` 后：
+When you modify blog content, `config/site.yaml`, or `.env`:
 
 ```bash
-# 建议先生成内容资产（LQIP、相似度、AI 摘要）
+# Recommended to generate content assets first (LQIP, similarity, AI summaries)
 pnpm koharu generate all
 
-# 然后重新构建部署
+# Then rebuild and deploy
 pnpm docker:rebuild
 ```
 
-`rebuild.sh` 会自动检查 `.env` 是否存在，并提示是否需要运行内容生成脚本。
+`rebuild.sh` will automatically check if `.env` exists and prompt whether to run content generation scripts.
 
-#### 目录结构
+#### Directory Structure
 
 ```plain
 docker/
-├── Dockerfile            # 多阶段构建（builder → nginx）
-├── docker-compose.yml    # 服务编排
+├── Dockerfile            # Multi-stage build (builder → nginx)
+├── docker-compose.yml    # Service orchestration
 ├── nginx/
-│   └── default.conf      # nginx 配置（gzip、缓存、安全头、SPA 路由）
-└── rebuild.sh            # 一键重建脚本
+│   └── default.conf      # nginx configuration (gzip, caching, security headers, SPA routing)
+└── rebuild.sh            # One-click rebuild script
 ```
 
-#### nginx 配置说明
+#### nginx Configuration Notes
 
-`docker/nginx/default.conf` 包含以下优化：
+`docker/nginx/default.conf` includes the following optimizations:
 
-- **Gzip 压缩**：JS/CSS/SVG/JSON 等资源自动压缩
-- **静态资源长缓存**：`js/css/图片/字体` 设置 1 年缓存 + `immutable`
-- **HTML 短缓存**：1 小时 + `must-revalidate`
-- **安全头**：`X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`
-- **Astro 路由**：`try_files $uri $uri/index.html =404` 匹配静态输出格式
-- **Pagefind 搜索**：独立缓存策略（1 天）
+- **Gzip Compression**: JS/CSS/SVG/JSON and other resources are automatically compressed
+- **Long-term Static Resource Caching**: `js/css/images/fonts` set to 1-year cache + `immutable`
+- **Short-term HTML Caching**: 1 hour + `must-revalidate`
+- **Security Headers**: `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`
+- **Astro Routing**: `try_files $uri $uri/index.html =404` matching static output format
+- **Pagefind Search**: Independent caching policy (1 day)
 
-#### 自定义反向代理
+#### Custom Reverse Proxy
 
-如果在 nginx/Caddy 等反向代理后面运行，将端口映射改为仅绑定 127.0.0.1：
+If running behind a reverse proxy like nginx/Caddy, change port mapping to bind only to 127.0.0.1:
 
 ```yaml
 # docker-compose.yml
@@ -127,17 +127,17 @@ ports:
   - "127.0.0.1:${BLOG_PORT:-4321}:80"
 ```
 
-然后在外层反向代理中配置转发到该端口。
+Then configure forwarding to this port in the outer reverse proxy.
 
-#### 环境变量
+#### Environment Variables
 
-| 变量 | 说明 | 默认值 |
+| Variable | Description | Default Value |
 |------|------|--------|
-| `BLOG_PORT` | 主机端口映射 | `4321` |
+| `BLOG_PORT` | Host port mapping | `4321` |
 
-## 本地测试
+## Local Testing
 
-测试特定平台适配器：
+Test specific platform adapters:
 
 ```bash
 # Vercel
@@ -146,13 +146,13 @@ VERCEL=1 NODE_ENV=production pnpm build
 # Netlify
 NETLIFY=true NODE_ENV=production pnpm build
 
-# Node.js (默认)
+# Node.js (default)
 NODE_ENV=production pnpm build
 ```
 
-## 相关文档
+## Related Documentation
 
-- [Astro 按需渲染](https://docs.astro.build/en/guides/on-demand-rendering/)
-- [Vercel 适配器](https://docs.astro.build/en/guides/integrations-guide/vercel/)
-- [Netlify 适配器](https://docs.astro.build/en/guides/integrations-guide/netlify/)
-- [Node 适配器](https://docs.astro.build/en/guides/integrations-guide/node/)
+- [Astro On-demand Rendering](https://docs.astro.build/en/guides/on-demand-rendering/)
+- [Vercel Adapter](https://docs.astro.build/en/guides/integrations-guide/vercel/)
+- [Netlify Adapter](https://docs.astro.build/en/guides/integrations-guide/netlify/)
+- [Node Adapter](https://docs.astro.build/en/guides/integrations-guide/node/)

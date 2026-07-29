@@ -1,42 +1,43 @@
-# 架构设计与技术栈
+# Architecture Design and Tech Stack
 
-## Astro Islands 架构理念
+## Astro Islands Architecture Concept
 
-astro-koharu 采用 Astro 的 **Islands Architecture（群岛架构）**，这是理解整个项目的核心。
+astro-koharu adopts Astro's **Islands Architecture**, which is core to understanding the entire project.
 
-### 什么是 Islands 架构？
+### What is Islands Architecture?
 
-传统 SPA（单页应用）将整个页面作为一个 JavaScript 应用，导致：
+Traditional SPAs (Single Page Applications) treat the entire page as one JavaScript application, leading to:
 
-- 首屏加载大量 JS
-- 静态内容也需要 JS 渲染
-- SEO 不友好
+- Loading a large amount of JS on first load
+- Static content also requiring JS rendering
+- Unfriendly to SEO
 
-Islands 架构的理念是：**页面默认是静态 HTML，只有需要交互的部分（"岛屿"）才加载 JavaScript**。
+The concept of Islands Architecture is: **the page is static HTML by default, and JavaScript is loaded only for interactive parts ("islands")**.
 
 ```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                    静态 HTML 页面（海洋）                     │
+│                    Static HTML Page (Ocean)                 │
 │  ┌─────────────┐                      ┌─────────────┐       │
 │  │   React     │                      │   React     │       │
-│  │  组件岛屿    │                      │  组件岛屿    │       │
-│  │ (有交互)    │                      │ (有交互)    │       │
+│  │ Component   │                      │ Component   │       │
+│  │   Island    │                      │   Island    │       │
+│  │ (Interactive)                      │ (Interactive)       │
 │  └─────────────┘                      └─────────────┘       │
 │                                                             │
-│       静态内容（无 JS）    静态内容（无 JS）                  │
+│       Static Content (No JS)   Static Content (No JS)       │
 │                                                             │
 │  ┌─────────────┐                                            │
-│  │   Astro     │         纯 HTML + CSS                      │
-│  │   组件      │         无需 JavaScript                     │
-│  │ (静态渲染)  │                                            │
+│  │   Astro     │         Pure HTML + CSS                    │
+│  │ Component   │         No JavaScript required             │
+│  │  (Static)   │                                            │
 │  └─────────────┘                                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 在 astro-koharu 中的体现
+### Demonstration in astro-koharu
 
 ```typescript
-// 静态 Astro 组件 - 不产生任何 JS
+// Static Astro Component - does not produce any JS
 // src/components/post/PostList.astro
 ---
 const posts = await getSortedPosts();
@@ -45,59 +46,59 @@ const posts = await getSortedPosts();
   {posts.map(post => <PostItemCard post={post} />)}
 </ul>
 
-// 交互式 React 组件 - 只在需要时加载 JS
+// Interactive React Component - loads JS only when needed
 // src/pages/index.astro
-<ThemeToggle client:load />        // 页面加载时激活
-<SearchDialog client:visible />    // 滚动到可见时激活
-<MenuIcon client:idle />           // 浏览器空闲时激活
+<ThemeToggle client:load />        // Hydrated on page load
+<SearchDialog client:visible />    // Hydrated when scrolled into view
+<MenuIcon client:idle />           // Hydrated when browser is idle
 ```
 
 ---
 
-## 技术选型解析
+## Tech Stack Selection Analysis
 
-### 为什么选择 Astro？
+### Why Choose Astro?
 
-| 需求       | Astro 的优势                   |
-| ---------- | ------------------------------ |
-| 博客静态化 | 默认生成纯 HTML，完美适配 CDN  |
-| SEO 友好   | 服务端渲染，爬虫可直接读取内容 |
-| 内容管理   | Content Collections 原生支持   |
-| 性能优先   | 零 JS 起步，按需加载           |
-| 框架灵活   | 可混用 React、Vue、Svelte      |
+| Requirement | Astro's Advantage |
+| --- | --- |
+| Blog Static Generation | Generates pure HTML by default, perfectly suited for CDNs |
+| SEO Friendly | Server-side rendering, crawlers can read content directly |
+| Content Management | Native support for Content Collections |
+| Performance First | Zero JS by default, on-demand loading |
+| Framework Flexibility | Mix and match React, Vue, Svelte |
 
-### 为什么选择 React？
+### Why Choose React?
 
-项目中的交互组件使用 React 19，原因：
+Interactive components in the project use React 19, for the following reasons:
 
-1. **生态成熟**：丰富的 UI 库（Radix UI、Floating UI）
-2. **Hooks 强大**：复杂状态逻辑易于管理
-3. **TypeScript 支持**：类型推导完善
-4. **Motion 库**：动画库原生支持 React
+1. **Mature Ecosystem**: Rich UI libraries (Radix UI, Floating UI)
+2. **Powerful Hooks**: Complex state logic is easy to manage
+3. **TypeScript Support**: Excellent type inference
+4. **Motion Library**: Animation library natively supports React
 
-### 为什么选择 Tailwind CSS 4？
+### Why Choose Tailwind CSS 4?
 
-1. **原子化 CSS**：无需命名，快速开发
-2. **按需生成**：只打包使用的样式
-3. **设计系统**：通过配置统一设计令牌
-4. **暗色模式**：`dark:` 前缀原生支持
+1. **Atomic CSS**: Rapid development without naming classes
+2. **On-demand Generation**: Bundles only used styles
+3. **Design System**: Unified design tokens through configuration
+4. **Dark Mode**: Native support via `dark:` prefix
 
-### 为什么选择 Nanostores？
+### Why Choose Nanostores?
 
-状态管理选择 Nanostores 而非 Redux/Zustand：
+Nanostores was chosen for state management instead of Redux/Zustand:
 
-1. **极轻量**：< 1KB
-2. **框架无关**：Astro 和 React 都能用
-3. **简单 API**：`atom` + `useStore` 即可
-4. **无样板代码**：无需 Provider 包裹
+1. **Extremely Lightweight**: < 1KB
+2. **Framework Agnostic**: Usable by both Astro and React
+3. **Simple API**: `atom` + `useStore` is all you need
+4. **No Boilerplate**: No wrapping Provider required
 
 ---
 
-## 配置文件详解
+## Configuration File Details
 
 ### astro.config.mjs
 
-这是 Astro 的核心配置文件：
+This is Astro's core configuration file:
 
 ```javascript
 // astro.config.mjs
@@ -113,18 +114,18 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import pagefind from 'astro-pagefind';
 
 export default defineConfig({
-  // 1. 站点 URL（用于生成绝对路径）
+  // 1. Site URL (used for generating absolute paths)
   site: siteConfig.site, // 'https://blog.cosine.ren/'
 
-  // 2. Markdown 处理配置
+  // 2. Markdown processing configuration
   markdown: {
     gfm: true, // GitHub Flavored Markdown
     rehypePlugins: [
-      rehypeSlug, // 为标题生成 ID
+      rehypeSlug, // Generate IDs for headings
       [
-        rehypeAutolinkHeadings, // 为标题添加锚点链接
+        rehypeAutolinkHeadings, // Add anchor links to headings
         {
-          behavior: 'append', // 在标题后追加链接
+          behavior: 'append', // Append link after heading
           properties: {
             className: ['anchor-link'],
           },
@@ -133,130 +134,130 @@ export default defineConfig({
     ],
     shikiConfig: {
       themes: {
-        light: 'github-light', // 浅色代码主题
-        dark: 'github-dark', // 深色代码主题
+        light: 'github-light', // Light code theme
+        dark: 'github-dark', // Dark code theme
       },
     },
   },
 
-  // 3. Astro 集成
+  // 3. Astro integrations
   integrations: [
-    react(), // React 支持
+    react(), // React support
     icon({
-      // 图标系统
+      // Icon system
       include: {
-        gg: ['*'], // gg 图标集
+        gg: ['*'], // gg icon set
         'fa6-regular': ['*'],
         'fa6-solid': ['*'],
         ri: ['*'], // Remix Icon
       },
     }),
     umami({
-      // 访问统计
+      // Analytics
       id: '14de13b0-3220-4beb-8f0b-e08b17724991',
       endpointUrl: 'https://stats.cosine.ren',
       hostUrl: 'https://stats.cosine.ren',
     }),
-    pagefind(), // 静态搜索
+    pagefind(), // Static search
   ],
 
-  // 4. 开发工具栏
+  // 4. Dev toolbar
   devToolbar: {
     enabled: true,
   },
 
-  // 5. Vite 配置（底层构建工具）
+  // 5. Vite configuration (underlying build tool)
   vite: {
     plugins: [
-      svgr(), // SVG 转 React 组件
+      svgr(), // Convert SVG to React components
       tailwindcss(), // Tailwind CSS
     ],
   },
 
-  // 6. URL 末尾斜杠处理
-  trailingSlash: 'ignore', // /about 和 /about/ 都有效
+  // 6. Trailing slash handling for URLs
+  trailingSlash: 'ignore', // Both /about and /about/ are valid
 });
 ```
 
-### 关键配置说明
+### Key Configuration Explanations
 
-#### Markdown 处理流程
+#### Markdown Processing Flow
 
 ```plain
-Markdown 文件
+Markdown File
      ↓
-   解析为 AST（语法树）
+Parsed into AST (Syntax Tree)
      ↓
-   rehypeSlug → 为 ## 标题 生成 id="标题"
+rehypeSlug → Generate id="heading" for ## Headings
      ↓
-   rehypeAutolinkHeadings → 添加 <a href="#标题">🔗</a>
+rehypeAutolinkHeadings → Add <a href="#heading">🔗</a>
      ↓
-   Shiki → 代码块语法高亮
+Shiki → Code block syntax highlighting
      ↓
-   输出 HTML
+Output HTML
 ```
 
-#### 图标系统配置
+#### Icon System Configuration
 
-`astro-icon` 集成了 Iconify 图标库，配置中包含 4 个图标集：
+`astro-icon` integrates the Iconify icon library, with 4 icon sets configured:
 
 ```jsx
-// 使用方式
+// Usage
 import { Icon } from 'astro-icon/components';
 
 <Icon name="ri:github-fill" />        // Remix Icon
 <Icon name="fa6-solid:house" />       // Font Awesome 6 Solid
 <Icon name="fa6-regular:heart" />     // Font Awesome 6 Regular
-<Icon name="gg:menu" />               // css.gg 图标
+<Icon name="gg:menu" />               // css.gg Icon
 ```
 
 ### tsconfig.json
 
-TypeScript 配置文件：
+TypeScript configuration file:
 
 ```json
 {
-  "extends": "astro/tsconfigs/strict", // 继承 Astro 严格配置
+  "extends": "astro/tsconfigs/strict", // Inherit Astro strict config
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "jsx": "react-jsx", // React 17+ JSX 转换
-    "jsxImportSource": "react", // 自动导入 React
-    "baseUrl": "src", // 基础路径
+    "jsx": "react-jsx", // React 17+ JSX transform
+    "jsxImportSource": "react", // Automatically import React
+    "baseUrl": "src", // Base path
     "paths": {
-      // 路径别名
+      // Path aliases
       "@/*": ["*"],
       "@components/*": ["components/*"],
       "@lib/*": ["lib/*"]
-      // ... 其他别名
+      // ... other aliases
     }
   }
 }
 ```
 
-#### 路径别名工作原理
+#### How Path Aliases Work
 
 ```typescript
-// 不使用别名
+// Without alias
 import { cn } from '../../../lib/utils';
 
-// 使用别名（推荐）
+// With alias (recommended)
 import { cn } from '@lib/utils';
 ```
 
-编译时，TypeScript 将 `@lib/utils` 解析为 `src/lib/utils`。
+At compile time, TypeScript resolves `@lib/utils` to `src/lib/utils`.
 
 ---
 
-## 主布局架构
+## Main Layout Architecture
 
-### Layout.astro 分析
+### Layout.astro Analysis
 
-主布局文件 `src/layouts/Layout.astro` 是所有页面的基础：
+The main layout file `src/layouts/Layout.astro` is the foundation for all pages:
 
 ```astro
 ---
-// 1. 类型定义
+// 1. Type definitions
 interface Props {
   title: string;
   description?: string;
@@ -264,25 +265,25 @@ interface Props {
   post?: BlogPost;
 }
 
-// 2. 组件导入
+// 2. Component imports
 import FloatingGroup from '@components/layout/FloatingGroup.astro';
 import Header from '@components/layout/Header.astro';
 import MobileDrawer from '@components/layout/MobileDrawer.astro';
 import { ClientRouter } from 'astro:transitions';
-import '@styles/index.css'; // 全局样式
+import '@styles/index.css'; // Global styles
 ---
 
 <!doctype html>
 <html transition:name="root" lang="zh-CN">
   <head>
-    <!-- 3. SEO 元数据 -->
+    <!-- 3. SEO Metadata -->
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
 
     <!-- 4. View Transitions -->
     <ClientRouter />
 
-    <!-- 5. 主题初始化（防止闪屏） -->
+    <!-- 5. Theme initialization (prevents flash of wrong theme) -->
     <script is:inline>
       if (
         localStorage.theme === 'dark' ||
@@ -295,11 +296,11 @@ import '@styles/index.css'; // 全局样式
 
   <body>
     <div class="flex min-h-screen flex-col">
-      <!-- 6. 页面结构 -->
+      <!-- 6. Page structure -->
       <Header />
       <main class="relative flex grow flex-col gap-4">
         <slot />
-        <!-- 页面内容插入点 -->
+        <!-- Page content insertion point -->
       </main>
       <FloatingGroup />
       <MobileDrawer type={siderType} post={post} />
@@ -308,17 +309,17 @@ import '@styles/index.css'; // 全局样式
 </html>
 ```
 
-### 架构流程图
+### Architecture Flowchart
 
 ```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                         Layout.astro                         │
+│                         Layout.astro                        │
 ├─────────────────────────────────────────────────────────────┤
 │  <head>                                                      │
-│  ├── SEO 元数据（title, description, og:*）                  │
-│  ├── ClientRouter（页面过渡动画）                             │
-│  ├── LoadingIndicator（加载指示器）                          │
-│  └── 主题初始化脚本（inline，立即执行）                       │
+│  ├── SEO Metadata (title, description, og:*)                 │
+│  ├── ClientRouter (Page transition animations)              │
+│  ├── LoadingIndicator                                       │
+│  └── Theme initialization script (inline, runs immediately) │
 ├─────────────────────────────────────────────────────────────┤
 │  <body>                                                      │
 │  │                                                           │
@@ -333,14 +334,14 @@ import '@styles/index.css'; // 全局样式
 │  │  │                    <main>                           │ │
 │  │  │                                                     │ │
 │  │  │                    <slot />                         │ │
-│  │  │              （页面特定内容）                         │ │
+│  │  │             (Page-specific content)                 │ │
 │  │  │                                                     │ │
 │  │  └─────────────────────────────────────────────────────┘ │
 │  │                                                           │
 │  │  ┌──────────────┐           ┌───────────────────────┐    │
 │  │  │ FloatingGroup│           │     MobileDrawer      │    │
-│  │  │  - 返回顶部  │           │   （移动端侧边栏）     │    │
-│  │  │  - 搜索按钮  │           │                       │    │
+│  │  │  - Back to top│           │    (Mobile Sidebar)   │    │
+│  │  │  - Search btn│           │                       │    │
 │  │  └──────────────┘           └───────────────────────┘    │
 │  │                                                           │
 │  └───────────────────────────────────────────────────────────│
@@ -349,37 +350,37 @@ import '@styles/index.css'; // 全局样式
 
 ---
 
-## 构建流程
+## Build Flow
 
-### 开发模式 (pnpm dev)
+### Development Mode (pnpm dev)
 
 ```plain
-源文件变更
+Source file changes
     ↓
-Vite HMR（热模块替换）
+Vite HMR (Hot Module Replacement)
     ↓
-浏览器自动刷新
+Browser auto-refresh
 ```
 
-### 生产构建 (pnpm build)
+### Production Build (pnpm build)
 
 ```plain
-src/ 源文件
+src/ Source files
     ↓
-Astro 编译
-├── .astro 组件 → 静态 HTML
-├── .tsx 组件 → JavaScript bundles（按需）
-├── .md 文件 → HTML（Content Collections）
-└── .css 文件 → 优化后的 CSS
+Astro Compilation
+├── .astro components → Static HTML
+├── .tsx components → JavaScript bundles (on demand)
+├── .md files → HTML (Content Collections)
+└── .css files → Optimized CSS
     ↓
-Vite 打包优化
-├── 代码分割
+Vite Bundling & Optimization
+├── Code splitting
 ├── Tree shaking
-└── 资源压缩
+└── Asset minification
     ↓
-Pagefind 索引生成（全文搜索）
+Pagefind Index Generation (Full-text search)
     ↓
-dist/ 输出目录
+dist/ Output directory
 ├── index.html
 ├── _astro/
 │   ├── *.js (chunks)
@@ -387,51 +388,52 @@ dist/ 输出目录
 ├── post/
 │   └── [slug]/index.html
 └── pagefind/
-    └── 搜索索引文件
+    └── Search index files
 ```
 
 ---
 
-## 客户端指令详解
+## Client Directives Detailed
 
-Astro 提供了多种 `client:*` 指令来控制组件何时加载 JavaScript：
+Astro provides various `client:*` directives to control when components load JavaScript:
 
-### 指令对比
+### Directive Comparison
 
-| 指令             | 何时加载 JS    | 适用场景                   |
-| ---------------- | -------------- | -------------------------- |
-| `client:load`    | 页面加载时立即 | 关键交互（主题切换、导航） |
-| `client:idle`    | 浏览器空闲时   | 非关键功能（评论、统计）   |
-| `client:visible` | 组件可见时     | 懒加载（图表、底部组件）   |
-| `client:media`   | 媒体查询匹配时 | 响应式功能                 |
-| `client:only`    | 仅客户端渲染   | 依赖浏览器 API             |
+| Directive | When JS Loads | Use Case |
+| --- | --- | --- |
+| `client:load` | Immediately on page load | Critical interactions (Theme toggle, navigation) |
+| `client:idle` | When browser is idle | Non-critical features (Comments, analytics) |
+| `client:visible` | When component becomes visible | Lazy loading (Charts, footer components) |
+| `client:media` | When media query matches | Responsive features |
+| `client:only` | Client-side rendering only | Depends on browser APIs |
 
-### 项目中的使用示例
+### Example Usage in Project
 
 ```astro
-// src/layouts/Layout.astro // 主题切换 - 关键功能，立即加载
+// src/layouts/Layout.astro // Theme toggle - critical feature, load immediately
 <ThemeToggle client:load />
 
-// src/components/layout/Header.astro // 下拉导航 - 需要交互
+// src/components/layout/Header.astro // Dropdown nav - requires interaction
 <DropdownNav client:load router={router} />
 
-// src/pages/index.astro // 搜索对话框 - 可见时再加载
+// src/pages/index.astro // Search dialog - load when visible
 <SearchDialog client:visible />
 
-// 菜单图标 - 空闲时加载
+// Menu icon - load when idle
 <MenuIcon client:idle />
 ```
 
 ---
 
-## View Transitions（页面过渡）
+## View Transitions
 
-Astro 内置了 View Transitions API 支持，实现页面切换动画：
+Astro features built-in View Transitions API support to achieve page transition animations:
 
-### 配置方式
+### Configuration Method
 
 ```astro
-// Layout.astro import {ClientRouter} from 'astro:transitions';
+// Layout.astro
+import { ClientRouter } from 'astro:transitions';
 
 <html transition:name="root">
   <head>
@@ -440,30 +442,30 @@ Astro 内置了 View Transitions API 支持，实现页面切换动画：
 </html>
 ```
 
-### 工作原理
+### How It Works
 
 ```plain
-用户点击链接
+User clicks link
      ↓
-Astro 拦截导航
+Astro intercepts navigation
      ↓
-预加载目标页面
+Preloads target page
      ↓
 View Transitions API
-├── 旧页面淡出
-└── 新页面淡入
+├── Old page fades out
+└── New page fades in
      ↓
-更新 URL（无刷新）
+Updates URL (No full reload)
 ```
 
-### 主题切换兼容
+### Theme Switcher Compatibility
 
-由于页面过渡不触发完整刷新，需要在每次导航后检查主题：
+Since page transitions do not trigger a full refresh, theme needs to be checked after each navigation:
 
 ```javascript
 // Layout.astro
 document.addEventListener('astro:page-load', () => {
-  // 每次页面加载（包括过渡后）检查主题
+  // Check theme on every page load (including after transitions)
   if (localStorage.theme === 'dark') {
     document.documentElement.classList.add('dark');
   }
@@ -472,27 +474,27 @@ document.addEventListener('astro:page-load', () => {
 
 ---
 
-## 学习要点
+## Key Takeaways
 
-1. **Islands 架构核心**：页面默认静态，交互组件按需加载 JavaScript
-2. **Astro vs React 分工**：
-   - Astro 组件：静态内容、布局、SEO
-   - React 组件：交互、动画、复杂状态
-3. **配置层次**：
-   - `astro.config.mjs`：框架级配置
-   - `tsconfig.json`：TypeScript 和路径别名
-   - `tailwind.config.mjs`：样式系统
-4. **客户端指令**：`client:load/idle/visible` 控制 JS 加载时机
-5. **View Transitions**：无刷新页面切换，提升用户体验
+1. **Islands Architecture Core**: Pages are static by default, interactive components load JavaScript on demand
+2. **Astro vs React Division of Labor**:
+   - Astro components: Static content, layout, SEO
+   - React components: Interaction, animation, complex state
+3. **Configuration Hierarchy**:
+   - `astro.config.mjs`: Framework-level configuration
+   - `tsconfig.json`: TypeScript and path aliases
+   - `tailwind.config.mjs`: Styling system
+4. **Client Directives**: `client:load/idle/visible` control when JS is loaded
+5. **View Transitions**: Seamless page transitions without refresh, improving user experience
 
 ---
 
-## 相关文件
+## Related Files
 
-| 文件                           | 说明            |
-| ------------------------------ | --------------- |
-| `astro.config.mjs`             | Astro 核心配置  |
-| `tsconfig.json`                | TypeScript 配置 |
-| `src/layouts/Layout.astro`     | 主布局模板      |
-| `src/constants/site-config.ts` | 站点配置        |
-| `package.json`                 | 依赖和脚本      |
+| File | Description |
+| --- | --- |
+| `astro.config.mjs` | Astro core configuration |
+| `tsconfig.json` | TypeScript configuration |
+| `src/layouts/Layout.astro` | Main layout template |
+| `src/constants/site-config.ts` | Site configuration |
+| `package.json` | Dependencies and scripts |

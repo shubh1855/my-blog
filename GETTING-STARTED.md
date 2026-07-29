@@ -1,78 +1,78 @@
-# 快速开始
+# Quick Start
 
-欢迎使用 astro-koharu 博客主题！本文档将帮助你在 5 分钟内启动你的博客。
+Welcome to the astro-koharu blog theme! This document will help you get your blog up and running in 5 minutes.
 
-## 1. 环境准备
+## 1. Prerequisites
 
-确保你的电脑已安装：
+Ensure your computer has the following installed:
 
-- **Node.js** 18.0 或更高版本
-- **pnpm** 包管理器
+- **Node.js** 18.0 or higher
+- **pnpm** package manager
 
-如果没有安装 pnpm，运行：
+If pnpm is not installed, run:
 
 ```bash
 npm install -g pnpm
 ```
 
-## 2. 三步启动
+## 2. Start in Three Steps
 
-### 第一步：获取代码
+### Step 1: Get the Code
 
 ```bash
-# 方式一：克隆仓库
+# Method 1: Clone the repository
 git clone https://github.com/cosZone/astro-koharu.git
 cd astro-koharu
 
-# 方式二：使用 GitHub 模板（推荐）
-# 点击仓库页面的 "Use this template" 按钮
+# Method 2: Use GitHub Template (Recommended)
+# Click the "Use this template" button on the repository page
 ```
 
-### 第二步：安装依赖
+### Step 2: Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 第三步：启动开发服务器
+### Step 3: Start the Development Server
 
 ```bash
 pnpm dev
 ```
 
-打开浏览器访问 http://localhost:4321 即可看到你的博客！
+Open your browser and visit http://localhost:4321 to view your blog!
 
-## 3. 配置你的博客
+## 3. Configure Your Blog
 
-### 基本信息
+### Basic Information
 
-编辑 `config/site.yaml`：
+Edit `config/site.yaml`:
 
 ```yaml
 site:
-  title: 你的博客名称              # 网站标题
-  alternate: myblog               # 英文短名，用于 logo
-  subtitle: 你的副标题            # 副标题
-  name: 你的名字                  # 作者名
-  description: 博客简介            # 一句话介绍
-  author: 你的名字                # 文章作者
-  url: https://your-domain.com/   # 部署后的域名
-  defaultOgImage: /img/avatar.webp # 默认 Open Graph 图片
-  startYear: 2024                 # 建站年份
-  avatar: /img/avatar.webp        # 头像路径
-  showLogo: true                  # 是否显示 logo
-  keywords:                       # SEO 关键词
-    - 博客
-    - 技术
+  title: Your Blog Title          # Site title
+  alternate: myblog               # English short name, used for logo
+  subtitle: Your Subtitle         # Subtitle
+  name: Your Name                 # Author name
+  description: Blog description   # One-sentence description
+  author: Your Name               # Article author
+  url: https://your-domain.com/   # Deployed domain
+  defaultOgImage: /img/avatar.webp # Default Open Graph image
+  startYear: 2024                 # Site creation year
+  avatar: /img/avatar.webp        # Avatar path
+  showLogo: true                  # Whether to show logo
+  keywords:                       # SEO keywords
+    - Blog
+    - Tech
 ```
 
-### 替换头像
+### Replace Avatar
 
-将你的头像图片替换到 `public/img/avatar.webp`
+Replace your avatar image at `public/img/avatar.webp`
 
-### 社交链接
+### Social Links
 
-在 `config/site.yaml` 中配置社交媒体链接：
+Configure social media links in `config/site.yaml`:
 
 ```yaml
 social:
@@ -88,118 +88,118 @@ social:
     url: /rss.xml
     icon: ri:rss-line
     color: '#ff6600'
-  # 添加更多社交链接...
+  # Add more social links...
 ```
 
-## 4. 写第一篇文章
+## 4. Write Your First Post
 
-在 `src/content/blog/` 目录下创建 Markdown 文件。
+Create a Markdown file in the `src/content/blog/` directory.
 
-### 基础模板
+### Basic Template
 
 ```markdown
 ---
-title: 我的第一篇文章
+title: My First Post
 date: 2024-01-01 12:00:00
 tags:
-  - 标签1
-  - 标签2
+  - Tag1
+  - Tag2
 categories:
-  - 分类名
+  - CategoryName
 cover: /img/cover/1.webp
 ---
 
-文章正文内容...
+Article main content...
 ```
 
-### Frontmatter 字段说明
+### Frontmatter Field Description
 
-| 字段          | 必填 | 说明                            |
+| Field | Required | Description |
 | ------------- | ---- | ------------------------------- |
-| `title`       | ✅   | 文章标题                        |
-| `date`        | ✅   | 发布日期                        |
-| `tags`        | ❌   | 标签列表                        |
-| `categories`  | ❌   | 分类，支持嵌套如 `[笔记, 前端]` |
-| `cover`       | ❌   | 封面图片路径                    |
-| `description` | ❌   | 文章摘要                        |
-| `sticky`      | ❌   | 设为 `true` 置顶文章            |
-| `draft`       | ❌   | 设为 `true` 标记为草稿          |
+| `title` | ✅ | Article title |
+| `date` | ✅ | Publishing date |
+| `tags` | ❌ | List of tags |
+| `categories` | ❌ | Categories, supports nesting like `[Notes, Frontend]` |
+| `cover` | ❌ | Cover image path |
+| `description` | ❌ | Article summary |
+| `sticky` | ❌ | Set to `true` to pin article to top |
+| `draft` | ❌ | Set to `true` to mark as draft |
 
-### 分类使用
+### Using Categories
 
-单层分类：
-
-```yaml
-categories:
-  - 随笔
-```
-
-嵌套分类：
+Single-level category:
 
 ```yaml
 categories:
-  - [笔记, 前端]
+  - Essays
 ```
 
-## 5. 部署上线
+Nested categories:
 
-### Vercel 一键部署（推荐）
+```yaml
+categories:
+  - [Notes, Frontend]
+```
+
+## 5. Deployment
+
+### One-Click Deployment with Vercel (Recommended)
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cosZone/astro-koharu&project-name=astro-koharu&repository-name=astro-koharu)
 
-1. 点击上方按钮
-2. 登录 GitHub 账号
-3. 等待自动部署完成
+1. Click the button above
+2. Log in with your GitHub account
+3. Wait for the automatic deployment to complete
 
-### 自定义域名
+### Custom Domain
 
-1. 在 Vercel 项目设置中添加域名
-2. 按照提示配置 DNS
-3. 更新 `config/site.yaml` 中的 `site.url` 字段
+1. Add your domain in the Vercel project settings
+2. Configure DNS as instructed
+3. Update the `site.url` field in `config/site.yaml`
 
-### Docker 部署
+### Docker Deployment
 
-如果你更喜欢使用 Docker 部署：
+If you prefer using Docker for deployment:
 
 ```bash
-# 1. 复制环境变量文件并填写配置
+# 1. Copy the environment variable file and complete the configuration
 cp .env.example .env
 
-# 2. 构建并启动（从仓库根目录运行）
+# 2. Build and start (run from repository root directory)
 docker compose --env-file ./.env -f docker/docker-compose.yml up -d --build
 
-# 3. 访问博客
+# 3. Access your blog
 open http://localhost:4321
 ```
 
-**重要**: 生成脚本需要在本地运行：
+**Important**: Asset generation scripts need to be run locally:
 
 ```bash
-# 添加新图片/文章后，先本地运行：
+# After adding new images/posts, run locally first:
 pnpm koharu generate all
 
-# 然后提交更改
+# Then commit changes
 git add src/assets/*.json
 git commit -m "chore: update generated assets"
 
-# 最后重建 Docker
+# Finally rebuild Docker
 ./docker/rebuild.sh
 ```
 
-详细说明请参考[使用指南的 Docker 部署章节](./src/content/blog/tools/astro-koharu-guide.md)。
+For detailed instructions, please refer to the [Docker Deployment section in the User Guide](./src/content/blog/tools/astro-koharu-guide.md).
 
-## 6. 进阶功能
+## 6. Advanced Features
 
-### 周刊/系列文章
+### Weekly / Series Articles
 
-在 `config/site.yaml` 中配置 `featuredSeries`：
+Configure `featuredSeries` in `config/site.yaml`:
 
 ```yaml
 featuredSeries:
-  categoryName: 周刊
-  label: 我的周刊
-  fullName: 我的技术周刊
-  description: 每周技术分享
+  categoryName: Weekly
+  label: My Weekly
+  fullName: My Tech Weekly
+  description: Weekly tech sharing
   cover: /img/weekly_header.webp
   enabled: true
   links:
@@ -207,15 +207,15 @@ featuredSeries:
     rss: /rss.xml
 ```
 
-然后在 `src/content/blog/` 目录创建周刊文章。
+Then create weekly articles in the `src/content/blog/` directory.
 
-### 多语言支持（i18n）
+### Internationalization (i18n)
 
-博客内置多语言支持。在 `config/site.yaml` 中配置：
+The blog has built-in multi-language support. Configure in `config/site.yaml`:
 
 ```yaml
 i18n:
-  defaultLocale: zh        # 默认语言（URL 无前缀）
+  defaultLocale: zh        # Default language (URL without prefix)
   locales:
     - code: zh
       label: 中文
@@ -223,183 +223,183 @@ i18n:
       label: English
 ```
 
-配置后，博客会自动生成带语言前缀的页面（如 `/en/post/xxx`），导航栏和移动端抽屉中会出现语言切换器。
+After configuration, the blog will automatically generate pages with language prefixes (e.g., `/en/post/xxx`), and a language switcher will appear in the navigation bar and mobile drawer.
 
-**添加翻译文章**：将翻译文章放在 `src/content/blog/<locale>/` 目录下，保持与默认语言相同的路径结构：
+**Adding Translated Articles**: Place translated articles under the `src/content/blog/<locale>/` directory, preserving the same path structure as the default language:
 
 ```plain
 src/content/blog/
-├── tools/getting-started.md        # 默认语言 (zh)
-└── en/tools/getting-started.md     # 英文翻译
+├── tools/getting-started.md        # Default language (zh)
+└── en/tools/getting-started.md     # English translation
 ```
 
-没有对应翻译的文章会自动回退显示默认语言内容，并标注提示。
+Articles without a corresponding translation will automatically fall back to displaying content in the default language with an indication prompt.
 
-更多详细配置（内容翻译、添加新语言等）请参考 [README 的多语言配置章节](./README.md#多语言配置i18n)。
+For more detailed configuration (content translation, adding new languages, etc.), please refer to the [i18n Configuration section in README](./README.md#多语言配置i18n).
 
-### 背景音乐（BGM）
+### Background Music (BGM)
 
-在 `config/site.yaml` 中配置背景音乐播放器：
+Configure the background music player in `config/site.yaml`:
 
 ```yaml
 bgm:
   enabled: true
-  # metingApi: https://163.hyc.moe/  # 自定义 Meting API 地址（默认 https://163.hyc.moe/）
+  # metingApi: https://163.hyc.moe/  # Custom Meting API address (default https://163.hyc.moe/)
   audio:
-    - title: 我的歌单
+    - title: My Playlist
       list:
-        - https://music.163.com/playlist?id=你的歌单ID
+        - https://music.163.com/playlist?id=YOUR_PLAYLIST_ID
 ```
 
-音频播放器通过 [Meting](https://github.com/metowolf/meting) API 解析音乐平台链接，默认使用公共 API，**推荐自部署以获得更稳定的服务**。
+The audio player resolves music platform links via the [Meting](https://github.com/metowolf/meting) API. It uses a public API by default; **self-hosting is recommended for more stable service**.
 
-### 内容生成（可选）
+### Content Generation (Optional)
 
-使用 Koharu CLI 生成内容资产：
+Use Koharu CLI to generate content assets:
 
 ```bash
-# 交互式选择生成类型
+# Interactively select generation type
 pnpm koharu generate
 
-# 或直接指定类型
-pnpm koharu generate lqips        # 生成 LQIP 图片占位符，提升加载体验
-pnpm koharu generate similarities # 生成语义相似度向量，推荐相关文章
-pnpm koharu generate summaries    # 生成 AI 摘要
-pnpm koharu generate all          # 生成全部
+# Or specify the type directly
+pnpm koharu generate lqips        # Generate LQIP image placeholders to enhance loading experience
+pnpm koharu generate similarities # Generate semantic similarity vectors to recommend related articles
+pnpm koharu generate summaries    # Generate AI summaries
+pnpm koharu generate all          # Generate all
 ```
 
-## 常用命令
+## Common Commands
 
-| 命令                        | 说明                               |
+| Command | Description |
 | --------------------------- | ---------------------------------- |
-| `pnpm dev`                  | 启动开发服务器                     |
-| `pnpm build`                | 构建生产版本                       |
-| `pnpm preview`              | 预览生产构建                       |
-| `pnpm lint`                 | 代码检查                           |
-| `pnpm koharu`               | 交互式 CLI 菜单                    |
-| `pnpm koharu backup`        | 备份博客内容（--full 完整备份）    |
-| `pnpm koharu restore`       | 从备份恢复（--latest 还原最新）    |
-| `pnpm koharu update`        | 更新主题（--check, --clean, --rebase 等）|
-| `pnpm koharu generate`      | 生成内容资产                       |
-| `pnpm koharu clean`         | 清理旧备份（--keep N 保留 N 个）   |
-| `pnpm koharu list`          | 查看所有备份                       |
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build production version |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Code linting |
+| `pnpm koharu` | Interactive CLI menu |
+| `pnpm koharu backup` | Backup blog content (--full full backup) |
+| `pnpm koharu restore` | Restore from backup (--latest restore latest) |
+| `pnpm koharu update` | Update theme (--check, --clean, --rebase, etc.) |
+| `pnpm koharu generate` | Generate content assets |
+| `pnpm koharu clean` | Clean up old backups (--keep N keep N backups) |
+| `pnpm koharu list` | View all backups |
 
-## 7. 更新主题
+## 7. Updating the Theme
 
-当主题发布新版本时，你可以按以下步骤更新，同时保留你的个人内容。
+When a new version of the theme is released, you can follow these steps to update while retaining your personal content.
 
-### 使用 CLI 更新（推荐）
+### Update Using CLI (Recommended)
 
-使用 Koharu CLI 一键更新主题，自动完成备份 → 拉取 → 合并 → 安装依赖的全流程：
+Use Koharu CLI to update the theme with one click, automatically completing the entire workflow: Backup → Fetch → Merge → Install Dependencies:
 
 ```bash
-# 完整更新流程（默认会先备份）
+# Full update workflow (backups by default)
 pnpm koharu update
 
-# 仅检查是否有更新
+# Check for updates only
 pnpm koharu update --check
 
-# 跳过备份直接更新
+# Skip backup and update directly
 pnpm koharu update --skip-backup
 
-# clean 模式（零冲突，适合首次迁移或冲突较多时）
+# Clean mode (zero conflicts, suitable for initial migration or when conflicts are numerous)
 pnpm koharu update --clean
 
-# rebase 模式（重写历史，适合熟悉 git 的用户）
+# Rebase mode (rewrite history, suitable for users familiar with git)
 pnpm koharu update --rebase
 
-# 预览操作（不实际执行）
+# Preview operations (dry run without executing)
 pnpm koharu update --dry-run
 
-# 更新到指定版本
+# Update to a specified version
 pnpm koharu update --tag v2.1.0
 ```
 
-**三种更新模式：**
+**Three Update Modes:**
 
-| 模式 | 命令 | 适合场景 | 备份 |
+| Mode | Command | Suitable Scenario | Backup |
 |------|------|---------|------|
-| **默认** | `pnpm koharu update` | 日常更新 | 可选 |
-| **Clean** | `pnpm koharu update --clean` | 首次迁移、冲突较多 | 强制 |
-| **Rebase** | `pnpm koharu update --rebase` | 熟悉 git 的用户 | 强制 |
+| **Default** | `pnpm koharu update` | Daily updates | Optional |
+| **Clean** | `pnpm koharu update --clean` | Initial migration, numerous conflicts | Mandatory |
+| **Rebase** | `pnpm koharu update --rebase` | Users familiar with git | Mandatory |
 
-- **默认模式**：使用 `git merge` 合并上游更新。用户内容（博客文章、配置等）冲突会自动保留本地版本，仅主题文件冲突需手动解决。
-- **Clean 模式**：用上游最新版本替换所有主题文件，再从备份还原你的用户内容，实现零冲突。**注意：你对主题文件的自定义修改不会被保留。**
-- **Rebase 模式**：将你的本地提交重放到上游之上，重写提交历史。适合对 git 有一定了解的用户。
+- **Default Mode**: Uses `git merge` to merge upstream updates. Conflicts in user content (blog posts, configuration, etc.) will automatically keep the local version; only conflicts in theme files need to be resolved manually.
+- **Clean Mode**: Replaces all theme files with the latest upstream version, then restores your user content from backup, achieving zero conflicts. **Note: Your custom modifications to theme files will not be preserved.**
+- **Rebase Mode**: Replays your local commits on top of upstream, rewriting commit history. Suitable for users with a good understanding of git.
 
-> **💡 给熟悉 git 的用户：** CLI 更新命令是对 git 操作的封装便利工具。如果你对 git 比较熟悉，完全可以直接使用 `git fetch upstream && git rebase upstream/main`（或 `git merge`）手动操作，这样能更精确地控制合并过程。
+> **💡 For users familiar with git:** The CLI update command is a convenience wrapper around git operations. If you are familiar with git, you can directly use `git fetch upstream && git rebase upstream/main` (or `git merge`) manually to get more precise control over the merge process.
 
-更新过程中会自动：
-1. 检查工作区状态
-2. 备份你的个人内容（可选，clean/rebase 模式强制备份）
-3. 设置 upstream remote（如果没有）
-4. 获取最新代码
-5. 显示新提交列表和更新日志
-6. 合并更新（根据所选模式）
-7. 安装依赖
+During the update process, it will automatically:
+1. Check workspace status
+2. Backup your personal content (optional, mandatory in clean/rebase mode)
+3. Set upstream remote (if not set)
+4. Fetch the latest code
+5. Display new commit list and changelog
+6. Merge updates (according to the selected mode)
+7. Install dependencies
 
-如果遇到合并冲突，CLI 会显示冲突文件列表并提供解决指引。用户内容的冲突会被自动解决（保留本地版本）。
+If merge conflicts occur, the CLI will display a list of conflicting files and provide resolution instructions. Conflicts in user content will be resolved automatically (retaining local versions).
 
-### 手动更新
+### Manual Update
 
-如果你更喜欢手动操作：
+If you prefer manual operation:
 
 ```bash
-# 1. 先备份你的个人内容
+# 1. Back up your personal content first
 pnpm koharu backup --full
 
-# 2. 添加上游仓库（只需执行一次）
+# 2. Add upstream repository (only needs to be executed once)
 git remote add upstream https://github.com/cosZone/astro-koharu.git
 
-# 3. 获取最新代码
+# 3. Fetch latest code
 git fetch upstream
 
-# 4. 合并更新到你的分支
+# 4. Merge updates into your branch
 git merge upstream/main
 
-# 5. 解决可能的冲突，然后安装依赖
+# 5. Resolve any conflicts, then install dependencies
 pnpm install
 
-# 6. 测试是否正常
+# 6. Test if everything works
 pnpm dev
 ```
 
-### 还原备份
+### Restore Backup
 
-如果更新后需要还原备份：
+If you need to restore from a backup after updating:
 
 ```bash
-# 查看所有备份
+# View all backups
 pnpm koharu list
 
-# 预览将要还原的文件
+# Preview files to be restored
 pnpm koharu restore --dry-run
 
-# 还原最新备份
+# Restore the latest backup
 pnpm koharu restore --latest
 ```
 
-### 更新后检查
+### Post-Update Check
 
-更新完成后，建议检查以下内容：
+After completing the update, it is recommended to check the following:
 
-1. **配置兼容性**：如果 `config/site.yaml` 有新增字段，参考 `.env.example` 或文档补充
-2. **依赖更新**：运行 `pnpm install` 确保依赖正确安装
-3. **构建测试**：运行 `pnpm build` 确保构建成功
-4. **功能测试**：运行 `pnpm dev` 检查页面是否正常显示
+1. **Configuration Compatibility**: If `config/site.yaml` has new fields, refer to `.env.example` or documentation to supplement them
+2. **Dependency Update**: Run `pnpm install` to ensure dependencies are installed correctly
+3. **Build Test**: Run `pnpm build` to ensure the build succeeds
+4. **Functionality Test**: Run `pnpm dev` to check if pages render normally
 
-### 注意事项
+### Notes
 
-- 如果你修改了主题的源代码（如组件样式），合并时可能会产生冲突，需要手动解决
-- 建议在更新前使用 `git stash` 或创建分支保存本地修改
-- 重大版本更新请查看 [Release Notes](https://github.com/cosZone/astro-koharu/releases) 了解破坏性变更
+- If you modified the theme's source code (such as component styles), conflicts may occur during merge and must be resolved manually
+- It is recommended to use `git stash` or create a branch to save local changes before updating
+- For major version updates, please check [Release Notes](https://github.com/cosZone/astro-koharu/releases) for breaking changes
 
-## 获取帮助
+## Getting Help
 
-- 📖 [详细使用指南](./src/content/blog/tools/astro-koharu-guide.md)
-- 🐛 [提交 Issue](https://github.com/cosZone/astro-koharu/issues)
-- ⭐ [GitHub 仓库](https://github.com/cosZone/astro-koharu)
+- 📖 [Detailed User Guide](./src/content/blog/tools/astro-koharu-guide.md)
+- 🐛 [Submit an Issue](https://github.com/cosZone/astro-koharu/issues)
+- ⭐ [GitHub Repository](https://github.com/cosZone/astro-koharu)
 
 ---
 
-祝你搭建愉快！
+Happy building!

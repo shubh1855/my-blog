@@ -1,98 +1,98 @@
-# 多系列功能测试指南
+# Multi-Series Feature Testing Guide
 
-本文档介绍如何使用 patch 文件测试多系列功能的各种场景。
+This document explains how to use patch files to test various scenarios of the multi-series feature.
 
-## 前置准备
+## Prerequisites
 
 ```bash
-# 确保工作区干净
+# Make sure the workspace is clean
 git status
 
-# 如果有未提交的更改，先暂存
+# If there are uncommitted changes, stash them first
 git stash
 ```
 
 ---
 
-## 测试 1：添加第二个系列（书摘）
+## Test 1: Add Second Series (Book Excerpts)
 
-**目的**：验证多系列功能正常工作
+**Objective**: Verify that the multi-series feature functions properly
 
-### 应用 Patch
+### Apply Patch
 
 ```bash
 git apply tests/series-test-patches/01-add-reading-series.patch
 ```
 
-### 变更内容
+### Changes Included
 
-- `config/site.yaml`：
-  - categoryMap 添加 `书摘: reading`
-  - featuredSeries 添加第二个系列配置
-  - navigation 添加「书摘」导航项
-- 新建测试文章 `src/content/blog/reading/test-book.md`
+- `config/site.yaml`:
+  - Add `书摘: reading` to `categoryMap`
+  - Add second series configuration to `featuredSeries`
+  - Add "Book Excerpts" navigation item to `navigation`
+- Create new test article `src/content/blog/reading/test-book.md`
 
-### 验证步骤
+### Verification Steps
 
-1. 启动开发服务器
+1. Start development server
    ```bash
    pnpm dev
    ```
 
-2. 检查以下页面：
-   - [ ] 首页：应显示「书摘」系列的最新文章高亮卡片
-   - [ ] `/reading`：系列页面正常显示，有测试文章
-   - [ ] 导航栏：应出现「书摘」菜单项
-   - [ ] `/weekly`：周刊页面仍正常工作
+2. Check the following pages:
+   - [ ] Homepage: Should display the latest article highlight card for the "Book Excerpts" series
+   - [ ] `/reading`: Series page displays normally with test articles
+   - [ ] Navigation bar: "Book Excerpts" menu item should appear
+   - [ ] `/weekly`: Weekly series page still functions normally
 
-3. 构建测试
+3. Build test
    ```bash
    pnpm build
    ```
-   应无错误完成构建。
+   Build should complete without errors.
 
-### 还原
+### Revert
 
 ```bash
 git checkout -- .
-rm -rf src/content/blog/reading  # 删除新建的测试文章目录
+rm -rf src/content/blog/reading  # Delete newly created test article directory
 ```
 
 ---
 
-## 测试 2：禁用周刊系列
+## Test 2: Disable Weekly Series
 
-**目的**：验证 `enabled: false` 能正确禁用系列
+**Objective**: Verify that `enabled: false` correctly disables a series
 
-### 应用 Patch
+### Apply Patch
 
 ```bash
 git apply tests/series-test-patches/02-disable-weekly.patch
 ```
 
-### 变更内容
+### Changes Included
 
-- `config/site.yaml`：将 weekly 系列的 `enabled: true` 改为 `enabled: false`
+- `config/site.yaml`: Change `enabled: true` to `enabled: false` for the weekly series
 
-### 验证步骤
+### Verification Steps
 
-1. 启动开发服务器
+1. Start development server
    ```bash
    pnpm dev
    ```
 
-2. 检查以下内容：
-   - [ ] 首页：不应显示周刊系列的高亮卡片
-   - [ ] `/weekly`：访问应返回 404 页面
-   - [ ] 侧边栏：不应显示周刊入口
+2. Check the following:
+   - [ ] Homepage: Should NOT display the highlight card for the weekly series
+   - [ ] `/weekly`: Accessing should return a 404 page
+   - [ ] Sidebar: Should NOT display the weekly entry
 
-3. 构建测试
+3. Build test
    ```bash
    pnpm build
    ```
-   应无错误完成构建，且不生成 `/weekly` 相关页面。
+   Build should complete without errors and should not generate `/weekly` related pages.
 
-### 还原
+### Revert
 
 ```bash
 git checkout -- .
@@ -100,39 +100,39 @@ git checkout -- .
 
 ---
 
-## 测试 3：保留路由冲突错误
+## Test 3: Reserved Route Conflict Error
 
-**目的**：验证使用保留路由作为 slug 时会触发构建错误
+**Objective**: Verify that using a reserved route as a slug triggers a build error
 
-### 应用 Patch
+### Apply Patch
 
 ```bash
 git apply tests/series-test-patches/03-test-reserved-slug-error.patch
 ```
 
-### 变更内容
+### Changes Included
 
-- `config/site.yaml`：将 slug 从 `weekly` 改为 `categories`（保留路由）
+- `config/site.yaml`: Change slug from `weekly` to `categories` (a reserved route)
 
-### 验证步骤
+### Verification Steps
 
-1. 尝试构建
+1. Attempt build
    ```bash
    pnpm build
    ```
 
-2. 预期结果：
-   - [ ] 构建应该**失败**
-   - [ ] 错误信息应提示 `categories` 是保留路由
-   - [ ] 错误信息应列出所有保留路由名称
+2. Expected Result:
+   - [ ] Build should **fail**
+   - [ ] Error message should indicate that `categories` is a reserved route
+   - [ ] Error message should list all reserved route names
 
-3. 开发模式也应报错
+3. Development mode should also report an error
    ```bash
    pnpm dev
    ```
-   - [ ] 启动时应显示配置错误警告
+   - [ ] A configuration error warning should be displayed on startup
 
-### 还原
+### Revert
 
 ```bash
 git checkout -- .
@@ -140,39 +140,39 @@ git checkout -- .
 
 ---
 
-## 测试 4：关闭首页高亮
+## Test 4: Disable Homepage Highlight
 
-**目的**：验证 `highlightOnHome: false` 能关闭首页高亮显示
+**Objective**: Verify that `highlightOnHome: false` can turn off homepage highlight display
 
-### 应用 Patch
+### Apply Patch
 
 ```bash
 git apply tests/series-test-patches/04-test-highlight-off.patch
 ```
 
-### 变更内容
+### Changes Included
 
-- `config/site.yaml`：为 weekly 系列添加 `highlightOnHome: false`
+- `config/site.yaml`: Add `highlightOnHome: false` to the weekly series
 
-### 验证步骤
+### Verification Steps
 
-1. 启动开发服务器
+1. Start development server
    ```bash
    pnpm dev
    ```
 
-2. 检查以下内容：
-   - [ ] 首页：**不应**显示周刊系列的高亮卡片
-   - [ ] `/weekly`：系列页面仍正常工作
-   - [ ] 导航栏：周刊菜单项仍存在
+2. Check the following:
+   - [ ] Homepage: Should **NOT** display the weekly series highlight card
+   - [ ] `/weekly`: Series page still works normally
+   - [ ] Navigation bar: Weekly menu item still exists
 
-3. 构建测试
+3. Build test
    ```bash
    pnpm build
    ```
-   应无错误完成构建。
+   Build should complete without errors.
 
-### 还原
+### Revert
 
 ```bash
 git checkout -- .
@@ -180,43 +180,43 @@ git checkout -- .
 
 ---
 
-## 组合测试（可选）
+## Combined Testing (Optional)
 
-你也可以组合应用多个 patch 进行更复杂的测试：
+You can also combine multiple patches for more complex testing:
 
 ```bash
-# 同时启用书摘系列 + 关闭周刊首页高亮
+# Enable book excerpts series + turn off weekly homepage highlight at the same time
 git apply tests/series-test-patches/01-add-reading-series.patch
 git apply tests/series-test-patches/04-test-highlight-off.patch
 
 pnpm dev
-# 验证：首页只显示书摘高亮，不显示周刊高亮
+# Verify: Homepage only displays book excerpts highlight, does not display weekly highlight
 
-# 还原
+# Revert
 git checkout -- .
 rm -rf src/content/blog/reading
 ```
 
 ---
 
-## 快速参考
+## Quick Reference
 
-| Patch | 测试场景 | 预期结果 |
+| Patch | Test Scenario | Expected Result |
 |-------|---------|---------|
-| `01-add-reading-series.patch` | 添加第二个系列 | 正常工作，两个系列并存 |
-| `02-disable-weekly.patch` | 禁用系列 | 系列页面 404，首页无高亮 |
-| `03-test-reserved-slug-error.patch` | 保留路由冲突 | 构建失败，报错提示 |
-| `04-test-highlight-off.patch` | 关闭首页高亮 | 系列正常但首页无高亮卡片 |
+| `01-add-reading-series.patch` | Add a second series | Works normally, both series coexist |
+| `02-disable-weekly.patch` | Disable series | Series page 404, no highlight on homepage |
+| `03-test-reserved-slug-error.patch` | Reserved route conflict | Build fails with error prompt |
+| `04-test-highlight-off.patch` | Disable homepage highlight | Series page normal but no homepage highlight card |
 
 ---
 
-## 测试完成后
+## After Testing is Complete
 
 ```bash
-# 确保所有更改已还原
+# Ensure all changes are reverted
 git checkout -- .
-rm -rf src/content/blog/reading  # 如果测试过 patch 01
+rm -rf src/content/blog/reading  # If patch 01 was tested
 
-# 恢复之前暂存的更改（如果有）
+# Restore previously stashed changes (if any)
 git stash pop
 ```
