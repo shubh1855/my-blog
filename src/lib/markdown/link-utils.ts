@@ -26,7 +26,7 @@ export interface MarkdownNode {
  * - https://twitter.com/i/web/status/1234567890
  * - With query parameters
  */
-export function extractTweetId(url: string): string | null {
+function extractTweetId(url: string): string | null {
   try {
     const urlObj = new URL(url);
     const hostname = urlObj.hostname.toLowerCase();
@@ -46,13 +46,6 @@ export function extractTweetId(url: string): string | null {
 }
 
 /**
- * Check if URL is a Twitter/X link
- */
-export function isTweetUrl(url: string): boolean {
-  return extractTweetId(url) !== null;
-}
-
-/**
  * Extract CodePen user and pen ID from CodePen URL
  * Supports formats:
  * - https://codepen.io/username/pen/PenId
@@ -60,7 +53,7 @@ export function isTweetUrl(url: string): boolean {
  * - https://codepen.io/username/details/PenId
  * - With query parameters or hash
  */
-export function extractCodePenId(url: string): { user: string; penId: string } | null {
+function extractCodePenId(url: string): { user: string; penId: string } | null {
   try {
     const urlObj = new URL(url);
     const hostname = urlObj.hostname.toLowerCase();
@@ -85,13 +78,6 @@ export function extractCodePenId(url: string): { user: string; penId: string } |
     console.warn('[Link Utils] Failed to parse CodePen URL:', url, error);
     return null;
   }
-}
-
-/**
- * Check if URL is a CodePen link
- */
-export function isCodePenUrl(url: string): boolean {
-  return extractCodePenId(url) !== null;
 }
 
 /**
