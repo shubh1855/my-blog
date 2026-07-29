@@ -270,7 +270,7 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
 
       ytPlayerRef.current = window.globalYtPlayer;
 
-      if (ytPlayerRef.current?.getPlayerState) {
+      if (typeof ytPlayerRef.current?.getPlayerState === 'function') {
         isReadyRef.current = true;
         setState((s) => ({ ...s, loading: false }));
       }
