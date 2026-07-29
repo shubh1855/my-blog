@@ -11,12 +11,12 @@ import { getPostLocale, getPostSlug } from './locale';
 import { getPostDescriptionWithSummary, getPostLastCategory, getPostReadingTime } from './posts';
 
 /**
- * BlogPost 可提取的字段映射
- * - 直接字段：从 post.slug 或 post.data.xxx 直接取
- * - 计算字段：需要调用函数计算
+ * Extractable field map for BlogPost
+ * - Direct fields: read directly from post.slug or post.data.xxx
+ * - Computed fields: require function calls to compute
  */
 export type PostFieldMap = {
-  // 直接字段
+  // Direct fields
   slug: string;
   link: string | undefined;
   title: string;
@@ -25,7 +25,7 @@ export type PostFieldMap = {
   tags: string[] | undefined;
   categories: string[] | string[][] | undefined;
   draft: boolean | undefined;
-  // 计算字段
+  // Computed fields
   categoryName: string | undefined; // from getPostLastCategory()
   description: string; // from getPostDescriptionWithSummary()
   wordCount: number; // from reading-time
@@ -34,11 +34,11 @@ export type PostFieldMap = {
 };
 
 /**
- * 字段提取器映射
- * 每个字段对应一个从 BlogPost 提取值的函数
+ * Field extractor map
+ * Each field maps to a function that extracts the value from a BlogPost
  */
 const fieldExtractors: { [K in keyof PostFieldMap]: (post: BlogPost, locale: string) => PostFieldMap[K] } = {
-  // 直接字段
+  // Direct fields
   slug: (p) => getPostSlug(p),
   link: (p) => p.data?.link,
   title: (p) => p.data.title,
@@ -47,7 +47,7 @@ const fieldExtractors: { [K in keyof PostFieldMap]: (post: BlogPost, locale: str
   tags: (p) => p.data?.tags,
   categories: (p) => p.data?.categories,
   draft: (p) => p.data?.draft,
-  // 计算字段
+  // Computed fields
   categoryName: (p) => getPostLastCategory(p).name || undefined,
   description: (p, locale) => getPostDescriptionWithSummary(p, locale),
   wordCount: (p) => getPostReadingTime(p).words,
@@ -56,7 +56,7 @@ const fieldExtractors: { [K in keyof PostFieldMap]: (post: BlogPost, locale: str
 };
 
 /**
- * 从 BlogPost 中选取指定字段
+ * Pick specified fields from a BlogPost
  * @example pickPost(post, ['slug', 'link', 'title'])
  * @example pickPost(post, ['slug', 'link', 'title', 'categoryName'])
  */
@@ -73,7 +73,7 @@ function pickPost<K extends keyof PostFieldMap>(
 }
 
 /**
- * 批量从 BlogPost 数组中选取指定字段
+ * Batch pick specified fields from a BlogPost array
  * @example pickPosts(posts, ['slug', 'link', 'title'])
  * @example pickPosts(posts, ['slug', 'link', 'title', 'categoryName'])
  */
@@ -85,12 +85,12 @@ function pickPosts<K extends keyof PostFieldMap>(
   return posts.map((post) => pickPost(post, keys, locale));
 }
 
-// 便捷别名 - 保持向后兼容
+// Convenience aliases — backward compatible
 
-/** PostRef 需要的字段 */
+/** Fields required for PostRef */
 const POST_REF_KEYS = ['slug', 'link', 'title'] as const;
 
-/** PostCardData 需要的字段 */
+/** Fields required for PostCardData */
 const POST_CARD_DATA_KEYS = [
   'slug',
   'link',
@@ -106,19 +106,19 @@ const POST_CARD_DATA_KEYS = [
   'postLocale',
 ] as const;
 
-/** PostRefWithCategory 需要的字段 */
+/** Fields required for PostRefWithCategory */
 const POST_REF_WITH_CATEGORY_KEYS = ['slug', 'link', 'title', 'categoryName'] as const;
 
 /**
- * 转换为带分类引用 (4 字段: slug, link, title, categoryName)
+ * Convert to a reference with category (4 fields: slug, link, title, categoryName)
  */
 export const toPostRefWithCategory = (post: BlogPost) => pickPost(post, POST_REF_WITH_CATEGORY_KEYS);
 /**
- * 转换为最小引用 (3 字段: slug, link, title)
+ * Convert to a minimal reference (3 fields: slug, link, title)
  */
 export const toPostRef = (post: BlogPost) => pickPost(post, POST_REF_KEYS);
 
-// 批量转换便捷函数
+// Batch conversion helpers
 export const toPostRefs = (posts: BlogPost[]) => pickPosts(posts, POST_REF_KEYS);
 
 export const toPostCardDataList = (posts: BlogPost[], locale: string = defaultLocale) =>
