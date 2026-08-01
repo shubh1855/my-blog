@@ -28,7 +28,7 @@ We approached the challenge by reading the route definitions and the tests toget
 
 ### 1. Identify security-sensitive routes
 
-The first place to inspect was [checkpoint/app/routes.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/app/routes.py). That file documents the route surface clearly:
+The first place to inspect was `checkpoint/app/routes.py`. That file documents the route surface clearly:
 
 - `POST /app/gate/present`
 - `GET /app/gate/inspect`
@@ -43,7 +43,7 @@ That immediately marked `/app/gate/decree` as the most security-sensitive endpoi
 
 ### 2. Inspect how "internal" is decided
 
-Next we read [checkpoint/app/gate.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/app/gate.py).
+Next we read `checkpoint/app/gate.py`.
 
 The check is based on `request.remote_addr`, which is accepted as internal when it falls into one of these ranges:
 
@@ -56,7 +56,7 @@ By itself that is not necessarily wrong, but it means the correctness of the acc
 
 ### 3. Inspect the proxy boundary
 
-Then we read [checkpoint/conf/Caddyfile](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/conf/Caddyfile) and [checkpoint/app/**init**.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/app/__init__.py).
+Then we read `checkpoint/conf/Caddyfile` and `checkpoint/app/__init__.py`.
 
 The Caddy config shows a single reverse proxy hop:
 
@@ -107,7 +107,7 @@ That breaks the guarantee around:
 
 ## How We Solved It
 
-We changed the proxy trust configuration in [checkpoint/app/**init**.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/app/__init__.py#L21).
+We changed the proxy trust configuration in `checkpoint/app/__init__.py`.
 
 ### Before
 
@@ -134,7 +134,7 @@ We used two levels of validation.
 
 ### 1. Add a regression test
 
-We added a test in [checkpoint/tests/test_gate.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/tests/test_gate.py#L56):
+We added a test in `checkpoint/tests/test_gate.py`:
 
 ```python
 def test_decree_rejects_spoofed_forwarded_for_chain(client):
@@ -200,8 +200,8 @@ This fix is correct for both security and functionality.
 
 Files changed:
 
-- [checkpoint/app/**init**.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/app/__init__.py)
-- [checkpoint/tests/test_gate.py](/home/shubh/Project/htb-cyber-apocalypse/secure-coding/core_application/checkpoint/tests/test_gate.py)
+- `checkpoint/app/__init__.py`
+- `checkpoint/tests/test_gate.py`
 
 Commit used for submission:
 
