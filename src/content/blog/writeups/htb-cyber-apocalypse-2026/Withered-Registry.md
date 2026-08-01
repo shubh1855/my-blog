@@ -3,7 +3,7 @@ title: "Withered Registry"
 description: "Writeup for Withered Registry from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-30
 categories:
-  - [Writeups, HTB Cyber Apocalypse CTF 2026: The Salt Crown]
+  - [Writeups, "HTB Cyber Apocalypse CTF 2026: The Salt Crown"]
 tags:
   - HTB Cyber Apocalypse 2026
   - Secure Coding
