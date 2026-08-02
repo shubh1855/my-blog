@@ -223,6 +223,12 @@ friends:
       desc: Security related blogs and essential writeups
       image: https://www.thepensieve.in/mystic-logo.png
       color: "#60328d"
+    - site: The False Positive
+      url: https://www.thefalsepositive.dev/
+      owner: vaLak
+      desc: Cybersecurity, writeups
+      image: https://www.thefalsepositive.dev/assets/l_hero.png
+      color: "#191c19"
 # =============================================================================
 # Announcements
 # 公告系统 - 在页面顶部显示重要通知
@@ -244,8 +250,10 @@ friends:
 # -----------------------------------------------------------------------------
 # 取消下方注释即可启用公告示例：
 # -----------------------------------------------------------------------------
-announcements: # - id: welcome-2026 # 唯一标识符
-#   title: 2026 年新年快乐! # 公告标题
+announcements:
+  # - id: welcome-2026 # 唯一标识符
+  #   title: 2026 年新年快乐! # 公告标题
+
 #   content: 新年快乐! 感谢大家一直以来的支持~ # 公告内容
 #   type: success # 类型: info/success/warning/error
 #   priority: 10 # 优先级，数值越大越靠前
@@ -463,11 +471,11 @@ navigation:
     #     recaptchaV3Key: reCAPTCHA v3 Key (可选)
     #     turnstileKey: Cloudflare Turnstile Key (可选)
     #     locale: 自定义语言显示 (可选)
-# twikoo:
-# envId: # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
-# region: # 环境地域，默认为 ap-shanghai
-# path: # 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
-# lang: # 语言 (默认: 'zh-CN')
+    # twikoo:
+    # envId: # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
+    # region: # 环境地域，默认为 ap-shanghai
+    # path: # 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
+    # lang: # 语言 (默认: 'zh-CN')
 
 comment:
   provider: none # 'remark42' | 'giscus' | 'waline' | 'twikoo' | 'none'
@@ -558,15 +566,15 @@ analytics:
     # -----------------------------------------------------------------------------
 seo:
   robots:
-  # policy:                          # 爬虫策略（可选，取消注释并配置）
-  #   - userAgent: '*'
-  #     allow: '/'
-  #     disallow:
-  #       - '/api/'
-  # host: true                       # 可选：添加 Host 指令（Yandex）
-  # =============================================================================
-  # Christmas/Seasonal Features
-  # =============================================================================
+    # policy:                          # 爬虫策略（可选，取消注释并配置）
+    #   - userAgent: '*'
+    #     allow: '/'
+    #     disallow:
+    #       - '/api/'
+    # host: true                       # 可选：添加 Host 指令（Yandex）
+    # =============================================================================
+    # Christmas/Seasonal Features
+    # =============================================================================
 bgm:
   enabled: true
   audio:
