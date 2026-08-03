@@ -53,6 +53,7 @@ i18n:
 categoryMap:
   # Primary categories
   笔记: note
+  Notes: note
   工具: tools
   周刊: weekly
   # Secondary categories (for nested paths)
