@@ -1,6 +1,6 @@
 ---
 title: astro-koharu へようこそ
-link: getting-started
+link: getting-started-ja
 catalog: true
 date: 2024-01-01 00:00:00
 description: astro-koharu ブログテーマへようこそ！Astro で構築されたモダンなブログシステムで、エレガントなインターフェースと豊富な機能を備えています。

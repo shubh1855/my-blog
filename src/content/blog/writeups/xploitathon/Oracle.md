@@ -1,4 +1,5 @@
 ---
+link: 'writeups/xploitathon/oracle'
 title: "Oracle - Xploitathon CTF"
 description: "Writeup for Oracle from Xploitathon."
 date: 2026-03-06 14:45:00

@@ -1,4 +1,5 @@
 ---
+link: 'writeups/xploitathon/ecorp-vault'
 title: "Ecorp Vault - Xploitathon CTF"
 description: "Writeup for Ecorp Vault from Xploitathon."
 date: 2026-03-06 15:45:00

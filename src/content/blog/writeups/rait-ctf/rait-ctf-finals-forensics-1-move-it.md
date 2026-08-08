@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-finals-forensics-1-move-it'
 title: "RAIT-CTF Finals Forensics 1 - Move It"
 description: "Writeup for RAIT-CTF Finals Forensics 1 - Move It from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

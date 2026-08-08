@@ -1,4 +1,5 @@
 ---
+link: 'writeups/xploitathon/ghost-process'
 title: "Ghost Process - Xploitathon CTF"
 description: "Writeup for Ghost Process from Xploitathon."
 date: 2026-03-06 14:30:00

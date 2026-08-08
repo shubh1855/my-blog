@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-finals-crypto-1-secure-shell'
 title: "RAIT-CTF Finals Crypto 1 - Secure Shell"
 description: "Writeup for RAIT-CTF Finals Crypto 1 - Secure Shell from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

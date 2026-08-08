@@ -1,4 +1,5 @@
 ---
+link: 'writeups/xploitathon/dark-army-terminal'
 title: "Dark Army Terminal - Xploitathon CTF"
 description: "Writeup for Dark Army Terminal from Xploitathon."
 date: 2026-03-06 16:00:00

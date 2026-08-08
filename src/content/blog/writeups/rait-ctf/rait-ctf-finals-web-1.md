@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-finals-web-1'
 title: "RAIT-CTF Finals Web 1"
 description: "Writeup for RAIT-CTF Finals Web 1 from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

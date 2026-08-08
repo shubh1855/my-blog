@@ -58,7 +58,7 @@ export const defaultCoverList = yamlConfig?.defaultCoverList?.length ? yamlConfi
 export const commentConfig: CommentConfig = yamlConfig.comment || {};
 
 // Map YAML analytics config
-const analyticsConfig: AnalyticsConfig = yamlConfig.analytics || {};
+export const analyticsConfig: AnalyticsConfig = yamlConfig.analytics || {};
 
 const _umami = analyticsConfig?.umami;
 

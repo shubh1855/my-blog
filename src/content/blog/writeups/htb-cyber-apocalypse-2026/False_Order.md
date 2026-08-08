@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/false_order'
 title: "False Order"
 description: "Detailed writeup for False Order from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-29

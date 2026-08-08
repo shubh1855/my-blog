@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/the_compressed_truth'
 title: "The Compressed Truth"
 description: "Detailed writeup for The Compressed Truth from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-27

@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-finals-reverse-1-runner'
 title: "RAIT-CTF Finals Reverse 1 - Runner"
 description: "Writeup for RAIT-CTF Finals Reverse 1 - Runner from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

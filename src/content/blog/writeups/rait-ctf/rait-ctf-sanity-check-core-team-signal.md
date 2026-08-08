@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-sanity-check-core-team-signal'
 title: "RAIT-CTF Sanity Check – Core Team Signal"
 description: "Writeup for RAIT-CTF Sanity Check – Core Team Signal from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

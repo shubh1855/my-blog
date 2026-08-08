@@ -1,4 +1,5 @@
 ---
+link: 'writeups/xploitathon/temporal-evidence'
 title: "Temporal Evidence - Xploitathon CTF"
 description: "Writeup for Temporal Evidence from Xploitathon."
 date: 2026-03-06 14:00:00

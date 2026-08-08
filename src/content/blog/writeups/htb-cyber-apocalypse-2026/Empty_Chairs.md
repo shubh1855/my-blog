@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/empty_chairs'
 title: "Empty Chairs"
 description: "Detailed writeup for Empty Chairs from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-29

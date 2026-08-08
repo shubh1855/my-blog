@@ -5,9 +5,9 @@
  * Meting API at runtime, builds a grouped playlist, and renders the player UI.
  */
 
-import { useAudioPlayer } from '@hooks/useAudioPlayer';
 import { useTranslation } from '@hooks/useTranslation';
-import type { MetingSong } from '@lib/meting';
+import { useYouTubePlayer } from '@hooks/useYouTubePlayer';
+import type { YouTubeTrack } from '@lib/config/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PlayerPlaylist } from './audio-player/PlayerPlaylist';
 import { PlayerPreview } from './audio-player/PlayerPreview';
@@ -15,7 +15,7 @@ import { MediaControls } from './shared/MediaControls';
 
 interface AudioGroup {
   title?: string;
-  list: MetingSong[];
+  list: YouTubeTrack[];
 }
 
 interface PlaylistGroup {
@@ -31,7 +31,7 @@ interface AudioPlayerProps {
 export function AudioPlayer({ element }: AudioPlayerProps) {
   const { t } = useTranslation();
   const dataSrc = element.dataset.src || '[]';
-  
+
   const audioGroups: AudioGroup[] = useMemo(() => {
     try {
       return JSON.parse(dataSrc);
@@ -40,12 +40,12 @@ export function AudioPlayer({ element }: AudioPlayerProps) {
     }
   }, [dataSrc]);
 
-  const [tracks, setTracks] = useState<MetingSong[]>([]);
+  const [tracks, setTracks] = useState<YouTubeTrack[]>([]);
   const [groups, setGroups] = useState<PlaylistGroup[]>([]);
   const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
-    const allTracks: MetingSong[] = [];
+    const allTracks: YouTubeTrack[] = [];
     const resolvedGroups: PlaylistGroup[] = [];
 
     for (const group of audioGroups) {
@@ -62,7 +62,7 @@ export function AudioPlayer({ element }: AudioPlayerProps) {
     setGroups(resolvedGroups);
   }, [audioGroups]);
 
-  const player = useAudioPlayer(tracks);
+  const player = useYouTubePlayer(tracks);
   const currentTrack = tracks[player.state.currentIndex] ?? null;
 
   const handleTrackSelect = useCallback(

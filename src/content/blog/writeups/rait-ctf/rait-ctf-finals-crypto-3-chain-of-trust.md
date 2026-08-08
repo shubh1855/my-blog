@@ -1,4 +1,5 @@
 ---
+link: 'writeups/rait-ctf/rait-ctf-finals-crypto-3-chain-of-trust'
 title: "RAIT-CTF Finals Crypto 3 - Chain of Trust"
 description: "Writeup for RAIT-CTF Finals Crypto 3 - Chain of Trust from RAIT-CTF 2026 Finals."
 date: 2026-07-06 22:45:00

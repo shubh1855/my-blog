@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/hollow-courier'
 title: "The Hollow Courier"
 description: "Writeup for The Hollow Courier from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-30

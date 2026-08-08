@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/the_ash_binder_signature'
 title: "The Ash-Binder Signature"
 description: "Detailed writeup for The Ash-Binder Signature from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-29

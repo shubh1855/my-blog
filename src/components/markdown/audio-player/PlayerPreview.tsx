@@ -2,15 +2,17 @@
  * PlayerPreview — vinyl disc with tonearm (left) + song info + centered lyrics (right).
  */
 
-import type { MetingSong } from '@lib/meting';
+import type { YouTubeTrack } from '@lib/config/types';
 import type { PlaybackTimeStore } from '@lib/playback-time-store';
 import { cn } from '@lib/utils';
 import { memo } from 'react';
 
 interface PlayerPreviewProps {
-  track: MetingSong | null;
+  track: YouTubeTrack | null;
   playing: boolean;
   timeStore: PlaybackTimeStore;
+  lrcLineHeight?: number;
+  lrcContainerHeight?: number;
 }
 
 export const PlayerPreview = memo(function PlayerPreview({ track, playing }: PlayerPreviewProps) {
@@ -19,8 +21,13 @@ export const PlayerPreview = memo(function PlayerPreview({ track, playing }: Pla
       {/* Disc wrapper: vinyl disc + tonearm */}
       <div className="audio-player-disc-wrapper">
         <div className={cn('audio-player-disc', playing && 'spinning')}>
-          {track?.pic ? (
-            <img src={track.pic} alt={track.name || ''} className="audio-player-cover" draggable={false} />
+          {track?.youtubeId ? (
+            <img
+              src={`https://img.youtube.com/vi/${track.youtubeId}/mqdefault.jpg`}
+              alt={track.name || ''}
+              className="audio-player-cover"
+              draggable={false}
+            />
           ) : (
             <div className="audio-player-cover audio-player-cover-placeholder" />
           )}

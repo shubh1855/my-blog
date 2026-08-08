@@ -1,4 +1,5 @@
 ---
+link: 'writeups/htb-cyber-apocalypse-2026/deception_strategy'
 title: "Deception Strategy"
 description: "Detailed writeup for Deception Strategy from Hack The Box Cyber Apocalypse CTF 2026: The Salt Crown."
 date: 2026-07-28

@@ -1,4 +1,5 @@
 ---
+link: 'writeups/technovate/technovate-web-writeup'
 title: "Technovate CTF: The Memories Writeup"
 description: "A multi-step web exploitation chain combining credential leakage, IDOR, SSTI, and Flask session forgery."
 date: 2026-07-06 22:25:00
