@@ -74,7 +74,7 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
         if (upstream.reason === 'missing' && checkOnly) {
           dispatch({
             type: 'ERROR',
-            error: 'Check mode doesn't modify repository, please manually add upstream or use non --check mode',
+            error: "Check mode doesn't modify repository, please manually add upstream or use non --check mode",
           });
           return undefined;
         }
@@ -95,7 +95,7 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
         if (!hasUpstreamTrackingRef()) {
           dispatch({
             type: 'ERROR',
-            error: 'Check mode doesn't run git fetch, please manually run git fetch upstream',
+            error: "Check mode doesn't run git fetch, please manually run git fetch upstream",
           });
           return undefined;
         }
