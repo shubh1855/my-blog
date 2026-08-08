@@ -2,9 +2,11 @@
  * Consumer hooks for PlaybackTimeStore.
  *
  * - `usePlaybackProgress` — imperative DOM updates for progress bars (zero re-renders)
+ * - `usePlaybackLrcIndex` — discrete sync for lyric line changes (~0.1-0.5 re-renders/s)
  * - `usePlaybackFormattedTime` — discrete sync for time text (max 1 re-render/s)
  */
 
+import type { LrcLine } from '@components/markdown/audio-player/LrcParser';
 import { formatTime } from '@components/markdown/audio-player/utils';
 import type { PlaybackTimeStore } from '@lib/playback-time-store';
 import { type RefObject, useEffect, useRef, useSyncExternalStore } from 'react';
@@ -18,7 +20,6 @@ export function usePlaybackProgress(
   progressBarRef: RefObject<HTMLElement | null>,
   sliderRef?: RefObject<HTMLElement | null>,
 ) {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ref.current is accessed imperatively, refs are stable identity objects
   useEffect(() => {
     const sync = () => {
       const bar = progressBarRef.current;
@@ -33,7 +34,36 @@ export function usePlaybackProgress(
     };
     sync();
     return timeStore.subscribe(sync);
-  }, [timeStore]);
+  }, [timeStore, progressBarRef, sliderRef]);
+}
+
+/** Binary search for the current lyric line index. */
+function findCurrentLrcIndex(lines: LrcLine[], time: number): number {
+  let lo = 0;
+  let hi = lines.length - 1;
+  let result = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >>> 1;
+    if (lines[mid].time <= time) {
+      result = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return result;
+}
+
+/**
+ * Returns the current lyric line index via useSyncExternalStore.
+ * Only triggers re-render when the index actually changes.
+ */
+export function usePlaybackLrcIndex(timeStore: PlaybackTimeStore, lrcLines: LrcLine[]): number {
+  return useSyncExternalStore(
+    timeStore.subscribe,
+    () => findCurrentLrcIndex(lrcLines, timeStore.getCurrentTime()),
+    () => -1,
+  );
 }
 
 /**

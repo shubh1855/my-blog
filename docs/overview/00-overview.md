@@ -1,256 +1,256 @@
-# astro-koharu Project Overview
+# astro-koharu 项目总览
 
-## Project Introduction
+## 项目简介
 
-astro-koharu is a modern static blog system built on top of **Astro 5.x**, migrated from Hexo, and inspired by the Shoka theme. The project uses React for interactive components and Tailwind CSS for styling, while maintaining compatibility with the original Hexo blog content.
+astro-koharu 是一个基于 **Astro 7.x** 构建的现代化静态博客系统，从 Hexo 迁移而来，灵感源自 Shoka 主题。项目采用 React 实现交互组件，Tailwind CSS 进行样式设计，同时保持与原有 Hexo 博客内容的兼容性。
 
-### Project Features
+### 项目特点
 
-- **High Performance**: Astro Islands architecture, zero JavaScript by default, loaded on demand
-- **Modern**: React 19 + Tailwind CSS 4 + Motion animation library
-- **Content First**: Astro Content Collections managing 183+ blog posts
-- **Full-Text Search**: Pagefind static search, no backend required
-- **Theme Switching**: Dark/light modes supporting View Transitions animations
-- **Hexo Compatibility**: Retains original post formats and category structures
+- **高性能**：Astro Islands 架构，默认零 JavaScript，按需加载
+- **现代化**：React 19 + Tailwind CSS 4 + Motion 动画库
+- **内容优先**：Astro Content Collections 管理 183+ 篇博客文章
+- **全文搜索**：Pagefind 静态搜索，无需后端
+- **主题切换**：深色/浅色模式，支持 View Transitions 动画
+- **Hexo 兼容**：保留原有文章格式和分类结构
 
 ---
 
-## Tech Stack Overview
+## 技术栈概览
 
 ```plain
 ┌─────────────────────────────────────────────────────────────┐
 │                        astro-koharu                         │
 ├─────────────────────────────────────────────────────────────┤
-│  Framework Layer                                            │
+│  框架层                                                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │  Astro 5.x  │  │  React 19   │  │  TypeScript │         │
+│  │  Astro 7.x  │  │  React 19   │  │  TypeScript │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 ├─────────────────────────────────────────────────────────────┤
-│  Styling Layer                                              │
+│  样式层                                                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │ Tailwind 4  │  │   Motion    │  │  CSS Vars   │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 ├─────────────────────────────────────────────────────────────┤
-│  Feature Layer                                              │
+│  功能层                                                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │ Nanostores  │  │  Pagefind   │  │ Floating UI │         │
-│  │ State Mgt.  │  │ Full Search │  │Float Position│        │
+│  │  状态管理    │  │  全文搜索    │  │  浮动定位    │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 ├─────────────────────────────────────────────────────────────┤
-│  Content Layer                                              │
+│  内容层                                                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │  Content    │  │   Shiki     │  │   Rehype    │         │
-│  │ Collections │  │Code Highltng│  │  Markdown   │         │
+│  │ Collections │  │  代码高亮    │  │  Markdown   │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Core Dependencies Overview
+### 核心依赖说明
 
-| Dependency | Version | Purpose |
-| --- | --- | --- |
-| `astro` | 5.2.3 | Core framework, static site generation |
-| `react` | 19.0.0 | Interactive component development |
-| `tailwindcss` | 4.0.0 | Atomic CSS framework |
-| `motion` | 11.15.0 | Animation library (successor to Framer Motion) |
-| `nanostores` | - | Lightweight state management |
-| `astro-pagefind` | - | Static full-text search |
-| `astro-icon` | 1.1.5 | Icon system (Iconify) |
+| 依赖             | 版本    | 用途                           |
+| ---------------- | ------- | ------------------------------ |
+| `astro`          | 5.2.3   | 核心框架，静态站点生成         |
+| `react`          | 19.0.0  | 交互组件开发                   |
+| `tailwindcss`    | 4.0.0   | 原子化 CSS 框架                |
+| `motion`         | 11.15.0 | 动画库（Framer Motion 后继者） |
+| `nanostores`     | -       | 轻量级状态管理                 |
+| `astro-pagefind` | -       | 静态全文搜索                   |
+| `astro-icon`     | 1.1.5   | 图标系统（Iconify）            |
 
 ---
 
-## Directory Structure
+## 目录结构
 
 ```plain
 astro-koharu/
-├── public/                     # Static assets (copied directly to build directory)
+├── public/                     # 静态资源（直接复制到构建目录）
 │   ├── favicon.ico
-│   ├── img/                    # Image assets
-│   │   ├── avatar.webp        # Avatar
-│   │   └── cover/             # Article covers
-│   └── js/                     # Third-party scripts
+│   ├── img/                    # 图片资源
+│   │   ├── avatar.webp        # 头像
+│   │   └── cover/             # 文章封面
+│   └── js/                     # 第三方脚本
 │
-├── src/                        # Source code
-│   ├── assets/                 # Assets requiring processing
-│   │   └── svg/               # SVG files
+├── src/                        # 源代码
+│   ├── assets/                 # 需要处理的资源
+│   │   └── svg/               # SVG 文件
 │   │
-│   ├── components/             # Component library (60+ components)
-│   │   ├── common/            # Common components (ErrorBoundary)
-│   │   ├── layout/            # Layout components (Header, Navigator)
-│   │   ├── ui/                # UI base components (Button, Card, Popover)
-│   │   ├── post/              # Post-related components
-│   │   ├── category/          # Category components
-│   │   ├── theme/             # Theme switcher
-│   │   ├── friends/           # Friend link components
-│   │   └── comment/           # Comment components
+│   ├── components/             # 组件库（60+ 组件）
+│   │   ├── common/            # 通用组件（ErrorBoundary）
+│   │   ├── layout/            # 布局组件（Header, Navigator）
+│   │   ├── ui/                # UI 基础组件（Button, Card, Popover）
+│   │   ├── post/              # 文章相关组件
+│   │   ├── category/          # 分类组件
+│   │   ├── theme/             # 主题切换
+│   │   ├── friends/           # 友链组件
+│   │   └── comment/           # 评论组件
 │   │
 │   ├── content/                # Astro Content Collections
-│   │   ├── config.ts          # Schema definition
-│   │   └── blog/              # Blog posts (183 articles)
-│   │       ├── life/          # Essays / Life
-│   │       ├── note/          # Notes
-│   │       │   ├── front-end/ # Front-end notes
+│   │   ├── config.ts          # Schema 定义
+│   │   └── blog/              # 博客文章（183 篇）
+│   │       ├── life/          # 随笔
+│   │       ├── note/          # 笔记
+│   │       │   ├── front-end/ # 前端笔记
 │   │       │   └── ...
-│   │       ├── weekly/        # Weekly issues
+│   │       ├── weekly/        # 周刊
 │   │       └── ...
 │   │
-│   ├── constants/              # Constant configurations
-│   │   ├── site-config.ts     # Site configuration (most important)
-│   │   ├── router.ts          # Navigation routing
-│   │   ├── design-tokens.ts   # Design tokens
-│   │   └── anim/              # Animation configuration
+│   ├── constants/              # 常量配置
+│   │   ├── site-config.ts     # 站点配置（最重要）
+│   │   ├── router.ts          # 导航路由
+│   │   ├── design-tokens.ts   # 设计令牌
+│   │   └── anim/              # 动画配置
 │   │
 │   ├── hooks/                  # React Hooks
 │   │   ├── useToggle.ts
 │   │   ├── useFloatingUI.ts
 │   │   └── ...
 │   │
-│   ├── layouts/                # Page layouts
-│   │   ├── Layout.astro       # Main layout
+│   ├── layouts/                # 页面布局
+│   │   ├── Layout.astro       # 主布局
 │   │   └── TwoColumnLayout.astro
 │   │
-│   ├── lib/                    # Utility functions
-│   │   ├── content/           # Content operations
-│   │   │   ├── posts.ts       # Post queries
-│   │   │   ├── categories.ts  # Category processing
-│   │   │   └── tags.ts        # Tag processing
-│   │   ├── utils.ts           # General utilities
-│   │   └── datetime.ts        # Date processing
+│   ├── lib/                    # 工具函数
+│   │   ├── content/           # 内容操作
+│   │   │   ├── posts.ts       # 文章查询
+│   │   │   ├── categories.ts  # 分类处理
+│   │   │   └── tags.ts        # 标签处理
+│   │   ├── utils.ts           # 通用工具
+│   │   └── datetime.ts        # 日期处理
 │   │
-│   ├── pages/                  # Page routes
-│   │   ├── index.astro        # Home page
-│   │   ├── post/[...slug].astro    # Post detail
-│   │   ├── posts/[...page].astro   # Post list
-│   │   ├── categories/        # Category pages
-│   │   ├── tags/              # Tag pages
-│   │   └── rss.xml.ts         # RSS feed
+│   ├── pages/                  # 页面路由
+│   │   ├── index.astro        # 首页
+│   │   ├── post/[...slug].astro    # 文章详情
+│   │   ├── posts/[...page].astro   # 文章列表
+│   │   ├── categories/        # 分类页面
+│   │   ├── tags/              # 标签页面
+│   │   └── rss.xml.ts         # RSS 源
 │   │
-│   ├── store/                  # Nanostores state
-│   │   ├── app.ts             # App state
-│   │   └── ui.ts              # UI state
+│   ├── store/                  # Nanostores 状态
+│   │   ├── app.ts             # 应用状态
+│   │   └── ui.ts              # UI 状态
 │   │
-│   ├── styles/                 # Global styles
-│   │   ├── index.css          # Entry point
-│   │   ├── global/            # Global styles
-│   │   ├── theme/             # Theme styles
-│   │   └── components/        # Component styles
+│   ├── styles/                 # 全局样式
+│   │   ├── index.css          # 入口
+│   │   ├── global/            # 全局样式
+│   │   ├── theme/             # 主题样式
+│   │   └── components/        # 组件样式
 │   │
-│   └── types/                  # TypeScript types
+│   └── types/                  # TypeScript 类型
 │       ├── blog.ts
 │       └── components.ts
 │
-├── astro.config.mjs            # Astro configuration
-├── tailwind.config.mjs         # Tailwind configuration
-├── tsconfig.json               # TypeScript configuration
-├── package.json                # Dependencies and scripts
-├── _config.yml                 # Hexo category mapping (legacy)
-└── CLAUDE.md                   # AI assistant guide
+├── astro.config.mjs            # Astro 配置
+├── tailwind.config.mjs         # Tailwind 配置
+├── tsconfig.json               # TypeScript 配置
+├── package.json                # 依赖和脚本
+├── _config.yml                 # Hexo 分类映射（遗留）
+└── CLAUDE.md                   # AI 助手指南
 ```
 
 ---
 
-## Quick Start
+## 快速开始
 
-### Environment Requirements
+### 环境要求
 
-- **Node.js**: 18.x or higher
-- **Package Manager**: pnpm 9.15.1 (specified by project)
+- **Node.js**: 22.20.0 或更高版本
+- **包管理器**: pnpm 10.28.2（项目指定）
 
-### Installation & Execution
+### 安装与运行
 
 ```bash
-# 1. Clone the repository
+# 1. 克隆项目
 git clone <repo-url>
 cd astro-koharu
 
-# 2. Install dependencies
+# 2. 安装依赖
 pnpm install
 
-# 3. Start development server
+# 3. 启动开发服务器
 pnpm dev
-# Visit http://localhost:4321
+# 访问 http://localhost:4321
 
-# 4. Build production version
+# 4. 构建生产版本
 pnpm build
 
-# 5. Preview build result
+# 5. 预览构建结果
 pnpm preview
 ```
 
-### Common Commands Reference
+### 常用命令速查
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build production version |
-| `pnpm preview` | Preview production build |
-| `pnpm lint` | Run ESLint checks |
-| `pnpm lint-md` | Check Markdown files |
-| `pnpm lint-md:fix` | Automatically fix Markdown issues |
-| `pnpm knip` | Find unused code and dependencies |
-| `pnpm change` | Generate CHANGELOG |
+| 命令               | 说明                   |
+| ------------------ | ---------------------- |
+| `pnpm dev`         | 启动开发服务器         |
+| `pnpm build`       | 构建生产版本           |
+| `pnpm preview`     | 预览生产构建           |
+| `pnpm lint`        | 运行 ESLint 检查       |
+| `pnpm lint-md`     | 检查 Markdown 文件     |
+| `pnpm lint-md:fix` | 自动修复 Markdown 问题 |
+| `pnpm knip`        | 查找未使用的代码和依赖 |
+| `pnpm change`      | 生成 CHANGELOG         |
 
 ---
 
-## Path Aliases
+## 路径别名
 
-The project configures rich path aliases to simplify import paths:
+项目配置了丰富的路径别名，简化导入路径：
 
 ```typescript
-// Defined in tsconfig.json
+// tsconfig.json 中定义
 import { cn } from '@lib/utils';           // src/lib/utils.ts
 import { Button } from '@components/ui/button';  // src/components/ui/button.tsx
 import { siteConfig } from '@constants/site-config';  // src/constants/site-config.ts
 import type { BlogPost } from '@types/blog';  // src/types/blog.ts
 ```
 
-| Alias | Mapped Path |
-| --- | --- |
-| `@/*` | `src/*` |
+| 别名            | 对应路径           |
+| --------------- | ------------------ |
+| `@/*`           | `src/*`            |
 | `@components/*` | `src/components/*` |
-| `@lib/*` | `src/lib/*` |
-| `@constants/*` | `src/constants/*` |
-| `@hooks/*` | `src/hooks/*` |
-| `@store/*` | `src/store/*` |
-| `@types/*` | `src/types/*` |
-| `@layouts/*` | `src/layouts/*` |
-| `@pages/*` | `src/pages/*` |
-| `@content/*` | `src/content/*` |
-| `@styles/*` | `src/styles/*` |
-| `@assets/*` | `src/assets/*` |
-| `@scripts/*` | `src/scripts/*` |
+| `@lib/*`        | `src/lib/*`        |
+| `@constants/*`  | `src/constants/*`  |
+| `@hooks/*`      | `src/hooks/*`      |
+| `@store/*`      | `src/store/*`      |
+| `@types/*`      | `src/types/*`      |
+| `@layouts/*`    | `src/layouts/*`    |
+| `@pages/*`      | `src/pages/*`      |
+| `@content/*`    | `src/content/*`    |
+| `@styles/*`     | `src/styles/*`     |
+| `@assets/*`     | `src/assets/*`     |
+| `@scripts/*`    | `src/scripts/*`    |
 
 ---
 
-## Site Configuration
+## 站点配置
 
-The core site configuration is located at `src/constants/site-config.ts`:
+站点的核心配置位于 `src/constants/site-config.ts`：
 
 ```typescript
 export const siteConfig = {
-  // Basic info
+  // 基本信息
   title: '余弦の博客',
   alternate: 'cosine',
   subtitle: 'WA 的一声就哭了',
   name: 'cos',
   description: 'FE / ACG / 手工 / 深色模式强迫症...',
 
-  // Resources
+  // 资源
   avatar: '/img/avatar.webp',
   site: 'https://blog.cosine.ren/',
   startYear: 2020,
 
-  // Featured categories (displayed on home page)
+  // 特色分类（首页展示）
   featuredCategories: [...],
 
-  // Weekly column configuration
+  // 周刊专栏配置
   featuredSeries: {
     categoryName: '周刊',
     label: 'FE Bits',
     fullName: 'FE Bits 前端周周谈',
   },
 
-  // Social links
+  // 社交链接
   socialConfig: {
     github: '...',
     bilibili: '...',
@@ -263,46 +263,49 @@ export const siteConfig = {
 
 ---
 
-## Page Routing Overview
+## 页面路由概览
 
 ```plain
-/                           # Home page (Latest posts + Sticky posts)
-├── /posts/[page]           # Post list pagination
-├── /post/[slug]            # Post detail page
-├── /categories/            # Category index
-│   └── /categories/[...slug]  # Category page (supports multi-level)
-├── /tags/                  # Tag index
-│   └── /tags/[tag]         # Tag page
-├── /archives               # Archives page
-├── /weekly                 # Weekly column
-├── /friends                # Friends page
-├── /about                  # About page
-└── /rss.xml                # RSS feed
+/                           # 首页（最新文章 + 置顶）
+├── /posts/[page]           # 文章列表分页
+├── /post/[slug]            # 文章详情页
+├── /categories/            # 分类首页
+│   └── /categories/[...slug]  # 分类页面（支持多级）
+├── /tags/                  # 标签首页
+│   └── /tags/[tag]         # 标签页面
+├── /archives               # 归档页面
+├── /weekly                 # 周刊专栏
+├── /friends                # 友链页面
+├── /about                  # 关于页面
+└── /rss.xml                # RSS 订阅源
 ```
 
 ---
 
-## Document Navigation
+## 文档导航
 
-This document series consists of 10 articles, recommended to be read in order:
+本系列文档共 13 篇，建议按顺序阅读：
 
-1. **[00-overview.md](./00-overview.md)** (Current) - Project overview and quick start
-2. **[01-architecture.md](./01-architecture.md)** - Architecture design and tech stack
-3. **[02-content-system.md](./02-content-system.md)** - Content system deep dive
-4. **[03-routing.md](./03-routing.md)** - Routing system detailed guide
-5. **[04-component-patterns.md](./04-component-patterns.md)** - Component patterns and best practices
-6. **[05-ui-components.md](./05-ui-components.md)** - UI component library implementation
-7. **[06-state-management.md](./06-state-management.md)** - State management (Nanostores)
-8. **[07-theme-system.md](./07-theme-system.md)** - Theme system implementation
-9. **[08-animation-system.md](./08-animation-system.md)** - Animation system design
-10. **[09-styling.md](./09-styling.md)** - Styling system (Tailwind + Design Tokens)
+1. **[00-overview.md](./00-overview.md)**（当前） - 项目总览与快速开始
+2. **[01-architecture.md](./01-architecture.md)** - 架构设计与技术栈
+3. **[02-content-system.md](./02-content-system.md)** - 内容系统深度解析
+4. **[03-routing.md](./03-routing.md)** - 路由系统详解
+5. **[04-component-patterns.md](./04-component-patterns.md)** - 组件模式与最佳实践
+6. **[05-ui-components.md](./05-ui-components.md)** - UI 组件库实现
+7. **[06-state-management.md](./06-state-management.md)** - 状态管理（Nanostores）
+8. **[07-theme-system.md](./07-theme-system.md)** - 主题系统实现
+9. **[08-animation-system.md](./08-animation-system.md)** - 动画系统设计
+10. **[09-styling.md](./09-styling.md)** - 样式系统（Tailwind + 设计令牌）
+11. **[10-markdown-system.md](./10-markdown-system.md)** - Markdown 处理管线
+12. **[11-deployment-adapters.md](./11-deployment-adapters.md)** - 静态部署与适配器边界
+13. **[12-astro-7-upgrade.md](./12-astro-7-upgrade.md)** - Astro 7 升级、验证与回滚
 
 ---
 
-## Key Takeaways
+## 学习要点
 
-- astro-koharu is a modern blog project migrated from Hexo to Astro
-- Uses Astro Islands architecture, static rendering by default, React components hydrated on demand
-- Clear project structure, organized modularly by feature
-- Uses pnpm as package manager to ensure consistent dependency versions
-- Path aliases simplify module imports and enhance development experience
+- astro-koharu 是一个从 Hexo 迁移到 Astro 的现代化博客项目
+- 采用 Astro Islands 架构，默认静态渲染，按需激活 React 组件
+- 项目结构清晰，按功能模块化组织
+- 使用 pnpm 作为包管理器，确保一致的依赖版本
+- 路径别名简化了模块导入，提升开发体验

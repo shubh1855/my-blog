@@ -1,257 +1,253 @@
-# Link Embedding Feature
+# 链接嵌入功能
 
 ![](https://r2.cosine.ren/i/2026/01/6804aa167fd4cf7022a9b511d52017ce.webp)
 
-Automatically converts standalone Twitter/X and CodePen links into embed components, and displays OG preview cards for other links.
+自动将独行的 Twitter/X、CodePen 链接转换为嵌入组件,并为其他链接显示 OG 预览卡片。
 
-## Features
+## 功能特性
 
-### 1. Automatic Tweet Embedding
+### 1. Tweet 自动嵌入
 
-Automatically converts standalone Twitter or X links into beautiful Tweet embed components:
+将独行的 Twitter 或 X 链接自动转换为美观的 Tweet 嵌入组件:
 
-- ✅ Supports `twitter.com` and `x.com` domains
-- ✅ Only 16KB in size (vs Twitter native iframe 560KB)
-- ✅ Automatically adapts to dark/light themes
-- ✅ Server-side rendered, requiring no client-side JavaScript loading
-- ✅ No iframe, avoiding layout shift
+- ✅ 支持 `twitter.com` 和 `x.com` 域名
+- ✅ 仅 16KB 大小 (vs Twitter 原生 iframe 560KB)
+- ✅ 自动适配深色/浅色主题
+- ✅ 服务端渲染,无需客户端 JavaScript 加载
+- ✅ 无 iframe,避免布局偏移
 
-**Example:**
+**示例:**
 
 ```markdown
-This is a standalone Tweet link that will automatically convert to an embed component:
+这是一条独行的 Tweet 链接,会自动转换为嵌入组件:
 
 https://twitter.com/vercel/status/1683949196632969217
 
-Or using the x.com domain:
+或者使用 x.com 域名:
 
 https://x.com/elonmusk/status/1683631781486342144
 ```
 
-### 2. Automatic CodePen Embedding
+### 2. CodePen 自动嵌入
 
-Automatically converts standalone CodePen links into interactive code demos:
+将独行的 CodePen 链接自动转换为交互式代码演示:
 
-- ✅ Supports `codepen.io` domain
-- ✅ Uses CodePen official embed format
-- ✅ Supports real-time code editing and preview
-- ✅ Automatically adapts to Astro page navigation
-- ✅ On-demand loading for optimized performance
-- ✅ Supports dark/light themes
+- ✅ 支持 `codepen.io` 域名
+- ✅ 使用 CodePen 官方嵌入格式
+- ✅ 支持实时代码编辑和预览
+- ✅ 自动适配 Astro 页面导航
+- ✅ 按需加载,优化性能
+- ✅ 支持深色/浅色主题
 
-**Example:**
+**示例:**
 
 ```markdown
-This is a standalone CodePen link that will automatically convert to an interactive embed:
+这是一个独行的 CodePen 链接,会自动转换为交互式嵌入:
 
 https://codepen.io/username/pen/PenId
 
-Supported formats:
+支持的格式:
 https://codepen.io/username/pen/PenId
 https://codepen.io/username/details/PenId
 ```
 
-**Technical Implementation:**
+**技术实现:**
 
-- Uses official CodePen Embed API (`__CPEmbed`)
-- Automatically handles Astro page transitions to ensure embeds initialize correctly
-- Scripts are loaded on-demand, only when the page contains CodePen embeds
-- Supports multiple CodePen embeds on the same page
+- 使用 CodePen 官方嵌入 API (`__CPEmbed`)
+- 自动处理 Astro 页面转换,确保嵌入正确初始化
+- 脚本按需加载,仅在页面包含 CodePen 嵌入时加载
+- 支持多个 CodePen 嵌入在同一页面
 
-### 3. Generic Link Preview
+### 3. 通用链接预览
 
-Displays OG (Open Graph) preview cards for standalone standard links:
+为独行的普通链接显示 OG (Open Graph) 预览卡片:
 
-- ✅ Fetches OG metadata (title, description, image) at build time
-- ✅ Fully static with zero runtime overhead
-- ✅ Displays site favicon and domain
-- ✅ Responsive design, mobile-friendly
-- ✅ Graceful error handling and fallback
-- ✅ Supports dark/light themes
-- ✅ SEO friendly
+- ✅ 构建时获取 OG 元数据 (标题、描述、图片)
+- ✅ 完全静态化,无运行时开销
+- ✅ 显示网站图标和域名
+- ✅ 响应式设计,适配移动端
+- ✅ 优雅的错误处理和降级
+- ✅ 支持深色/浅色主题
+- ✅ SEO 友好
 
-**Example:**
+**示例:**
 
 ```markdown
-This is a standalone link that will display an OG preview:
+这是一个独行的链接,会显示 OG 预览:
 
 https://github.com/vercel/react-tweet
 
-Another example:
+另一个例子:
 
 https://react-tweet.vercel.app/
 ```
 
-### 4. Inline Links Remain Unchanged
+### 3. 行内链接保持不变
 
-Links inside paragraphs will not be converted, maintaining their original style:
+段落中的链接不会被转换,保持原有样式:
 
 ```markdown
-The link [react-tweet](https://github.com/vercel/react-tweet) inside this paragraph will not be embedded.
+这段话中的链接 [react-tweet](https://github.com/vercel/react-tweet) 不会被嵌入。
 ```
 
-## How It Works
+## 工作原理
 
-### Markdown Processing Workflow
+### Markdown 处理流程
 
-1. **Remark Plugin Parsing**: `remark-link-embed` plugin identifies standalone links during Markdown compilation
-2. **Link Classification**:
-   - Detects Twitter/X links and extracts Tweet ID (client hydration)
-   - Other links use **metascraper** to fetch OG data at build time (server rendering)
-3. **Build-Time Processing**:
-   - Tweet: Generates placeholders, client hydrates
-   - Link Preview: Uses metascraper to fetch metadata, generating full static HTML
-4. **Client Hydration**: `EmbedHydrator` component handles Tweet embeds only
+1. **Remark 插件解析**: `remark-link-embed` 插件在 Markdown 编译时识别独行链接
+2. **链接分类**:
+   - 检测 Twitter/X 链接并提取 Tweet ID (客户端水合)
+   - 其他链接使用 **metascraper** 在构建时获取 OG 数据 (服务端渲染)
+3. **构建时处理**:
+   - Tweet: 生成占位符,客户端水合
+   - 链接预览: 使用 metascraper 获取元数据,生成完整静态 HTML
+4. **客户端水合**: `EmbedHydrator` 组件仅处理 Tweet 嵌入
 
-### Architecture Diagram
+### 架构图
 
 ```plain
-Markdown File
+Markdown 文件
     ↓
-remark-link-embed plugin (Identify standalone links)
+remark-link-embed 插件 (识别独行链接)
     ↓
-├─ Tweet Link → Generate placeholder (<div data-tweet-embed>)
+├─ Tweet 链接 → 生成占位符 (<div data-tweet-embed>)
 │                    ↓
-│               EmbedHydrator (Client-hydrate TweetEmbed)
+│               EmbedHydrator (客户端水合 TweetEmbed)
 │
-└─ Standard Link → metascraper fetches OG data at build time
+└─ 普通链接 → metascraper 构建时获取 OG 数据
                    ↓
-              Generate full static HTML
+              生成完整静态 HTML
 ```
 
-## Configuration Options
+## 配置选项
 
-Can be configured in `src/constants/content-config.ts`:
+在 `config/site.yaml` 的 `content:` 段中配置(相关字段):
 
-```typescript
-export interface ContentConfig {
-  // ... Other configurations
-
-  // Whether to enable link embedding feature
-  enableLinkEmbed: boolean;
-
-  // Whether to enable Tweet embedding
-  enableTweetEmbed: boolean;
-
-  // Whether to enable OG link preview
-  enableOGPreview: boolean;
-
-  // Preview data cache time (seconds)
-  previewCacheTime: number;
-
-  // Whether to lazy load embedded content
-  lazyLoadEmbeds: boolean;
-}
-
-export const defaultContentConfig: ContentConfig = {
-  // ... Other configurations
-  enableLinkEmbed: true,
-  enableTweetEmbed: true,
-  enableOGPreview: true,
-  enableCodePenEmbed: true,
-  previewCacheTime: 30, // 30 days
-  lazyLoadEmbeds: true,
-};
+```yaml
+content:
+  # ... 其他内容处理选项
+  enableLinkEmbed: true # 链接卡片预览
+  enableCodePenEmbed: true # CodePen 嵌入
+  enableTweetEmbed: true # 推文嵌入
+  enableOGPreview: true # OG 预览卡片
+  previewCacheTime: 30 # 预览缓存时间(天)
+  lazyLoadEmbeds: true # 延迟加载嵌入
 ```
 
-## File Structure
+字段说明:
+
+| 字段 | 默认值 | 说明 |
+| --- | --- | --- |
+| `enableLinkEmbed` | `true` | 是否启用链接嵌入功能(总开关) |
+| `enableCodePenEmbed` | `true` | 是否启用 CodePen 嵌入 |
+| `enableTweetEmbed` | `true` | 是否启用 Tweet 嵌入 |
+| `enableOGPreview` | `true` | 是否启用 OG 链接预览卡片 |
+| `previewCacheTime` | `30` | 预览数据缓存时间,单位为**天** |
+| `lazyLoadEmbeds` | `true` | 是否懒加载嵌入内容 |
+
+默认值与校验逻辑由 `src/lib/config/content.ts` 的 `normalizeContentConfig()` 统一维护,`content:` 段可以只写需要覆盖的字段,其余字段沿用默认值。`src/constants/content-config.ts` 只是对 `@lib/config/site` 的再导出,直接修改它不会生效。
+
+修改 `config/site.yaml` 后需要重启 dev server 或重新构建,YAML 配置在构建时会被缓存。
+
+## 文件结构
 
 ```plain
 src/
 ├── lib/
 │   └── markdown/
-│       ├── remark-link-embed.ts      # Remark plugin (using metascraper)
-│       └── link-utils.ts             # Link detection utilities
+│       ├── remark-link-embed.ts      # Remark 插件(使用 metascraper)
+│       └── link-utils.ts             # 链接检测工具
 ├── components/
 │   └── embed/
-│       ├── TweetEmbed.tsx            # Tweet embed component
-│       └── EmbedHydrator.tsx         # Hydration component (handles tweets only)
+│       ├── TweetEmbed.tsx            # Tweet 嵌入组件
+│       └── EmbedHydrator.tsx         # 水合组件(仅处理 tweets)
 └── styles/
     └── components/
-        └── embed.css                 # Embed component styles
+        └── embed.css                 # 嵌入组件样式
 ```
 
-## Build-Time Data Fetching (metascraper)
+## 构建时数据获取 (metascraper)
 
-Link preview uses **metascraper** to fetch OG metadata at build time without needing API endpoints:
+链接预览使用 **metascraper** 在构建时获取 OG 元数据,无需 API 端点:
 
-- **Powerful Metadata Extraction**: metascraper supports multiple metadata sources and rules
-- **Build-Time Processing**: OG data is fetched during Markdown compilation
-- **Fully Static**: Zero runtime overhead
-- **Graceful Fallback**: If fetching fails, degrades gracefully to a simple link
-- **Automatic Updates**: Link content updates require rebuilding the site
+- **强大的元数据提取**: metascraper 支持多种元数据源和规则
+- **构建时处理**: OG 数据在 Markdown 编译期间获取
+- **完全静态化**: 无运行时开销
+- **优雅降级**: 如果获取失败,会降级为简单链接
+- **自动更新**: 链接内容更新需要重新构建站点
 
-### metascraper Features
+### metascraper 特性
 
-- Supports standard Open Graph tags like og:title, og:description, og:image, etc.
-- Automatically extracts website logo/favicon
-- Smart fallback to meta tags and HTML title
-- Highly customizable rule system
+- 支持 og:title, og:description, og:image 等标准 Open Graph 标签
+- 自动提取网站 logo/favicon
+- 智能回退到 meta 标签和 HTML title
+- 高度可定制的规则系统
 
-## Performance Optimization
+## 性能优化
 
-### Tweet Embeds
+### Tweet 嵌入
 
-- Uses `react-tweet` library, only 16KB vs native Twitter embeds at 560KB
-- Server-side rendered, displayed on first screen load
-- No iframe, avoiding extra HTTP requests and layout shifts
+- 使用 `react-tweet` 库,仅 16KB vs 原生 Twitter 嵌入 560KB
+- 服务端渲染,首屏即显示
+- 无 iframe,避免额外的 HTTP 请求和布局偏移
 
-### Link Previews
+### 链接预览
 
-- **Fully Static**: Fetches OG data at build time, zero runtime overhead
-- **No JavaScript**: Does not require client-side JavaScript
-- **SEO Friendly**: Search engines can directly index preview content
-- **Graceful Fallback**: Displays simple link when fetching fails
-- **Faster Page Load**: No extra API requests required
+- **完全静态化**: 构建时获取 OG 数据,零运行时开销
+- **无 JavaScript**: 不需要客户端 JavaScript
+- **SEO 友好**: 搜索引擎可以直接索引预览内容
+- **优雅降级**: 获取失败时显示简单链接
+- **更快的页面加载**: 无需额外的 API 请求
 
-## Theme Support
+## 主题支持
 
-Both embeds support dark/light themes:
+两种嵌入都支持深色/浅色主题:
 
-- **TweetEmbed**: Listens for class changes on `document.documentElement` via MutationObserver
-- **Link Preview**: Uses Tailwind theme variables for automatic adaptation without JavaScript
+- **TweetEmbed**: 通过 MutationObserver 监听 `document.documentElement` 的 class 变化
+- **链接预览**: 使用 Tailwind 的主题变量,自动适配,无需 JavaScript
 
-## Troubleshooting
+## 故障排除
 
-### Tweet Not Displaying
+### Tweet 不显示
 
-1. Check if the Tweet ID is correct
-2. Confirm network connection is working
-3. Check if the Tweet has been deleted or set to private
+1. 检查 Tweet ID 是否正确
+2. 确认网络连接正常
+3. 检查 Tweet 是否已被删除或设为私密
 
-### Link Preview Not Displaying
+### 链接预览不显示
 
-1. Check if the target website has OG tags
-2. Check build logs to confirm whether OG data fetching succeeded
-3. If the website requires authentication or has access restrictions, previews may fail to fetch
-4. Check network connection to ensure access to the target website during build
+1. 检查目标网站是否有 OG 标签
+2. 查看构建日志,确认 OG 数据获取是否成功
+3. 如果网站需要认证或有访问限制,预览可能无法获取
+4. 检查网络连接,确保构建时能访问目标网站
 
-### Style Issues
+### 样式问题
 
-1. Ensure `src/styles/components/embed.css` is imported
-2. Check if react-tweet styles are loaded correctly
-3. Clear browser cache and retry
+1. 确保 `src/styles/components/embed.css` 已导入
+2. 检查 react-tweet 样式是否正确加载
+3. 清除浏览器缓存重试
 
-## Disabling Features
+## 禁用功能
 
-To disable this feature, configure in `src/constants/content-config.ts`:
+如需禁用此功能,可在 `config/site.yaml` 的 `content:` 段中设置:
 
-```typescript
-export const defaultContentConfig: ContentConfig = {
-  // ...
-  enableLinkEmbed: false,
-  // Or disable specific features individually
-  enableTweetEmbed: false,
-  enableOGPreview: false,
-};
+```yaml
+content:
+  enableLinkEmbed: false # 关闭链接嵌入总开关
+  # 或单独禁用某个功能
+  enableTweetEmbed: false
+  enableOGPreview: false
+  enableCodePenEmbed: false
 ```
 
-## Tech Stack
+同样地,修改后需要重启 dev server 或重新构建才会生效。
 
-- **react-tweet**: Tweet embedding library
-- **metascraper**: Powerful metadata extraction library for fetching OG data at build time
-- **remark**: Markdown processing
-- **unist-util-visit**: AST traversal
-- **React 19**: Tweet component rendering
-- **Astro 5**: Framework integration
-- **Static Site Generation (SSG)**: Link previews generated at build time
+## 技术栈
+
+- **react-tweet**: Tweet 嵌入库
+- **metascraper**: 强大的元数据提取库，构建时获取 OG 数据
+- **remark**: Markdown 处理
+- **unist-util-visit**: AST 遍历
+- **React 19**: Tweet 组件渲染
+- **Astro 7**: 框架集成
+- **静态站点生成 (SSG)**: 链接预览在构建时生成

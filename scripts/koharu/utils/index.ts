@@ -2,7 +2,7 @@
 export { type ParsedArgs, parseArgs } from './args';
 
 // Backup utilities
-export { type BackupInfo, getBackupList, parseBackupManifest } from './backup';
+export { type BackupInfo, getBackupList, getRestorableBackupList, parseBackupManifest } from './backup';
 
 // Backup operations
 export { type BackupOutput, type BackupResult, runBackup } from './backup-operations';
@@ -22,6 +22,10 @@ export {
   runGenerateAll,
   runScript,
 } from './generate-operations';
+// Git porcelain
+export { abortMerge, abortRebase } from './git-porcelain';
+// Migration operations
+export { applyContentMigration, type ContentMigrationPlan, planContentMigration } from './migration-operations';
 // New operations
 export {
   appendFriend,
@@ -35,18 +39,25 @@ export {
   loadSiteConfig,
   postExists,
 } from './new-operations';
+// Release feed
+export { buildReleaseUrl, extractReleaseSummary, fetchReleaseInfo } from './release-feed';
 // Restore operations
-export { getRestorePreview, type RestorePreviewItem, restoreBackup } from './restore-operations';
+export {
+  getRestorePreview,
+  type RestoreOptions,
+  type RestoreOutput,
+  type RestorePreview,
+  type RestorePreviewItem,
+  restoreBackup,
+} from './restore-operations';
 // Tar utilities
 export { tarCreate, tarExtract, tarExtractManifest, tarList } from './tar';
 // Update state machine
 export { statusEffects } from './update-effects';
 // Update operations
 export {
-  abortMerge,
   addUpstreamRemote,
   checkGitStatus,
-  cleanRestore,
   ensureUpstreamRemote,
   fetchUpstream,
   getUpdateInfo,
@@ -55,12 +66,13 @@ export {
   installDeps,
   mergeUpstream,
 } from './update-operations';
-export { createInitialState, updateReducer } from './update-reducer';
+export { createInitialState, selectUpdatePresentation, type UpdatePresentation, updateReducer } from './update-reducer';
 // Validation utilities
 export {
   isPathWithinBackupDir,
   isPathWithinDir,
   isValidBackupFile,
+  validateBackupArchive,
   validateBackupFilePath,
   validatePathInBackupDir,
 } from './validation';

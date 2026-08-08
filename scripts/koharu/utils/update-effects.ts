@@ -2,9 +2,10 @@ import path from 'node:path';
 import type { Dispatch } from 'react';
 import { BACKUP_DIR } from '../constants/paths';
 import { UPSTREAM_URL, type UpdateAction, type UpdateState, type UpdateStatus } from '../constants/update';
+import { git, resetHard } from './git-porcelain';
+import { restoreBackup } from './restore-operations';
 import {
   checkGitStatus,
-  cleanRestore,
   ensureUpstreamRemote,
   fetchUpstream,
   getUpdateInfo,
@@ -13,51 +14,74 @@ import {
   installDeps,
   listRecentTags,
   mergeUpstream,
+  readProjectPackageManager,
   tagExists,
 } from './update-operations';
 
-/** Internal implementation note. */
+/** Effect 函数类型：接收当前状态和 dispatch，可返回 cleanup 函数 */
 type EffectFn = (state: UpdateState, dispatch: Dispatch<UpdateAction>) => (() => void) | undefined;
 
 /**
- * Internal implementation note.
- * Internal implementation note.
+ * Clean 模式：从备份还原用户内容并 amend 到 merge commit。
+ *
+ * This spans the git and backup domains, so it lives in the effect layer rather
+ * than inside either operation module.
+ * @param preCleanSha 合并前的 commit SHA，还原失败时回滚到此状态
+ */
+function cleanRestore(backupPath: string, preCleanSha?: string): string[] {
+  try {
+    // restoreBackup throws when content migration fails, so a returned result is always fully migrated.
+    const { restoredFiles } = restoreBackup(backupPath);
+    git('add -A');
+    git('commit --amend --no-edit');
+    return restoredFiles;
+  } catch (error) {
+    // 还原失败，回滚到合并前的状态以保护用户数据
+    if (preCleanSha) resetHard(preCleanSha);
+    throw error;
+  }
+}
+
+/**
+ * 状态副作用映射表
+ * 每个需要执行副作用的状态对应一个 effect 函数
  */
 export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
   checking: (state, dispatch) => {
     try {
-      // Internal implementation note.
+      // --clean 和 --rebase 互斥
       if (state.options.clean && state.options.rebase) {
-        dispatch({ type: 'ERROR', error: '--clean and --rebase cannot be used together' });
+        dispatch({ type: 'ERROR', error: '--clean 和 --rebase 不能同时使用' });
         return undefined;
       }
 
       const gitStatus = checkGitStatus();
+      const packageManager = readProjectPackageManager();
       const { checkOnly } = state.options;
 
-      // Internal implementation note.
+      // 确保 upstream remote 存在
       const upstream = ensureUpstreamRemote({ allowAdd: !checkOnly });
       if (!upstream.success) {
         if (upstream.reason === 'mismatch') {
           const currentUrl = upstream.currentUrl ?? 'unknown';
           dispatch({
             type: 'ERROR',
-            error: `upstream already exists but points to ${currentUrl}; please manually change it to  ${UPSTREAM_URL}`,
+            error: `upstream 已存在但指向 ${currentUrl}，请手动调整为 ${UPSTREAM_URL}`,
           });
           return undefined;
         }
         if (upstream.reason === 'missing' && checkOnly) {
           dispatch({
             type: 'ERROR',
-            error: 'Check mode does not modify the repository; add upstream manually or use non---check mode',
+            error: '检查模式不会修改仓库，请先手动添加 upstream 或使用非 --check 模式',
           });
           return undefined;
         }
-        dispatch({ type: 'ERROR', error: 'Unable to add upstream remote' });
+        dispatch({ type: 'ERROR', error: '无法添加 upstream remote' });
         return undefined;
       }
 
-      dispatch({ type: 'GIT_CHECKED', payload: gitStatus });
+      dispatch({ type: 'GIT_CHECKED', payload: gitStatus, packageManager });
     } catch (err) {
       dispatch({ type: 'ERROR', error: err instanceof Error ? err.message : String(err) });
     }
@@ -70,32 +94,32 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
         if (!hasUpstreamTrackingRef()) {
           dispatch({
             type: 'ERROR',
-            error: 'Check mode does not run git fetch; run git fetch upstream manually',
+            error: '检查模式不会执行 git fetch，请先手动执行 git fetch upstream',
           });
           return undefined;
         }
       } else {
         const success = fetchUpstream();
         if (!success) {
-          dispatch({ type: 'ERROR', error: 'Unable to fetch upstream updates; check network connection' });
+          dispatch({ type: 'ERROR', error: '无法获取 upstream 更新，请检查网络连接' });
           return undefined;
         }
       }
 
-      // Internal implementation note.
+      // 如果指定了 targetTag，验证其存在性
       if (state.options.targetTag && !tagExists(state.options.targetTag)) {
         const recentTags = listRecentTags(5);
-        const tagsHint = recentTags.length > 0 ? `\nAvailable versions: ${recentTags.join(', ')}` : '';
+        const tagsHint = recentTags.length > 0 ? `\n可用的版本: ${recentTags.join(', ')}` : '';
         dispatch({
           type: 'ERROR',
-          error: `Tag "${state.options.targetTag}" does not exist${tagsHint}`,
+          error: `Tag "${state.options.targetTag}" 不存在${tagsHint}`,
         });
         return undefined;
       }
 
       const info = getUpdateInfo(state.options.targetTag);
 
-      // Internal implementation note.
+      // 检测是否需要首次迁移提示（rebase/clean 模式不需要）
       const needsMigration = !state.options.clean && !state.options.rebase && !hasUpstreamMergeHistory();
 
       dispatch({ type: 'FETCHED', payload: info, needsMigration });
@@ -108,7 +132,7 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
   merging: (state, dispatch) => {
     let cancelled = false;
 
-    // Internal implementation note.
+    // 延迟到微任务让 Ink 先渲染一帧 Spinner（execSync 仍会阻塞后续帧）
     Promise.resolve()
       .then(() => {
         if (cancelled) return;
@@ -133,25 +157,22 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
   'clean-restoring': (state, dispatch) => {
     let cancelled = false;
 
-    // Internal implementation note.
+    // 延迟到微任务让 Ink 先渲染一帧 Spinner（execSync 仍会阻塞后续帧）
     Promise.resolve()
       .then(() => {
         if (cancelled) return;
         if (!state.backupFile) {
-          dispatch({ type: 'ERROR', error: 'Clean mode needs a backup file, but no backup was found' });
+          dispatch({ type: 'ERROR', error: 'Clean 模式需要备份文件，但未找到备份' });
           return;
         }
-        // Internal implementation note.
+        // backupFile 存储的是 basename，需要构造完整路径
         const fullPath = path.join(BACKUP_DIR, state.backupFile);
         const restoredFiles = cleanRestore(fullPath, state.mergeResult?.preCleanSha);
         dispatch({ type: 'CLEAN_RESTORED', restoredFiles });
       })
       .catch((err) => {
         if (cancelled) return;
-        dispatch({
-          type: 'ERROR',
-          error: `Failed to restore user content: ${err instanceof Error ? err.message : String(err)}`,
-        });
+        dispatch({ type: 'ERROR', error: `还原用户内容失败: ${err instanceof Error ? err.message : String(err)}` });
       });
 
     return () => {
@@ -159,14 +180,14 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
     };
   },
 
-  installing: (_state, dispatch) => {
+  installing: (state, dispatch) => {
     let cancelled = false;
 
-    installDeps()
+    installDeps(state.packageManager)
       .then((result) => {
         if (cancelled) return;
         if (!result.success) {
-          dispatch({ type: 'ERROR', error: `Dependency install failed: ${result.error}` });
+          dispatch({ type: 'ERROR', error: `依赖安装失败: ${result.error}` });
           return;
         }
         dispatch({ type: 'INSTALLED' });
@@ -176,7 +197,7 @@ export const statusEffects: Partial<Record<UpdateStatus, EffectFn>> = {
         dispatch({ type: 'ERROR', error: err instanceof Error ? err.message : String(err) });
       });
 
-    // Internal implementation note.
+    // 返回 cleanup 函数，防止组件卸载后更新状态
     return () => {
       cancelled = true;
     };

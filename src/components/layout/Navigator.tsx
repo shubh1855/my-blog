@@ -67,8 +67,6 @@ const Navigator = memo(function Navigator({ currentPath, locale = defaultLocale 
   const strippedPath = stripLocaleFromPath(currentPath);
   const isPostPageMobile = isTablet && strippedPath.startsWith('/post/');
 
-  const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isScrollingRef = useRef(false);
   const firstScrollRef = useRef(true);
 
   // Apply with-background class based on scroll position
@@ -89,18 +87,9 @@ const Navigator = memo(function Navigator({ currentPath, locale = defaultLocale 
 
     // Post page mobile: keep header visible during scroll
     if (isPostPageMobile) {
-      if (scrollEndTimerRef.current) {
-        clearTimeout(scrollEndTimerRef.current);
-      }
-      isScrollingRef.current = true;
-
       // Ensure header is visible
       siteHeader?.classList.remove('-translate-y-full');
       mobileMenuContainer?.classList.remove('-translate-y-full');
-
-      scrollEndTimerRef.current = setTimeout(() => {
-        isScrollingRef.current = false;
-      }, 800);
       return;
     }
 
@@ -114,15 +103,6 @@ const Navigator = memo(function Navigator({ currentPath, locale = defaultLocale 
     }
   }, [direction, isPostPageMobile]);
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (scrollEndTimerRef.current) {
-        clearTimeout(scrollEndTimerRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="flex grow tablet:grow-0 items-center">
       {/* Desktop navigation */}
@@ -133,7 +113,7 @@ const Navigator = memo(function Navigator({ currentPath, locale = defaultLocale 
             return <DropdownNav key={item.path ?? item.name} item={item} currentPath={currentPath} locale={locale} />;
           }
           if (!item.path || !displayName) return null;
-          const localizedUrl = localizedPath(item.path, locale);
+          const localizedUrl = item.localeIndependent ? item.path : localizedPath(item.path, locale);
           return (
             <ButtonLink key={item.path} url={localizedUrl} label={displayName} isActive={item.path === strippedPath}>
               {item.icon && <NavIcon name={item.icon} />}

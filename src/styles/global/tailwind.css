@@ -3,6 +3,12 @@
 @import "./utils.css";
 @config "../../../tailwind.config.mjs";
 
+@font-face {
+  font-family: "Bear Days";
+  src: url("/fonts/bear-days.woff2") format("woff2");
+  font-display: swap;
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -21,11 +27,10 @@
 
   body {
     overscroll-behavior-y: none;
-    background-color: hsl(var(--background));
+    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
     scroll-behavior: smooth;
     letter-spacing: 0.02em;
     color: hsl(var(--foreground));
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   h1,
@@ -38,15 +43,34 @@
     letter-spacing: 0.02em;
   }
 
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+  }
+
+  /* Japanese pages: use Gen Jyuu Gothic P for correct JIS glyphs (fix #113) */
+  :lang(ja) {
+    font-family: "Gen Jyuu Gothic P", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  :lang(ja) :is(h1, h2, h3, h4, h5, h6) {
+    font-family: "Gen Jyuu Gothic P", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
   html {
     scrollbar-gutter: stable;
-    background: hsl(var(--background));
+    background: linear-gradient(to top, var(--gradient-bg-end) 0, var(--gradient-bg-start) 30%) no-repeat bottom;
     overflow: auto;
+  }
+
+  @media (992px >= width) {
+    html {
+      scrollbar-gutter: auto;
+    }
   }
 
   .vertical-scrollbar::-webkit-scrollbar {
     display: block;
-    width: var(--scrollbar-width, 0.15rem);
+    width: var(--scrollbar-width, 0.25rem);
     background: hsl(var(--background)); /* background color */
   }
 
@@ -57,7 +81,7 @@
 
   .horizontal-scrollbar::-webkit-scrollbar {
     display: block;
-    height: var(--scrollbar-width, 0.15rem);
+    height: var(--scrollbar-width, 0.25rem);
     background: hsl(var(--background)); /* background color */
   }
 
@@ -86,10 +110,10 @@
   #site-header {
     @apply relative translate-y-0 text-white transition-transform duration-300;
 
-    /* Pseudo-element for background with opacity transition */
+    /* Pseudo-element for gradient background with opacity transition */
     &::before {
       content: "";
-      @apply pointer-events-none absolute inset-0 -z-1 bg-background opacity-0 transition-opacity duration-300 ease-out;
+      @apply pointer-events-none absolute inset-0 -z-1 bg-gradient-header opacity-0 transition-opacity duration-300 ease-out;
     }
 
     button,
@@ -113,32 +137,18 @@
   .logo-text {
     font-size: 2rem;
     text-shadow:
-      3px 4px 2px #0f0b1d,
-      -1px -1px 0px rgba(176, 80, 160, 0.25);
+      3px 4px 2px #060000,
+      -1px -1px 0px #ffffff;
     text-transform: uppercase;
     letter-spacing: 1px;
-    line-height: 1.1;
+    line-height: 0.95;
     text-align: center;
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "Bear Days", sans-serif;
     font-weight: 700;
-    color: #5a4fba;
-    padding: 0.15em 0.1em;
+    color: #e9546b;
   }
 }
 
 .dark .logo-text {
-  color: #b858a8;
-}
-
-/* Geass symbol floating button */
-.geass-btn-icon img {
-  filter: drop-shadow(0 0 6px rgba(176, 80, 160, 0.7)) drop-shadow(0 0 12px rgba(138, 38, 102, 0.5));
-  transition: filter 0.3s ease;
-  opacity: 0.9;
-}
-
-button:hover .geass-btn-icon img {
-  filter: drop-shadow(0 0 10px rgba(184, 88, 168, 1)) drop-shadow(0 0 22px rgba(176, 80, 160, 0.9))
-    drop-shadow(0 0 36px rgba(138, 38, 102, 0.6));
-  opacity: 1;
+  color: #ed788c;
 }

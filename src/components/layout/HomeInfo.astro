@@ -37,21 +37,14 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
 ---
 
 <div class={cn('flex flex-col items-center md:py-2', className)} data-home-info-container={uniqueId}>
-  <div class="relative h-40 w-40 rounded-lg overflow-hidden" style={getLqipStyle((siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg)$/i, '.webp'))}>
-    <picture>
-      <source media="(max-width: 768px)" srcset={(siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" />
-      <img
-        transition:persist="page-home-info-avatar"
-        class="shadow-card-darker h-full w-full rounded-lg object-cover transition"
-        src={(siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg)$/i, '.webp')}
-        alt={`${siteConfig.name ?? ''} avatar`}
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-        width="160"
-        height="160"
-      />
-    </picture>
+  <div class="relative h-40 w-40 rounded-full" style={getLqipStyle(siteConfig.avatar ?? '/img/avatar.webp')}>
+    <img
+      class="shadow-card-darker hover:animate-shake h-full w-full rounded-full transition"
+      src={siteConfig.avatar ?? '/img/avatar.webp'}
+      alt={`${siteConfig.name ?? ''} avatar`}
+      loading="eager"
+      fetchpriority="high"
+    />
     {christmasConfig.enabled && christmasConfig.features.christmasHat && <ChristmasHat />}
   </div>
 
@@ -59,19 +52,21 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
   <p class="text-muted-foreground mt-3 text-center">{siteConfig?.description}</p>
   <Social />
   <div
-    class="text-muted-foreground mt-3 flex w-full px-4 justify-center text-center text-sm/4 whitespace-nowrap select-none dark:text-white/80"
+    class="text-muted-foreground mt-3 flex justify-center text-center text-sm/4 whitespace-nowrap select-none dark:text-white/80"
   >
-    <a href={localizedPath('/', locale)} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
+    <a href={localizedPath('/', locale)} class="hover:text-blue flex cursor-pointer flex-col gap-2 p-1 transition">
       <span class="text-lg/5 font-bold">{postCount}</span>
       {t(locale, 'homeInfo.articles')}
     </a>
-    <div class="bg-muted-foreground mx-1 w-px"></div>
-    <a href={localizedPath('/categories', locale)} aria-label={t(locale, 'homeInfo.categories')} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
-      <span class="text-lg/5 font-bold">{Object.keys(countMap).length}</span>
-      {t(locale, 'homeInfo.categories')}
+    <div class="bg-muted-foreground mx-3 w-px"></div>
+    <a href={localizedPath('/categories', locale)} aria-label={t(locale, 'homeInfo.categories')} class="hover:text-blue">
+      <p class="flex cursor-pointer flex-col gap-2 p-1 transition">
+        <span class="text-lg/5 font-bold">{Object.keys(countMap).length}</span>
+        {t(locale, 'homeInfo.categories')}
+      </p>
     </a>
-    <div class="bg-muted-foreground mx-1 w-px"></div>
-    <a href={localizedPath('/tags', locale)} class="hover:text-blue flex flex-1 cursor-pointer flex-col items-center gap-2 p-1 transition">
+    <div class="bg-muted-foreground mx-3 w-px"></div>
+    <a href={localizedPath('/tags', locale)} class="hover:text-blue flex cursor-pointer flex-col gap-2 p-1 transition">
       <span class="text-lg/5 font-bold">{allTags?.length ?? 0}</span>
       {t(locale, 'homeInfo.tags')}
     </a>
@@ -106,7 +101,11 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
                 <div class="flex flex-col items-center">
                   {item.children.map((child) => {
                     const childName = resolveNavName(child.nameKey, child.name, locale);
-                    const childUrl = child.path ? localizedPath(child.path, locale) : child.path;
+                    const childUrl = child.path
+                      ? child.localeIndependent
+                        ? child.path
+                        : localizedPath(child.path, locale)
+                      : child.path;
                     return (
                       <ButtonLink
                         url={childUrl}
@@ -127,7 +126,7 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
             </div>
           );
         }
-        const itemUrl = item.path ? localizedPath(item.path, locale) : item.path;
+        const itemUrl = item.path ? (item.localeIndependent ? item.path : localizedPath(item.path, locale)) : item.path;
         return (
           <ButtonLink
             url={itemUrl}

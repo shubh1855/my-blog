@@ -41,7 +41,10 @@ export function EmbedHydrator({ containerRef }: EmbedHydratorProps) {
         id: `tweet-${i}`,
         type: 'tweet',
         element,
-        data: { tweetId: element.dataset.tweetId || '' },
+        data: {
+          tweetId: element.dataset.tweetId || '',
+          url: element.dataset.url || '',
+        },
       });
     });
 
@@ -81,7 +84,14 @@ export function EmbedHydrator({ containerRef }: EmbedHydratorProps) {
       {targets.map((target) => {
         switch (target.type) {
           case 'tweet':
-            return createPortal(<TweetEmbed key={target.id} tweetId={target.data.tweetId} />, target.element);
+            return createPortal(
+              <TweetEmbed
+                key={target.id}
+                sourceUrl={target.data.url || `https://x.com/i/status/${target.data.tweetId}`}
+                tweetId={target.data.tweetId}
+              />,
+              target.element,
+            );
           case 'codepen':
             return createPortal(
               <CodePenEmbed key={target.id} user={target.data.user} penId={target.data.penId} url={target.data.url} />,

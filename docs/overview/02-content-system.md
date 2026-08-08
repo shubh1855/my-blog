@@ -1,74 +1,78 @@
-# Content System Deep Dive
+# 内容系统深度解析
 
-## Overview
+## 概述
 
-astro-koharu's content system is based on **Astro Content Collections**, which is Astro's native content management solution. It provides type-safe content queries, Markdown/MDX support, and flexible Schema validation.
+astro-koharu 的内容系统基于 **Astro Content Collections**，这是 Astro 原生的内容管理方案。它提供了类型安全的内容查询、Markdown/MDX 支持、以及灵活的 Schema 验证。
 
-The content system in this project also includes a complex **category system** designed to handle multi-level category structures migrated from Hexo.
+本项目的内容系统还包含了一套复杂的**分类系统**，用于处理从 Hexo 迁移过来的多层级分类结构。
 
 ---
 
-## Astro Content Collections Fundamentals
+## Astro Content Collections 基础
 
-### What are Content Collections?
+### 什么是 Content Collections？
 
-Content Collections are Astro's official way to manage content, organizing Markdown/MDX files into queryable collections:
+Content Collections 是 Astro 管理内容的官方方式，它将 Markdown/MDX 文件组织成可查询的集合：
 
 ```plain
-src/content/
-├── config.ts          # Schema definition
-└── blog/              # blog collection
-    ├── life/
-    │   └── post1.md
-    ├── note/
-    │   ├── front-end/
-    │   │   └── react-learning.md
-    │   └── algorithm/
-    │       └── sorting.md
-    └── weekly/
-        └── issue-01.md
+src/
+├── content.config.ts  # Schema 与 loader 定义
+└── content/
+    └── blog/          # blog 集合
+        ├── life/
+        │   └── post1.md
+        ├── note/
+        │   ├── front-end/
+        │   │   └── react-learning.md
+        │   └── algorithm/
+        │       └── sorting.md
+        └── weekly/
+            └── issue-01.md
 ```
 
-### Core Advantages
+### 核心优势
 
-1. **Type Safety**: Schema validation + TypeScript type inference
-2. **Automatic Parsing**: Markdown frontmatter automatically converted to objects
-3. **High-Performance Querying**: Statically generated at build time, zero runtime overhead
-4. **Flexible Organization**: Supports nested directory structures
+1. **类型安全**：Schema 验证 + TypeScript 类型推导
+2. **自动解析**：Markdown frontmatter 自动转换为对象
+3. **高性能查询**：构建时静态生成，无运行时开销
+4. **灵活组织**：支持嵌套目录结构
 
 ---
 
-## Schema Definition
+## Schema 定义
 
-### Configuration File `src/content/config.ts`
+### 配置文件 `src/content.config.ts`
 
 ```typescript
-import type { BlogSchema } from 'types/blog';
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+import type { BlogSchema, BlogSchemaInput } from 'types/blog';
 
 const blogCollection = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/blog' }),
   schema: z.object({
-    // Required fields
-    title: z.string(),              // Article title
-    date: z.date(),                 // Publication date
+    // 必填字段
+    title: z.string(),              // 文章标题
+    date: z.date(),                 // 发布日期
 
-    // Optional fields
-    description: z.string().optional(),  // Article description/summary
-    link: z.string().optional(),         // Custom URL identifier
-    cover: z.string().optional(),        // Cover image path
-    tags: z.array(z.string()).optional(), // Tag array
+    // 可选字段
+    description: z.string().optional(),  // 文章描述/摘要
+    link: z.string().optional(),         // 自定义 URL 标识符
+    cover: z.string().optional(),        // 封面图片路径
+    tags: z.array(z.string()).optional(), // 标签数组
 
-    // Hexo compatibility fields
-    subtitle: z.string().optional(),     // Subtitle (legacy Hexo)
-    catalog: z.boolean().optional(),     // Whether to show table of contents
-    sticky: z.boolean().optional(),      // Whether sticky/pinned
+    // Hexo 兼容字段
+    subtitle: z.string().optional(),     // 副标题（旧 Hexo）
+    catalog: z.boolean().optional(),     // 是否显示目录
+    sticky: z.boolean().optional(),      // 是否置顶
 
-    // Category field (supports two formats)
+    // 分类字段（支持两种格式）
     categories: z
-      .array(z.string())                    // Format 1: ['Tools']
-      .or(z.array(z.array(z.string())))     // Format 2: [['Notes', 'Front-End', 'React']]
+      .array(z.string())                    // 格式1: ['工具']
+      .or(z.array(z.array(z.string())))     // 格式2: [['笔记', '前端', 'React']]
       .optional(),
-  }) satisfies z.ZodType<BlogSchema>,
+  }) satisfies z.ZodType<BlogSchema, BlogSchemaInput>,
 });
 
 export const collections = {
@@ -76,57 +80,57 @@ export const collections = {
 };
 ```
 
-### Schema Field Descriptions
+### Schema 字段说明
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `title` | `string` | Yes | Article title |
-| `date` | `Date` | Yes | Publication date |
-| `description` | `string` | No | SEO description/summary |
-| `link` | `string` | No | Custom URL (defaults to filename) |
-| `cover` | `string` | No | Cover image path |
-| `tags` | `string[]` | No | Tag array |
-| `categories` | See below | No | Category (supports multi-level) |
-| `sticky` | `boolean` | No | Sticky flag |
-| `catalog` | `boolean` | No | Whether to generate catalog/TOC (Hexo legacy) |
-| `subtitle` | `string` | No | Subtitle (Hexo legacy) |
+| 字段          | 类型       | 必填 | 说明                       |
+| ------------- | ---------- | ---- | -------------------------- |
+| `title`       | `string`   | 是   | 文章标题                   |
+| `date`        | `Date`     | 是   | 发布日期                   |
+| `description` | `string`   | 否   | SEO 描述/摘要              |
+| `link`        | `string`   | 否   | 自定义 URL（默认用文件名） |
+| `cover`       | `string`   | 否   | 封面图路径                 |
+| `tags`        | `string[]` | 否   | 标签数组                   |
+| `categories`  | 见下文     | 否   | 分类（支持多层级）         |
+| `sticky`      | `boolean`  | 否   | 置顶标记                   |
+| `catalog`     | `boolean`  | 否   | 是否生成目录（Hexo 遗留）  |
+| `subtitle`    | `string`   | 否   | 副标题（Hexo 遗留）        |
 
 ---
 
-## Category System Implementation
+## 分类系统实现
 
-### Category Format Support
+### 分类格式支持
 
-The project supports two category formats to ensure compatibility with historical Hexo data:
+项目支持两种分类格式，以兼容 Hexo 的历史数据：
 
 ```yaml
-# Format 1: Single-level category
+# 格式 1：单层分类
 categories:
   - 工具
 
-# Format 2: Multi-level category (Recommended)
+# 格式 2：多层分类（推荐）
 categories:
   - [笔记, 前端, React]
 ```
 
-These two formats are processed uniformly in code:
+这两种格式在代码中统一处理：
 
 ```typescript
 // src/lib/content/posts.ts
 const firstCategory = categories[0];
 
 if (Array.isArray(firstCategory)) {
-  // Format 2: Multi-level category ['笔记', '前端', 'React']
+  // 格式 2：多层分类 ['笔记', '前端', 'React']
   return firstCategory.includes(categoryName);
 } else if (typeof firstCategory === 'string') {
-  // Format 1: Single-level category '工具'
+  // 格式 1：单层分类 '工具'
   return firstCategory === categoryName;
 }
 ```
 
-### Category Mapping `_config.yml`
+### 分类映射 `_config.yml`
 
-Since Chinese characters cannot be used directly in URLs, the project uses a mapping table to translate Chinese category names to English slugs:
+由于 URL 中不能直接使用中文，项目使用映射表将中文分类名转换为英文 slug：
 
 ```yaml
 # _config.yml
@@ -137,10 +141,10 @@ category_map:
   React: react
   工具: tools
   周刊: weekly
-  # ... total of 22 category mappings
+  # ... 共 22 个分类映射
 ```
 
-The mapping table is exported in `src/constants/category.ts`:
+映射表在 `src/constants/category.ts` 中被导出：
 
 ```typescript
 // src/constants/category.ts
@@ -152,19 +156,19 @@ export const categoryMap: Record<string, string> = {
 };
 ```
 
-### Category Tree Structure
+### 分类树结构
 
-Categories are organized in a tree structure, supporting infinitely nested levels:
+分类以树形结构组织，支持无限层级嵌套：
 
 ```typescript
 // src/lib/content/types.ts
 type Category = {
-  name: string;           // Category name (Chinese)
-  children?: Category[];  // Child categories
+  name: string;           // 分类名（中文）
+  children?: Category[];  // 子分类
 };
 ```
 
-Example of an actual category tree:
+实际的分类树示例：
 
 ```plain
 笔记
@@ -179,16 +183,16 @@ Example of an actual category tree:
 
 ---
 
-## Core Functions Detailed
+## 核心函数详解
 
-### 1. Get Category List `getCategoryList()`
+### 1. 获取分类列表 `getCategoryList()`
 
 ```typescript
 // src/lib/content/categories.ts
 export async function getCategoryList(): Promise<CategoryListResult> {
   const allBlogPosts = await getCollection('blog');
-  const countMap: { [key: string]: number } = {};  // Category post counts
-  const resCategories: Category[] = [];            // Category tree
+  const countMap: { [key: string]: number } = {};  // 分类文章计数
+  const resCategories: Category[] = [];            // 分类树
 
   for (const post of allBlogPosts) {
     const { catalog, categories } = post.data;
@@ -197,12 +201,12 @@ export async function getCategoryList(): Promise<CategoryListResult> {
     const firstCategory = categories[0];
 
     if (Array.isArray(firstCategory)) {
-      // Multi-level category: ['笔记', '前端', 'React']
+      // 多层分类：['笔记', '前端', 'React']
       for (let j = 0; j < firstCategory.length; ++j) {
         const name = firstCategory[j];
         countMap[name] = (countMap[name] || 0) + 1;
 
-        // Recursively build category tree
+        // 递归构建分类树
         if (j === 0) {
           addCategoryRecursively(resCategories, [], name);
         } else {
@@ -211,7 +215,7 @@ export async function getCategoryList(): Promise<CategoryListResult> {
         }
       }
     } else if (typeof firstCategory === 'string') {
-      // Single-level category: '工具'
+      // 单层分类：'工具'
       countMap[firstCategory] = (countMap[firstCategory] || 0) + 1;
       addCategoryRecursively(resCategories, [], firstCategory);
     }
@@ -221,7 +225,7 @@ export async function getCategoryList(): Promise<CategoryListResult> {
 }
 ```
 
-**Return Value Structure**:
+**返回值结构**：
 
 ```typescript
 {
@@ -244,9 +248,9 @@ export async function getCategoryList(): Promise<CategoryListResult> {
 }
 ```
 
-### 2. Recursively Add Category `addCategoryRecursively()`
+### 2. 递归添加分类 `addCategoryRecursively()`
 
-This is the core recursive function for building the category tree:
+这是构建分类树的核心递归函数：
 
 ```typescript
 // src/lib/content/categories.ts
@@ -256,21 +260,21 @@ export function addCategoryRecursively(
   name: string
 ) {
   if (parentNames.length === 0) {
-    // Root category: add directly
+    // 根分类：直接添加
     const index = rootCategories.findIndex((c) => c.name === name);
     if (index === -1) rootCategories.push({ name });
   } else {
-    // Sub-category: find parent category then recurse
+    // 子分类：找到父分类后递归
     const rootParentName = parentNames[0];
     const index = rootCategories.findIndex((c) => c.name === rootParentName);
 
     if (index === -1) {
-      // Parent category does not exist, create it
+      // 父分类不存在，创建
       const rootParentCategory = { name: rootParentName, children: [] };
       rootCategories.push(rootParentCategory);
       addCategoryRecursively(rootParentCategory.children, parentNames.slice(1), name);
     } else {
-      // Parent category exists, continue recursion
+      // 父分类存在，继续递归
       const rootParentCategory = rootCategories[index];
       if (!rootParentCategory?.children) rootParentCategory.children = [];
       addCategoryRecursively(rootParentCategory.children, parentNames.slice(1), name);
@@ -279,18 +283,18 @@ export function addCategoryRecursively(
 }
 ```
 
-**Execution Flow Example**:
+**执行流程示例**：
 
 ```plain
-Input: ['笔记', '前端', 'React']
+输入: ['笔记', '前端', 'React']
 
-Step 1: addCategoryRecursively([], [], '笔记')
+第 1 步: addCategoryRecursively([], [], '笔记')
   → categories = [{ name: '笔记' }]
 
-Step 2: addCategoryRecursively([], ['笔记'], '前端')
+第 2 步: addCategoryRecursively([], ['笔记'], '前端')
   → categories = [{ name: '笔记', children: [{ name: '前端' }] }]
 
-Step 3: addCategoryRecursively([], ['笔记', '前端'], 'React')
+第 3 步: addCategoryRecursively([], ['笔记', '前端'], 'React')
   → categories = [{
       name: '笔记',
       children: [{
@@ -300,9 +304,9 @@ Step 3: addCategoryRecursively([], ['笔记', '前端'], 'React')
     }]
 ```
 
-### 3. Build Category Path `buildCategoryPath()`
+### 3. 构建分类路径 `buildCategoryPath()`
 
-Converts an array of category names into a URL path:
+将分类名数组转换为 URL 路径：
 
 ```typescript
 // src/lib/content/categories.ts
@@ -316,7 +320,7 @@ export function buildCategoryPath(categoryNames: string | string[]): string {
   return '/categories/' + slugs.join('/');
 }
 
-// Example
+// 示例
 buildCategoryPath(['笔记', '前端', 'React'])
 // → '/categories/note/front-end/react'
 
@@ -324,9 +328,9 @@ buildCategoryPath('工具')
 // → '/categories/tools'
 ```
 
-### 4. Get Category by Link `getCategoryByLink()`
+### 4. 根据链接获取分类 `getCategoryByLink()`
 
-Reverse lookup of category object from URL path:
+从 URL 路径反向查找分类对象：
 
 ```typescript
 // src/lib/content/categories.ts
@@ -340,7 +344,7 @@ export function getCategoryByLink(
   for (const category of categories) {
     if (category.name === name) return category;
 
-    // Recursively search child categories
+    // 递归搜索子分类
     if (category?.children?.length) {
       const res = getCategoryByLink(category.children, link);
       if (res) return res;
@@ -352,23 +356,23 @@ export function getCategoryByLink(
 
 ---
 
-## Article Query Functions
+## 文章查询函数
 
-### Get Sorted Posts `getSortedPosts()`
+### 获取排序后的文章 `getSortedPosts()`
 
 ```typescript
 // src/lib/content/posts.ts
 export async function getSortedPosts(): Promise<CollectionEntry<'blog'>[]> {
   const posts = await getCollection('blog');
 
-  // Sort in descending order by date (newest first)
+  // 按日期降序排列（最新在前）
   return posts.sort((a, b) => {
     return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
   });
 }
 ```
 
-### Get Sticky Posts `getPostsBySticky()`
+### 获取置顶文章 `getPostsBySticky()`
 
 ```typescript
 // src/lib/content/posts.ts
@@ -393,7 +397,7 @@ export async function getPostsBySticky(): Promise<{
 }
 ```
 
-### Get Posts by Category `getPostsByCategory()`
+### 获取分类下的文章 `getPostsByCategory()`
 
 ```typescript
 // src/lib/content/posts.ts
@@ -406,7 +410,7 @@ export async function getPostsByCategory(categoryName: string): Promise<BlogPost
 
     const firstCategory = categories[0];
 
-    // Handle two category formats
+    // 处理两种分类格式
     if (Array.isArray(firstCategory)) {
       return firstCategory.includes(categoryName);
     } else if (typeof firstCategory === 'string') {
@@ -417,9 +421,9 @@ export async function getPostsByCategory(categoryName: string): Promise<BlogPost
 }
 ```
 
-### Get Series Posts `getSeriesPosts()`
+### 获取系列文章 `getSeriesPosts()`
 
-Series posts refer to all posts under the same deepest category level:
+系列文章是指同一最深层分类下的所有文章：
 
 ```typescript
 // src/lib/content/posts.ts
@@ -430,7 +434,7 @@ export async function getSeriesPosts(post: BlogPost): Promise<BlogPost[]> {
   return await getPostsByCategory(lastCategory.name);
 }
 
-// Get the deepest category level of a post
+// 获取文章的最深层分类
 export function getPostLastCategory(post: BlogPost): { link: string; name: string } {
   const { categories } = post.data;
   if (!categories?.length) return { link: '', name: '' };
@@ -438,7 +442,7 @@ export function getPostLastCategory(post: BlogPost): { link: string; name: strin
   const firstCategory = categories[0];
 
   if (Array.isArray(firstCategory)) {
-    // ['笔记', '前端', 'React'] → returns 'React'
+    // ['笔记', '前端', 'React'] → 返回 'React'
     return {
       link: buildCategoryPath(firstCategory),
       name: firstCategory[firstCategory.length - 1],
@@ -454,9 +458,9 @@ export function getPostLastCategory(post: BlogPost): { link: string; name: strin
 }
 ```
 
-### Get Adjacent Series Posts `getAdjacentSeriesPosts()`
+### 获取相邻系列文章 `getAdjacentSeriesPosts()`
 
-Used for "Previous / Next" post navigation on post details pages:
+用于文章页面的"上一篇/下一篇"导航：
 
 ```typescript
 // src/lib/content/posts.ts
@@ -470,17 +474,18 @@ export async function getAdjacentSeriesPosts(currentPost: BlogPost): Promise<{
     return { prevPost: null, nextPost: null };
   }
 
+  const currentSlug = getPostSlug(currentPost);
   const currentIndex = seriesPosts.findIndex(
-    (post) => post.slug === currentPost.slug
+    (post) => getPostSlug(post) === currentSlug
   );
 
   if (currentIndex === -1) {
     return { prevPost: null, nextPost: null };
   }
 
-  // Because posts are sorted by date descending (newest first)
-  // prevPost is the newer post (index - 1)
-  // nextPost is the older post (index + 1)
+  // 因为文章按日期降序排列（最新在前）
+  // prevPost 是更新的文章（索引 - 1）
+  // nextPost 是更旧的文章（索引 + 1）
   const prevPost = currentIndex > 0 ? seriesPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < seriesPosts.length - 1
     ? seriesPosts[currentIndex + 1]
@@ -492,14 +497,14 @@ export async function getAdjacentSeriesPosts(currentPost: BlogPost): Promise<{
 
 ---
 
-## Weekly Column Feature
+## 周刊专栏功能
 
-The project supports a special "Weekly" category displayed separately from regular posts:
+项目支持特殊的"周刊"分类，与普通文章分开展示：
 
 ```typescript
 // src/lib/content/posts.ts
 
-// Get all weekly posts
+// 获取所有周刊文章
 export async function getWeeklyPosts(): Promise<BlogPost[]> {
   const { featuredSeries } = siteConfig;
   if (!featuredSeries?.enabled || !featuredSeries.categoryName) {
@@ -509,13 +514,13 @@ export async function getWeeklyPosts(): Promise<BlogPost[]> {
   return await getPostsByCategory(featuredSeries.categoryName);
 }
 
-// Get latest weekly post
+// 获取最新周刊
 export async function getLatestWeeklyPost(): Promise<BlogPost | null> {
   const weeklyPosts = await getWeeklyPosts();
   return weeklyPosts[0] ?? null;
 }
 
-// Get non-weekly posts (used on home page)
+// 获取非周刊文章（首页使用）
 export async function getNonWeeklyPosts(): Promise<BlogPost[]> {
   const { featuredSeries } = siteConfig;
   if (!featuredSeries?.enabled || !featuredSeries.categoryName) {
@@ -531,9 +536,9 @@ export async function getNonWeeklyPosts(): Promise<BlogPost[]> {
 
 ---
 
-## Article Frontmatter Examples
+## 文章 Frontmatter 示例
 
-### Basic Article
+### 基础文章
 
 ```yaml
 ---
@@ -548,10 +553,10 @@ categories:
   - [笔记, 前端, React]
 catalog: true
 ---
-Article content...
+文章内容...
 ```
 
-### Sticky Article
+### 置顶文章
 
 ```yaml
 ---
@@ -563,7 +568,7 @@ categories:
 ---
 ```
 
-### Custom Link
+### 自定义链接
 
 ```yaml
 ---
@@ -571,23 +576,23 @@ title: 非常长的文章标题
 link: short-url
 date: 2024-02-20
 ---
-# Access path will be /post/short-url instead of filename
+# 访问路径将是 /post/short-url 而不是文件名
 ```
 
 ---
 
-## Data Flow Diagram
+## 数据流图
 
 ```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                    Markdown Files                           │
+│                    Markdown 文件                            │
 │   src/content/blog/note/front-end/react-hooks.md           │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Schema Validation                        │
-│   src/content/config.ts → z.object({...})                  │
+│                    Schema 验证                              │
+│   src/content.config.ts → glob loader + z.object({...})    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -598,7 +603,7 @@ date: 2024-02-20
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Utility Processing                       │
+│                    工具函数处理                              │
 │   ┌─────────────────┐  ┌─────────────────┐                 │
 │   │  posts.ts       │  │  categories.ts  │                 │
 │   │  - getSorted    │  │  - getList      │                 │
@@ -609,7 +614,7 @@ date: 2024-02-20
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Page Components                          │
+│                    页面组件                                  │
 │   ┌─────────────────┐  ┌─────────────────┐                 │
 │   │  PostList.astro │  │ CategoryList    │                 │
 │   │  PostCard.astro │  │ .astro          │                 │
@@ -618,7 +623,7 @@ date: 2024-02-20
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Static HTML Output                       │
+│                    静态 HTML 输出                            │
 │   dist/post/react-hooks/index.html                         │
 │   dist/categories/note/front-end/react/index.html          │
 └─────────────────────────────────────────────────────────────┘
@@ -626,28 +631,28 @@ date: 2024-02-20
 
 ---
 
-## Key Takeaways
+## 学习要点
 
-1. **Content Collections**: Astro native content management providing type safety and Schema validation
-2. **Dual-Format Categories**: Compatible with Hexo single-level and multi-level category formats
-3. **Category Mapping**: Chinese category name → English slug conversion mechanism
-4. **Recursive Algorithm**: Category tree construction and traversal
-5. **Utility Layering**:
-   - `posts.ts`: Article queries (sorting, filtering, pagination)
-   - `categories.ts`: Category operations (building, searching, path generation)
-   - `tags.ts`: Tag statistics
+1. **Content Collections**：Astro 原生内容管理，提供类型安全和 Schema 验证
+2. **双格式分类**：兼容 Hexo 的单层分类和多层分类格式
+3. **分类映射**：中文分类名 → 英文 slug 的转换机制
+4. **递归算法**：分类树的构建和遍历
+5. **工具函数分层**：
+   - `posts.ts`：文章查询（排序、筛选、分页）
+   - `categories.ts`：分类操作（构建、查找、路径生成）
+   - `tags.ts`：标签统计
 
 ---
 
-## Related Files
+## 相关文件
 
-| File | Description |
-| --- | --- |
-| `src/content/config.ts` | Schema definition |
-| `src/content/blog/` | Blog post directory |
-| `src/lib/content/posts.ts` | Article query functions |
-| `src/lib/content/categories.ts` | Category processing functions |
-| `src/lib/content/tags.ts` | Tag processing functions |
-| `src/lib/content/types.ts` | Type definitions |
-| `src/constants/category.ts` | Category mapping table |
-| `_config.yml` | Hexo category mapping source file |
+| 文件                            | 说明                |
+| ------------------------------- | ------------------- |
+| `src/content.config.ts`         | Loader 与 Schema 定义 |
+| `src/content/blog/`             | 博客文章目录        |
+| `src/lib/content/posts.ts`      | 文章查询函数        |
+| `src/lib/content/categories.ts` | 分类处理函数        |
+| `src/lib/content/tags.ts`       | 标签处理函数        |
+| `src/lib/content/types.ts`      | 类型定义            |
+| `src/constants/category.ts`     | 分类映射表          |
+| `_config.yml`                   | Hexo 分类映射源文件 |

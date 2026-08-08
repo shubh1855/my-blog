@@ -1,8 +1,8 @@
-# Routing System Detailed Guide
+# 路由系统详解
 
-## Astro File-Based Routing Fundamentals
+## Astro 文件路由基础
 
-Astro uses **file-system routing**, where files under the `src/pages/` directory are automatically mapped to URL paths:
+Astro 使用**文件系统路由**，`src/pages/` 目录下的文件会自动映射为 URL 路径：
 
 ```plain
 src/pages/
@@ -24,46 +24,43 @@ src/pages/
     └── [...slug].astro  →  /tags/*
 ```
 
-### Route Types
+### 路由类型
 
-| Type | Syntax | Example | Description |
-| --- | --- | --- | --- |
-| Static Route | `page.astro` | `about.md` → `/about` | Fixed URL |
-| Dynamic Route | `[param].astro` | `[tag].astro` → `/tags/react` | Single-level parameter |
-| Rest Parameter | `[...slug].astro` | `[...slug].astro` → `/a/b/c` | Multi-level parameter |
+| 类型      | 语法              | 示例                          | 说明     |
+| --------- | ----------------- | ----------------------------- | -------- |
+| 静态路由  | `page.astro`      | `about.md` → `/about`         | 固定 URL |
+| 动态路由  | `[param].astro`   | `[tag].astro` → `/tags/react` | 单级参数 |
+| Rest 参数 | `[...slug].astro` | `[...slug].astro` → `/a/b/c`  | 多级参数 |
 
 ---
 
-## Dynamic Route Implementation
+## 动态路由实现
 
-### 1. Article Detail Page `post/[...slug].astro`
+### 1. 文章详情页 `post/[...slug].astro`
 
-Article detail pages use the rest parameter `[...slug]` to match article URLs:
+文章详情页使用 rest 参数 `[...slug]` 来匹配文章 URL：
 
 ```astro
 ---
 // src/pages/post/[...slug].astro
 
-import { getSortedPosts } from '@lib/content';
+import { render } from 'astro:content';
+import { getPostById, getPostSlug, getSortedPosts } from '@lib/content';
 
-// getStaticPaths: Tells Astro which pages need to be generated
+// getStaticPaths：告诉 Astro 需要生成哪些页面
 export async function getStaticPaths() {
   const postCollections = await getSortedPosts();
 
-  return postCollections.map((post) => {
-    // Prioritize custom link, otherwise use file slug
-    const link = post.data?.link ?? post.slug;
-
-    return {
-      params: { slug: link }, // URL parameters
-      props: { post }, // Data passed to the page
-    };
-  });
+  return postCollections.map((post) => ({
+    params: { slug: getPostSlug(post) },
+    props: { postId: post.id },
+  }));
 }
 
-// Get post data from props
-const { post } = Astro.props;
-const { Content } = await post.render(); // Render Markdown content
+const { postId } = Astro.props;
+const post = await getPostById(postId);
+if (!post) throw new Error(`Post not found: ${postId}`);
+const { Content } = await render(post);
 ---
 
 <Layout title={post.data.title}>
@@ -73,21 +70,21 @@ const { Content } = await post.render(); // Render Markdown content
 </Layout>
 ```
 
-**Generated Pages Example**:
+**生成的页面示例**：
 
 ```plain
-Post file: src/content/blog/note/front-end/react-hooks.md
+文章文件: src/content/blog/note/front-end/react-hooks.md
 frontmatter: { link: 'react-hooks-guide' }
 
-Generated URL: /post/react-hooks-guide
+生成 URL: /post/react-hooks-guide
 
-If no link field:
-Generated URL: /post/note/front-end/react-hooks
+如果没有 link 字段:
+生成 URL: /post/note/front-end/react-hooks
 ```
 
-### 2. Category Page `categories/[...slug].astro`
+### 2. 分类页面 `categories/[...slug].astro`
 
-Category pages support multi-level category paths:
+分类页面支持多级分类路径：
 
 ```astro
 ---
@@ -96,14 +93,14 @@ Category pages support multi-level category paths:
 import { getCategoryByLink, getCategoryLinks, getCategoryList } from '@lib/content';
 
 export async function getStaticPaths() {
-  // 1. Get all categories
+  // 1. 获取所有分类
   const { categories } = await getCategoryList();
 
-  // 2. Generate URL links for all categories
+  // 2. 生成所有分类的 URL 链接
   const links = getCategoryLinks(categories, '');
   // links = ['life', 'note', 'note/front-end', 'note/front-end/react', ...]
 
-  // 3. Generate pages for each link
+  // 3. 为每个链接生成页面
   return links.map((link) => {
     const category = getCategoryByLink(categories, link);
     return {
@@ -116,23 +113,23 @@ export async function getStaticPaths() {
 const { category } = Astro.props;
 ---
 
-<Layout title={`Category - ${category?.name}`}>
+<Layout title={`分类 - ${category?.name}`}>
   <CategoryPostList category={category} />
 </Layout>
 ```
 
-**Generated Pages**:
+**生成的页面**：
 
 ```plain
-/categories/life           → Life / Essays Category
-/categories/note           → Notes Category
-/categories/note/front-end → Notes > Front-End Category
-/categories/note/front-end/react → Notes > Front-End > React Category
+/categories/life           → 随笔分类
+/categories/note           → 笔记分类
+/categories/note/front-end → 笔记 > 前端分类
+/categories/note/front-end/react → 笔记 > 前端 > React 分类
 ```
 
-### 3. Article List Pagination `posts/[...page].astro`
+### 3. 文章列表分页 `posts/[...page].astro`
 
-Uses Astro's built-in `paginate` function to implement pagination:
+使用 Astro 内置的 `paginate` 函数实现分页：
 
 ```astro
 ---
@@ -142,14 +139,14 @@ import { getNonWeeklyPosts } from '@lib/content';
 import type { PaginateFunction } from 'astro';
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  // Get all non-weekly posts
+  // 获取所有非周刊文章
   const postCollections = await getNonWeeklyPosts();
 
-  // paginate automatically generates paginated routes
+  // paginate 自动生成分页路由
   return paginate(postCollections, { pageSize: 10 });
 }
 
-// page object contains pagination information
+// page 对象包含分页信息
 const { page } = Astro.props;
 ---
 
@@ -158,41 +155,41 @@ const { page } = Astro.props;
 </Layout>
 ```
 
-**`page` Object Structure**:
+**`page` 对象结构**：
 
 ```typescript
 interface Page<T> {
-  data: T[];           // Data for current page
-  start: number;       // Starting index
-  end: number;         // Ending index
-  size: number;        // Page size
-  total: number;       // Total number of items
-  currentPage: number; // Current page number
-  lastPage: number;    // Last page number
+  data: T[];           // 当前页的数据
+  start: number;       // 起始索引
+  end: number;         // 结束索引
+  size: number;        // 每页大小
+  total: number;       // 总条目数
+  currentPage: number; // 当前页码
+  lastPage: number;    // 最后一页
   url: {
-    current: string;   // Current page URL
-    prev?: string;     // Previous page URL
-    next?: string;     // Next page URL
-    first: string;     // First page URL
-    last: string;      // Last page URL
+    current: string;   // 当前页 URL
+    prev?: string;     // 上一页 URL
+    next?: string;     // 下一页 URL
+    first: string;     // 第一页 URL
+    last: string;      // 最后一页 URL
   };
 }
 ```
 
-**Generated Pages**:
+**生成的页面**：
 
 ```plain
-/posts/1  → Page 1 (10 posts)
-/posts/2  → Page 2 (10 posts)
-/posts/3  → Page 3 (10 posts)
+/posts/1  → 第 1 页（10 篇文章）
+/posts/2  → 第 2 页（10 篇文章）
+/posts/3  → 第 3 页（10 篇文章）
 ...
 ```
 
 ---
 
-## Home Page Route `index.astro`
+## 首页路由 `index.astro`
 
-The home page is a special static page that manually constructs pagination data:
+首页是特殊的静态页面，手动构造分页数据：
 
 ```astro
 ---
@@ -200,19 +197,19 @@ The home page is a special static page that manually constructs pagination data:
 
 import { getLatestWeeklyPost, getNonWeeklyPostsBySticky } from '@lib/content';
 
-// 1. Get sticky posts and regular posts
+// 1. 获取置顶文章和普通文章
 const { stickyPosts: normalStickyPosts, allPosts: allNonWeeklyPosts } = await getNonWeeklyPostsBySticky();
 
-// 2. Get latest weekly post (special display)
+// 2. 获取最新周刊（特殊展示）
 const latestWeeklyPost = await getLatestWeeklyPost();
 
-// 3. Put weekly post at the beginning of the sticky list
+// 3. 周刊放在置顶列表开头
 const stickyPosts = latestWeeklyPost ? [latestWeeklyPost, ...normalStickyPosts] : normalStickyPosts;
 
-// 4. Home page displays first 10 regular posts
+// 4. 首页显示前 10 篇普通文章
 const posts = allNonWeeklyPosts.slice(0, 10);
 
-// 5. Manually construct Page object (for paginator component)
+// 5. 手动构造 Page 对象（用于分页组件）
 const page: Page<BlogPost> = {
   data: posts,
   start: 0,
@@ -232,25 +229,25 @@ const page: Page<BlogPost> = {
 ---
 
 <Layout>
-  <!-- Sticky posts section -->
-  <Divider>Sticky Posts</Divider>
+  <!-- 置顶文章区域 -->
+  <Divider>置顶文章</Divider>
   <PostList posts={stickyPosts} showPaginator={false} />
 
-  <!-- Regular post list -->
-  <Divider>Post List</Divider>
+  <!-- 普通文章列表 -->
+  <Divider>文章列表</Divider>
   <PostList posts={posts} page={page} baseUrl="/posts" />
 
-  <!-- Featured categories -->
-  <Divider>Featured Categories</Divider>
+  <!-- 精选分类 -->
+  <Divider>精选分类</Divider>
   <CategoryCards />
 </Layout>
 ```
 
 ---
 
-## RSS Feed Generation `rss.xml.ts`
+## RSS 源生成 `rss.xml.ts`
 
-RSS uses a TypeScript endpoint (`.ts` file) to generate XML:
+RSS 使用 TypeScript 端点（`.ts` 文件）生成 XML：
 
 ```typescript
 // src/pages/rss.xml.ts
@@ -262,18 +259,18 @@ import { getSanitizeHtml } from '@lib/sanitize';
 import type { APIContext } from 'astro';
 import sanitizeHtml from 'sanitize-html';
 
-// Generate plain text summary
+// 生成纯文本摘要
 const generateTextSummary = (html?: string, length: number = 150): string => {
   const text = sanitizeHtml(html ?? '', {
-    allowedTags: [],  // Remove all HTML tags
+    allowedTags: [],  // 移除所有 HTML 标签
     allowedAttributes: {},
   });
 
   if (text.length <= length) return text;
-  return text.substring(0, length).replace(/\s+\S*$/, '');  // Do not truncate words
+  return text.substring(0, length).replace(/\s+\S*$/, '');  // 不截断词语
 };
 
-// GET Endpoint - Returns RSS XML
+// GET 端点 - 返回 RSS XML
 export async function GET(context: APIContext) {
   const posts = await getSortedPosts();
   const { site } = context;
@@ -287,15 +284,15 @@ export async function GET(context: APIContext) {
     description: siteConfig.subtitle || 'No description',
     site,
     trailingSlash: false,
-    stylesheet: '/rss/cos-feed.xsl',  // RSS stylesheet
+    stylesheet: '/rss/cos-feed.xsl',  // RSS 样式表
 
-    // Only include latest 20 posts
+    // 只包含最新 20 篇文章
     items: posts
       .map((post) => ({
         title: post.data.title,
         pubDate: post.data.date,
         description: post.data?.description ?? generateTextSummary(post.rendered?.html),
-        link: `/post/${post.data.link ?? post.slug}`,
+        link: `/post/${getPostSlug(post)}`,
         content: getSanitizeHtml(post.rendered?.html ?? ''),
       }))
       .slice(0, 20),
@@ -303,7 +300,7 @@ export async function GET(context: APIContext) {
 }
 ```
 
-**RSS Output Example**:
+**RSS 输出示例**：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -318,32 +315,32 @@ export async function GET(context: APIContext) {
       <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>
       <description>深入理解 React Hooks...</description>
     </item>
-    <!-- More posts... -->
+    <!-- 更多文章... -->
   </channel>
 </rss>
 ```
 
 ---
 
-## Static Path Generation Flow
+## 静态路径生成流程
 
-### How `getStaticPaths()` Works
+### `getStaticPaths()` 工作原理
 
 ```plain
-Executed at build time
+构建时执行
      │
      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              getStaticPaths() Function Execution            │
+│              getStaticPaths() 函数执行                       │
 │                                                             │
-│  1. Read all content sources (Content Collections)          │
-│  2. Compute all URLs that need to be generated              │
-│  3. Return array of { params, props }                       │
+│  1. 读取所有内容源（Content Collections）                     │
+│  2. 计算需要生成的所有 URL                                    │
+│  3. 返回 { params, props } 数组                              │
 └─────────────────────────────────────────────────────────────┘
      │
      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Astro Generates Pages for Each Path            │
+│              Astro 为每个路径生成页面                         │
 │                                                             │
 │  /post/react-hooks     → dist/post/react-hooks/index.html   │
 │  /post/vue-basics      → dist/post/vue-basics/index.html    │
@@ -352,14 +349,14 @@ Executed at build time
      │
      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Static HTML Files                        │
-│                  (Deployable to CDN)                        │
+│                    静态 HTML 文件                            │
+│                   （可部署到 CDN）                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Route Generation Example
+### 路由生成示例
 
-Suppose there are the following posts:
+假设有以下文章：
 
 ```plain
 src/content/blog/
@@ -368,15 +365,15 @@ src/content/blog/
 └── note/algorithm/sorting.md   # categories: [['笔记', '算法']]
 ```
 
-**Generated Routes**:
+**生成的路由**：
 
 ```plain
-# Post pages
+# 文章页面
 /post/git-tips
-/post/note/front-end/react (or custom link)
+/post/note/front-end/react (或自定义 link)
 /post/note/algorithm/sorting
 
-# Category pages
+# 分类页面
 /categories/tools
 /categories/note
 /categories/note/front-end
@@ -386,9 +383,9 @@ src/content/blog/
 
 ---
 
-## Breadcrumb Navigation Implementation
+## 面包屑导航实现
 
-Post pages include breadcrumb navigation showing category hierarchy:
+文章页面包含面包屑导航，显示分类层级：
 
 ```astro
 ---
@@ -397,7 +394,7 @@ Post pages include breadcrumb navigation showing category hierarchy:
 const categoryArr = getCategoryArr(categories?.[0]);
 // categoryArr = ['笔记', '前端', 'React']
 
-// Generate breadcrumb data
+// 生成面包屑数据
 const breadcrumbCategories = [];
 if (categoryArr?.length) {
   for (let i = 0; i < categoryArr.length; i++) {
@@ -410,7 +407,7 @@ if (categoryArr?.length) {
   }
 }
 
-// Result:
+// 结果:
 // [
 //   { name: '笔记', link: '/categories/note' },
 //   { name: '前端', link: '/categories/note/front-end' },
@@ -418,9 +415,9 @@ if (categoryArr?.length) {
 // ]
 ---
 
-<!-- Breadcrumb rendering -->
+<!-- 面包屑渲染 -->
 <nav class="flex items-center gap-2 text-sm">
-  <a href="/">Home</a>
+  <a href="/">首页</a>
 
   {
     breadcrumbCategories.map((category, index) => (
@@ -432,14 +429,14 @@ if (categoryArr?.length) {
   }
 </nav>
 
-<!-- Display effect: Home > Notes > Front-End > React -->
+<!-- 显示效果: 首页 > 笔记 > 前端 > React -->
 ```
 
 ---
 
-## JSON-LD Structured Data
+## JSON-LD 结构化数据
 
-Post pages include SEO structured data:
+文章页面包含 SEO 结构化数据：
 
 ```astro
 ---
@@ -460,11 +457,11 @@ const jsonLd = {
 };
 ---
 
-<!-- Inject into head -->
+<!-- 注入到 head -->
 <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 ```
 
-**Output JSON-LD**:
+**输出的 JSON-LD**：
 
 ```json
 {
@@ -484,25 +481,25 @@ const jsonLd = {
 
 ---
 
-## Route Configuration Options
+## 路由配置选项
 
-### `trailingSlash` Configuration
+### `trailingSlash` 配置
 
-Configure URL trailing slash handling in `astro.config.mjs`:
+在 `astro.config.mjs` 中配置 URL 末尾斜杠处理：
 
 ```javascript
 // astro.config.mjs
 export default defineConfig({
-  trailingSlash: 'ignore', // Both /about and /about/ are valid
-  // 'always' - Force trailing slash
-  // 'never' - Force no trailing slash
-  // 'ignore' - Accept both
+  trailingSlash: 'ignore', // /about 和 /about/ 都有效
+  // 'always' - 强制末尾有斜杠
+  // 'never' - 强制末尾无斜杠
+  // 'ignore' - 两者都接受
 });
 ```
 
-### Custom 404 Page
+### 自定义 404 页面
 
-Create `src/pages/404.astro` to customize the 404 page:
+创建 `src/pages/404.astro` 即可自定义 404 页面：
 
 ```astro
 ---
@@ -510,43 +507,43 @@ Create `src/pages/404.astro` to customize the 404 page:
 import Layout from '@layouts/Layout.astro';
 ---
 
-<Layout title="Page Not Found">
+<Layout title="页面未找到">
   <div class="flex-center min-h-screen">
-    <h1>404 - Page Not Found</h1>
-    <a href="/">Back to Home</a>
+    <h1>404 - 页面未找到</h1>
+    <a href="/">返回首页</a>
   </div>
 </Layout>
 ```
 
 ---
 
-## Routing System Flowchart
+## 路由系统流程图
 
 ```plain
 ┌─────────────────────────────────────────────────────────────┐
-│                        User Request                         │
+│                       用户请求                               │
 │                    GET /post/react-hooks                    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                       Route Matching                        │
+│                    路由匹配                                  │
 │                                                             │
-│  /post/react-hooks matches src/pages/post/[...slug].astro   │
-│  params = { slug: 'react-hooks' }                           │
+│  /post/react-hooks 匹配 src/pages/post/[...slug].astro     │
+│  params = { slug: 'react-hooks' }                          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Static Page Lookup                       │
+│                 静态页面查找                                  │
 │                                                             │
-│  Find dist/post/react-hooks/index.html                      │
-│  (Generated at build time)                                  │
+│  查找 dist/post/react-hooks/index.html                     │
+│  （构建时已生成）                                             │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                         Return HTML                         │
+│                    返回 HTML                                 │
 │                                                             │
 │  Content-Type: text/html                                    │
 │  HTTP 200 OK                                                │
@@ -555,30 +552,30 @@ import Layout from '@layouts/Layout.astro';
 
 ---
 
-## Key Takeaways
+## 学习要点
 
-1. **File-System Routing**: Files under `src/pages/` automatically map to URLs
-2. **Dynamic Route Parameters**:
-   - `[param]` matches single-level path
-   - `[...slug]` matches multi-level path
-3. **`getStaticPaths()`**: Tells Astro which static pages to generate
-4. **`paginate()` Function**: Automatically handles pagination logic
-5. **RSS Endpoint**: Uses `.ts` files to generate non-HTML content
-6. **SEO Optimization**: JSON-LD structured data enhances search engine comprehension
+1. **文件系统路由**：`src/pages/` 下的文件自动映射为 URL
+2. **动态路由参数**：
+   - `[param]` 匹配单级路径
+   - `[...slug]` 匹配多级路径
+3. **`getStaticPaths()`**：告诉 Astro 需要生成哪些静态页面
+4. **`paginate()` 函数**：自动处理分页逻辑
+5. **RSS 端点**：使用 `.ts` 文件生成非 HTML 内容
+6. **SEO 优化**：JSON-LD 结构化数据提升搜索引擎理解
 
 ---
 
-## Related Files
+## 相关文件
 
-| File | Description |
-| --- | --- |
-| `src/pages/index.astro` | Home page |
-| `src/pages/post/[...slug].astro` | Post detail page |
-| `src/pages/posts/[...page].astro` | Post list pagination |
-| `src/pages/categories/[...slug].astro` | Category page |
-| `src/pages/categories/index.astro` | Category index |
-| `src/pages/tags/[...slug].astro` | Tag page |
-| `src/pages/rss.xml.ts` | RSS feed |
-| `src/pages/archives.astro` | Archives page |
-| `src/pages/weekly.astro` | Weekly page |
-| `src/pages/friends.astro` | Friends page |
+| 文件                                   | 说明         |
+| -------------------------------------- | ------------ |
+| `src/pages/index.astro`                | 首页         |
+| `src/pages/post/[...slug].astro`       | 文章详情页   |
+| `src/pages/posts/[...page].astro`      | 文章列表分页 |
+| `src/pages/categories/[...slug].astro` | 分类页面     |
+| `src/pages/categories/index.astro`     | 分类首页     |
+| `src/pages/tags/[...slug].astro`       | 标签页面     |
+| `src/pages/rss.xml.ts`                 | RSS 源       |
+| `src/pages/archives.astro`             | 归档页面     |
+| `src/pages/weekly.astro`               | 周刊页面     |
+| `src/pages/friends.astro`              | 友链页面     |

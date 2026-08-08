@@ -9,23 +9,18 @@ import { animation } from '@constants/design-tokens';
 import { FloatingFocusManager, FloatingPortal, useClick, useDismiss, useInteractions, useRole } from '@floating-ui/react';
 import { useControlledState } from '@hooks/useControlledState';
 import { useFloatingUI } from '@hooks/useFloatingUI';
-import type { Heading } from '@hooks/useHeadingTree';
 import { useTranslation } from '@hooks/useTranslation';
-import { AnimatePresence, motion } from 'motion/react';
+import type { Heading } from '@lib/toc';
+import { AnimatePresence, m } from 'motion/react';
 import type React from 'react';
-import { cloneElement } from 'react';
+import { cloneElement, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { HeadingList } from '../TableOfContents/HeadingList';
+import { TocProvider, useTocContext } from '../TableOfContents/TocContext';
 
 interface MobileTOCDropdownProps {
   /** Hierarchical heading tree */
   headings: Heading[];
-  /** ID of the currently active heading */
-  activeId: string;
-  /** Set of expanded heading IDs */
-  expandedIds: Set<string>;
-  /** Callback when a heading is clicked */
-  onHeadingClick: (id: string) => void;
   /** Trigger element that opens the dropdown */
   trigger: React.JSX.Element;
   /** Controlled open state */
@@ -38,15 +33,13 @@ interface MobileTOCDropdownProps {
 
 export function MobileTOCDropdown({
   headings,
-  activeId,
-  expandedIds,
-  onHeadingClick,
   trigger,
   open: passedOpen,
   onOpenChange,
   enableNumbering = true,
 }: MobileTOCDropdownProps) {
   const { t } = useTranslation();
+  const outerToc = useTocContext();
   const [isOpen, setIsOpen] = useControlledState({
     value: passedOpen,
     defaultValue: false,
@@ -67,10 +60,17 @@ export function MobileTOCDropdown({
 
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
-  const handleHeadingClick = (id: string) => {
-    onHeadingClick(id);
-    setIsOpen(false);
-  };
+  // Same TOC state, but a click also dismisses the dropdown
+  const toc = useMemo(
+    () => ({
+      ...outerToc,
+      onHeadingClick: (id: string) => {
+        outerToc.onHeadingClick(id);
+        setIsOpen(false);
+      },
+    }),
+    [outerToc, setIsOpen],
+  );
 
   return (
     <>
@@ -79,7 +79,7 @@ export function MobileTOCDropdown({
         {isOpen && (
           <FloatingPortal>
             <FloatingFocusManager context={context} modal={false}>
-              <motion.div
+              <m.div
                 ref={refs.setFloating}
                 style={floatingStyles}
                 className="z-50 max-h-[60vh] w-72 overflow-auto rounded-2xl border border-border bg-background/80 p-3 backdrop-blur-md"
@@ -94,16 +94,12 @@ export function MobileTOCDropdown({
                   aria-label={t('toc.title')}
                 >
                   <div className="space-y-1">
-                    <HeadingList
-                      headings={headings}
-                      depth={0}
-                      activeId={activeId}
-                      expandedIds={expandedIds}
-                      onHeadingClick={handleHeadingClick}
-                    />
+                    <TocProvider value={toc}>
+                      <HeadingList headings={headings} />
+                    </TocProvider>
                   </div>
                 </nav>
-              </motion.div>
+              </m.div>
             </FloatingFocusManager>
           </FloatingPortal>
         )}

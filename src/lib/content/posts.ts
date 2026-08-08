@@ -4,7 +4,7 @@
 
 import { type CollectionEntry, getCollection } from 'astro:content';
 import summaries from '@assets/summaries.json';
-import { siteConfig } from '@constants/site-config';
+import { siteConfig } from '@lib/config/site';
 import type { FeaturedSeriesItem } from '@lib/config/types';
 import readingTime from 'reading-time';
 import type { BlogPost } from 'types/blog';
@@ -51,13 +51,13 @@ for (const key of Object.keys(summaries as SummariesData)) {
 export function getPostDescription(post: BlogPost, locale: string = defaultLocale, maxLength: number = 150): string {
   if (post.data.description) return post.data.description;
   if (post.data.password) return t(locale, 'encrypted.post.description');
-  return extractTextFromMarkdown(post.body, maxLength);
+  return extractTextFromMarkdown(post.body ?? '', maxLength);
 }
 
 /**
- * 获取文章的 AI 摘要
- * @param slug 文章 slug（通常是 post.data.link 或 post.slug）
- * @returns AI 摘要文本，如果不存在则返回 null
+ * Get the AI-generated summary for a post.
+ * @param slug Public post slug, usually derived from post.data.link or post.id.
+ * @returns The generated summary, or null when none exists.
  */
 export function getPostSummary(slug: string): string | null {
   const data = summaries as SummariesData;
@@ -87,7 +87,7 @@ export function getPostDescriptionWithSummary(post: BlogPost, locale: string = d
   if (post.data.password) {
     return t(locale, 'encrypted.post.description');
   }
-  return getPostSummary(getPostSlug(post)) || extractTextFromMarkdown(post.body, maxLength);
+  return getPostSummary(getPostSlug(post)) || extractTextFromMarkdown(post.body ?? '', maxLength);
 }
 
 /**
@@ -103,7 +103,7 @@ export async function getSortedPosts(locale?: string): Promise<CollectionEntry<'
     });
 
     // 使用浅拷贝避免原地修改 Astro 内部缓存的数组
-    const sortedPosts = [...posts].sort((a: BlogPost, b: BlogPost) => {
+    const sortedPosts = posts.toSorted((a: BlogPost, b: BlogPost) => {
       return b.data.date.getTime() - a.data.date.getTime();
     });
 
@@ -356,6 +356,7 @@ export async function getNonFeaturedPosts(locale?: string): Promise<BlogPost[]> 
 /**
  * 获取非 Featured Series 文章，按置顶状态分组
  * @returns 置顶文章和非置顶的普通文章（互斥，不重叠）
+ * @deprecated Use `getHomePagePosts` when loading the home page sections together.
  */
 export async function getNonFeaturedPostsBySticky(locale?: string): Promise<{
   stickyPosts: BlogPost[];
@@ -380,6 +381,7 @@ export async function getNonFeaturedPostsBySticky(locale?: string): Promise<{
 /**
  * 获取所有 highlightOnHome=true 系列的最新文章
  * @returns 最新文章列表（每个系列一篇）
+ * @deprecated Use `getHomePagePosts` when loading the home page sections together.
  */
 export async function getHomeHighlightedPosts(locale?: string): Promise<BlogPost[]> {
   const highlightedSeries = getEnabledSeries().filter((series) => series.highlightOnHome !== false);

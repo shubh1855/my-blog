@@ -9,7 +9,7 @@
  * - `supportedLocales` / `localeList`: Only enabled locales — for routing, UI, hreflang
  */
 
-import { i18nConfig } from '@constants/site-config';
+import { i18nConfig } from '@lib/config/site';
 
 /** Default locale code (e.g., 'zh') */
 export const defaultLocale: string = i18nConfig.defaultLocale;
@@ -25,9 +25,9 @@ const allEntries = i18nConfig.locales.map((l) => ({
 export const allKnownLocales = new Set(allEntries.map((l) => l.code));
 
 /** Only enabled locale entries with code and label — for routing and UI */
-export const localeEntries: { code: string; label: string }[] = allEntries
-  .filter((l) => l.enabled)
-  .map(({ code, label }) => ({ code, label }));
+export const localeEntries: { code: string; label: string }[] = allEntries.flatMap(({ code, label, enabled }) =>
+  enabled ? [{ code, label }] : [],
+);
 
 /** All enabled locale codes as a set for O(1) lookup (module-internal) */
 const supportedLocales = new Set(localeEntries.map((l) => l.code));

@@ -1,64 +1,83 @@
-import { execSync, spawn } from 'node:child_process';
-import { BACKUP_ITEMS } from '../constants/backup';
-import { PROJECT_ROOT } from '../constants/paths';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import { USER_CONTENT_PREFIXES } from '../constants/backup';
+import { PACKAGE_JSON_PATH, PROJECT_ROOT } from '../constants/paths';
 import {
-  type CommitInfo,
-  GITHUB_REPO,
   type GitStatusInfo,
   MAIN_BRANCH,
   type MergeResult,
-  type ReleaseInfo,
   UPSTREAM_REMOTE,
   UPSTREAM_URL,
   type UpdateInfo,
 } from '../constants/update';
-import { restoreBackup } from './restore-operations';
+import {
+  addRemote,
+  fetchRemote,
+  getCurrentBranch,
+  getHeadSha,
+  getRemoteUrl,
+  getStatusLines,
+  git,
+  gitSafe,
+  hasRef,
+  keepOursAndStage,
+  normalizeRemoteUrl,
+  parseGitLines,
+  runGitCommands,
+  showFile,
+} from './git-porcelain';
+import {
+  decideDowngrade,
+  normalizeTag,
+  parseCommits,
+  parseConflictStatusLines,
+  parseRevListCounts,
+  planCleanFinalizeCommands,
+  planCleanRemovals,
+  planConflictResolution,
+  planDowngradeCommit,
+  planStrategyCommands,
+  resolveConflictOutcome,
+  resolveTargetRef,
+  selectUpdateStrategy,
+} from './update-policy';
 import { getVersion } from './version';
 
 /**
- * Internal implementation note.
+ * Executor for the update flow: it reads repository state through
+ * `git-porcelain.ts`, asks `update-policy.ts` what to do, and runs the result.
  */
-function git(args: string): string {
-  try {
-    return execSync(`git ${args}`, {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim();
-  } catch (error) {
-    if (error instanceof Error && 'stderr' in error) {
-      throw new Error((error as { stderr: string }).stderr || error.message);
-    }
-    throw error;
-  }
+
+export interface PackageManagerInstallCommand {
+  command: string;
+  args: string[];
 }
 
-/**
- * Internal implementation note.
- */
-function gitSafe(args: string): string | null {
-  try {
-    return git(args);
-  } catch {
-    return null;
+function parsePackageManager(packageManager: unknown): string {
+  if (typeof packageManager !== 'string' || !/^pnpm@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(packageManager)) {
+    throw new Error('package.json 必须声明精确的 packageManager，例如 pnpm@10.28.2');
   }
+
+  return packageManager;
 }
 
-function normalizeRemoteUrl(url: string): string {
-  const trimmed = url.trim();
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('ssh://')) {
-    try {
-      const parsed = new URL(trimmed);
-      return `${parsed.hostname}${parsed.pathname.replace(/\.git$/, '')}`;
-    } catch {
-      return trimmed.replace(/\.git$/, '');
-    }
-  }
-  const scpMatch = trimmed.match(/^[^@]+@([^:]+):(.+)$/);
-  if (scpMatch) {
-    return `${scpMatch[1]}${scpMatch[2].replace(/\.git$/, '')}`;
-  }
-  return trimmed.replace(/\.git$/, '');
+/** Build an install command that cannot fall back to the caller's older pnpm binary. */
+export function getPackageManagerInstallCommand(
+  packageManager: unknown,
+  fallbackPackageManager?: unknown,
+): PackageManagerInstallCommand {
+  const exactPackageManager = parsePackageManager(packageManager === undefined ? fallbackPackageManager : packageManager);
+
+  return {
+    command: process.platform === 'win32' ? 'npx.cmd' : 'npx',
+    args: ['--yes', exactPackageManager, 'install'],
+  };
+}
+
+/** Read the pnpm pin before an update can replace package.json with a legacy version. */
+export function readProjectPackageManager(): string {
+  const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8')) as { packageManager?: unknown };
+  return parsePackageManager(packageJson.packageManager);
 }
 
 export interface EnsureUpstreamOptions {
@@ -73,12 +92,11 @@ export interface EnsureUpstreamResult {
 }
 
 /**
- * Internal implementation note.
+ * 检查 Git 状态
  */
 export function checkGitStatus(): GitStatusInfo {
-  const currentBranch = git('rev-parse --abbrev-ref HEAD');
-  const statusOutput = gitSafe('status --porcelain') || '';
-  const uncommittedFiles = statusOutput.split('\n').filter((line) => line.trim().length > 0);
+  const currentBranch = getCurrentBranch();
+  const uncommittedFiles = getStatusLines();
 
   return {
     currentBranch,
@@ -88,43 +106,30 @@ export function checkGitStatus(): GitStatusInfo {
   };
 }
 
-/**
- * Internal implementation note.
- */
 export function hasUpstreamRemote(): boolean {
-  return Boolean(gitSafe(`remote get-url ${UPSTREAM_REMOTE}`));
+  return Boolean(getRemoteUrl(UPSTREAM_REMOTE));
 }
 
 export function hasUpstreamTrackingRef(): boolean {
-  return Boolean(gitSafe(`show-ref --verify refs/remotes/${UPSTREAM_REMOTE}/${MAIN_BRANCH}`));
+  return hasRef(`refs/remotes/${UPSTREAM_REMOTE}/${MAIN_BRANCH}`);
 }
 
 export function getUpstreamRemoteUrl(): string | null {
-  return gitSafe(`remote get-url ${UPSTREAM_REMOTE}`);
+  return getRemoteUrl(UPSTREAM_REMOTE);
 }
 
-/**
- * Internal implementation note.
- */
 export function addUpstreamRemote(): boolean {
-  try {
-    git(`remote add ${UPSTREAM_REMOTE} ${UPSTREAM_URL}`);
-    return true;
-  } catch {
-    return false;
-  }
+  return addRemote(UPSTREAM_REMOTE, UPSTREAM_URL);
 }
 
 /**
- * Internal implementation note.
+ * 确保 upstream remote 已配置
  */
 export function ensureUpstreamRemote(options: EnsureUpstreamOptions = {}): EnsureUpstreamResult {
   const allowAdd = options.allowAdd ?? true;
   const currentUrl = getUpstreamRemoteUrl();
   if (currentUrl) {
-    const expected = normalizeRemoteUrl(UPSTREAM_URL);
-    const actual = normalizeRemoteUrl(currentUrl);
-    if (expected !== actual) {
+    if (normalizeRemoteUrl(UPSTREAM_URL) !== normalizeRemoteUrl(currentUrl)) {
       return { existed: true, success: false, reason: 'mismatch', currentUrl };
     }
     return { existed: true, success: true, currentUrl };
@@ -136,50 +141,27 @@ export function ensureUpstreamRemote(options: EnsureUpstreamOptions = {}): Ensur
   return success ? { existed: false, success: true } : { existed: false, success: false, reason: 'add-failed' };
 }
 
-/**
- * Internal implementation note.
- */
 export function fetchUpstream(): boolean {
+  return fetchRemote(UPSTREAM_REMOTE);
+}
+
+function readVersionFromRef(ref: string): string | null {
+  const packageJsonContent = showFile(ref, 'package.json');
+  if (!packageJsonContent) return null;
   try {
-    git(`fetch ${UPSTREAM_REMOTE}`);
-    return true;
+    const packageJson = JSON.parse(packageJsonContent);
+    return typeof packageJson.version === 'string' ? packageJson.version : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 /**
- * Internal implementation note.
- */
-function parseCommits(output: string): CommitInfo[] {
-  if (!output.trim()) return [];
-
-  return output
-    .trim()
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => {
-      // Format: hash|message|date|author
-      const [hash, message, date, author] = line.split('|');
-      return { hash, message, date, author };
-    });
-}
-
-/**
- * Internal implementation note.
- */
-function normalizeTag(tag: string): string {
-  return tag.startsWith('v') ? tag : `v${tag}`;
-}
-
-/**
- * Internal implementation note.
- * Internal implementation note.
+ * 获取更新信息
+ * @param targetTag 可选的目标版本 tag，不指定时更新到 upstream/main
  */
 export function getUpdateInfo(targetTag?: string): UpdateInfo {
-  const hasUpstream = hasUpstreamRemote();
-
-  if (!hasUpstream) {
+  if (!hasUpstreamRemote()) {
     return {
       hasUpstream: false,
       behindCount: 0,
@@ -192,56 +174,20 @@ export function getUpdateInfo(targetTag?: string): UpdateInfo {
     };
   }
 
-  // Internal implementation note.
-  const normalizedTag = targetTag ? normalizeTag(targetTag) : null;
-  const targetRef = normalizedTag || `${UPSTREAM_REMOTE}/${MAIN_BRANCH}`;
+  const { normalizedTag, targetRef } = resolveTargetRef(targetTag);
+  const { aheadCount, behindCount } = parseRevListCounts(gitSafe(`rev-list --left-right --count HEAD...${targetRef}`));
+  const isDowngrade = decideDowngrade({ normalizedTag, aheadCount, behindCount });
 
-  // Get ahead/behind counts
-  const revList = gitSafe(`rev-list --left-right --count HEAD...${targetRef}`) || '0\t0';
-  const [aheadStr, behindStr] = revList.split('\t');
-  const aheadCount = Number.parseInt(aheadStr, 10) || 0;
-  const behindCount = Number.parseInt(behindStr, 10) || 0;
-
-  // Internal implementation note.
-  const isDowngrade = Boolean(normalizedTag && aheadCount > 0 && behindCount === 0);
-
-  // Get commits
   const commitFormat = '%h|%s|%ar|%an';
-  let commits: CommitInfo[];
+  // 降级列出将被移除的 commits，升级列出新增的 commits
+  const commitsRange = isDowngrade ? `${targetRef}..HEAD` : `HEAD..${targetRef}`;
+  const commits = parseCommits(gitSafe(`log ${commitsRange} --pretty=format:"${commitFormat}" --no-merges`) || '');
+  // 本地领先于 target 的 commits（rebase 时将被重放）
+  const localCommits = parseCommits(gitSafe(`log ${targetRef}..HEAD --pretty=format:"${commitFormat}" --no-merges`) || '');
 
-  if (isDowngrade) {
-    // Internal implementation note.
-    const commitsOutput = gitSafe(`log ${targetRef}..HEAD --pretty=format:"${commitFormat}" --no-merges`) || '';
-    commits = parseCommits(commitsOutput);
-  } else {
-    // Internal implementation note.
-    const commitsOutput = gitSafe(`log HEAD..${targetRef} --pretty=format:"${commitFormat}" --no-merges`) || '';
-    commits = parseCommits(commitsOutput);
-  }
-
-  // Internal implementation note.
-  const localCommitsOutput = gitSafe(`log ${targetRef}..HEAD --pretty=format:"${commitFormat}" --no-merges`) || '';
-  const localCommits = parseCommits(localCommitsOutput);
-
-  // Internal implementation note.
-  let parsedVersion = 'unknown';
-  if (normalizedTag) {
-    // Internal implementation note.
-    parsedVersion = normalizedTag.replace(/^v/, '');
-  } else {
-    // Try to get latest version from upstream package.json
-    const packageJsonContent = gitSafe(`show ${UPSTREAM_REMOTE}/${MAIN_BRANCH}:package.json`);
-    if (packageJsonContent) {
-      try {
-        const packageJson = JSON.parse(packageJsonContent);
-        if (packageJson.version) {
-          parsedVersion = packageJson.version;
-        }
-      } catch {
-        // JSON parse failed, keep 'unknown'
-      }
-    }
-  }
+  const latestVersion = normalizedTag
+    ? normalizedTag.replace(/^v/, '')
+    : (readVersionFromRef(`${UPSTREAM_REMOTE}/${MAIN_BRANCH}`) ?? 'unknown');
 
   return {
     hasUpstream: true,
@@ -250,164 +196,131 @@ export function getUpdateInfo(targetTag?: string): UpdateInfo {
     commits,
     localCommits,
     currentVersion: getVersion(),
-    latestVersion: parsedVersion,
+    latestVersion,
     isDowngrade,
   };
 }
 
-/** Internal implementation note. */
+/** 合并操作选项 */
 export interface MergeOptions {
-  /** Internal implementation note. */
+  /** 目标版本 tag（如 "v2.1.0"），不指定时使用 upstream/main */
   targetTag?: string;
-  /** Internal implementation note. */
+  /** 是否为降级操作，降级时使用 checkout + commit 保留历史 */
   isDowngrade?: boolean;
-  /** Internal implementation note. */
+  /** 使用 rebase 模式：将本地提交重放到目标引用之上（重写历史） */
   rebase?: boolean;
-  /** Internal implementation note. */
+  /** 使用 clean 模式：替换所有主题文件，后续从备份还原用户内容 */
   clean?: boolean;
 }
 
-/**
- * Internal implementation note.
- */
+/** 获取目标版本信息用于 commit message */
 function getVersionInfo(targetRef: string, normalizedTag: string | null): string {
   if (normalizedTag) return normalizedTag;
-  const packageJsonContent = gitSafe(`show ${targetRef}:package.json`);
-  if (packageJsonContent) {
-    try {
-      const packageJson = JSON.parse(packageJsonContent);
-      if (packageJson.version) return `v${packageJson.version}`;
-    } catch {
-      // JSON parse failed
-    }
-  }
-  return 'latest';
+  const version = readVersionFromRef(targetRef);
+  return version ? `v${version}` : 'latest';
 }
 
-/**
- * Internal implementation note.
- */
-const USER_CONTENT_PREFIXES = BACKUP_ITEMS.filter((item) => item.required).map((item) => item.src);
-
-/**
- * Internal implementation note.
- */
-function isUserContent(filePath: string): boolean {
-  return USER_CONTENT_PREFIXES.some((prefix) => filePath === prefix || filePath.startsWith(`${prefix}/`));
+function getConflictFiles(): string[] {
+  const diffFiles = parseGitLines(gitSafe('diff --name-only --diff-filter=U'));
+  if (diffFiles.length > 0) return [...new Set(diffFiles)];
+  return parseConflictStatusLines(getStatusLines());
 }
 
-/**
- * Internal implementation note.
- */
-function classifyConflicts(files: string[]): { userFiles: string[]; themeFiles: string[] } {
-  const userFiles: string[] = [];
-  const themeFiles: string[] = [];
-  for (const file of files) {
-    if (isUserContent(file)) {
-      userFiles.push(file);
-    } else {
-      themeFiles.push(file);
-    }
-  }
-  return { userFiles, themeFiles };
-}
-
-/**
- * Internal implementation note.
- * Internal implementation note.
- * Internal implementation note.
- */
-function autoResolveUserContent(files: string[]): string[] {
-  const failed: string[] = [];
-  for (const file of files) {
-    const checkoutOk = gitSafe(`checkout --ours -- "${file}"`) !== null;
-    const addOk = checkoutOk && gitSafe(`add -- "${file}"`) !== null;
-    if (!addOk) {
-      // Internal implementation note.
-      if (checkoutOk) {
-        gitSafe(`checkout -m -- "${file}"`);
-      }
-      failed.push(file);
-    }
-  }
-  return failed;
-}
-
-/**
- * Internal implementation note.
- */
+/** Clean 模式：删除上游已移除的非用户内容文件 */
 function removeDeletedUpstreamFiles(targetRef: string): void {
-  const localFiles = gitSafe('ls-files') || '';
-  const upstreamFiles = gitSafe(`ls-tree -r --name-only ${targetRef}`) || '';
-
-  const localSet = new Set(
-    localFiles
-      .split('\n')
-      .map((f) => f.trim())
-      .filter(Boolean),
-  );
-  const upstreamSet = new Set(
-    upstreamFiles
-      .split('\n')
-      .map((f) => f.trim())
-      .filter(Boolean),
-  );
-
-  const filesToRemove: string[] = [];
-  for (const file of localSet) {
-    if (!upstreamSet.has(file) && !isUserContent(file)) {
-      filesToRemove.push(file);
-    }
-  }
-
-  if (filesToRemove.length > 0) {
-    // Internal implementation note.
-    const BATCH_SIZE = 100;
-    for (let i = 0; i < filesToRemove.length; i += BATCH_SIZE) {
-      const chunk = filesToRemove.slice(i, i + BATCH_SIZE);
-      const batch = chunk.map((f) => `'${f.replaceAll("'", "'\\''")}'`).join(' ');
-      gitSafe(`rm --quiet -- ${batch}`);
-    }
-  }
+  const plan = planCleanRemovals({
+    localFiles: parseGitLines(gitSafe('ls-files')),
+    upstreamFiles: parseGitLines(gitSafe(`ls-tree -r --name-only ${targetRef}`)),
+    userContentPrefixes: USER_CONTENT_PREFIXES,
+  });
+  runGitCommands(plan.commands);
 }
 
 /**
- * Internal implementation note.
- * Internal implementation note.
- */
-export function cleanRestore(backupPath: string, preCleanSha?: string): string[] {
-  try {
-    const restored = restoreBackup(backupPath);
-    git('add -A');
-    git('commit --amend --no-edit');
-    return restored;
-  } catch (error) {
-    // Internal implementation note.
-    if (preCleanSha) {
-      gitSafe(`reset --hard ${preCleanSha}`);
-    }
-    throw error;
-  }
-}
-
-/**
- * Internal implementation note.
+ * 执行合并、降级、rebase 或 clean 操作
  *
- * Internal implementation note.
- * Internal implementation note.
- * Internal implementation note.
+ * @param options - 合并选项
+ * @returns 合并结果，包含成功状态、冲突信息等
+ */
+export function mergeUpstream(options: MergeOptions = {}): MergeResult {
+  const { normalizedTag, targetRef } = resolveTargetRef(options.targetTag);
+  const strategy = selectUpdateStrategy({ normalizedTag, ...options });
+
+  try {
+    if (strategy === 'clean') {
+      // 保存合并前 SHA，用于还原失败时回滚
+      const preCleanSha = getHeadSha();
+      runGitCommands(
+        planStrategyCommands(strategy, { targetRef, normalizedTag, versionInfo: getVersionInfo(targetRef, normalizedTag) }),
+      );
+      removeDeletedUpstreamFiles(targetRef);
+      // 暂存覆盖后的文件状态（用户内容将在 clean-restoring 阶段还原）
+      runGitCommands(planCleanFinalizeCommands());
+      return { success: true, hasConflict: false, conflictFiles: [], preCleanSha };
+    }
+
+    runGitCommands(
+      planStrategyCommands(strategy, { targetRef, normalizedTag, versionInfo: getVersionInfo(targetRef, normalizedTag) }),
+    );
+    if (strategy === 'downgrade' && normalizedTag && getStatusLines().length > 0) {
+      runGitCommands([planDowngradeCommit(normalizedTag)]);
+    }
+
+    return { success: true, hasConflict: false, conflictFiles: [] };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // 降级不会留下可解决的冲突状态
+    if (strategy === 'downgrade') {
+      return { success: false, hasConflict: false, conflictFiles: [], error: errorMessage };
+    }
+
+    const conflictFiles = getConflictFiles();
+    if (conflictFiles.length === 0) {
+      return { success: false, hasConflict: false, conflictFiles: [], error: errorMessage };
+    }
+
+    const plan = planConflictResolution({ strategy, conflictFiles, userContentPrefixes: USER_CONTENT_PREFIXES });
+    const failedFiles = plan.autoResolveFiles.filter((file) => !keepOursAndStage(file));
+    const outcome = resolveConflictOutcome(plan, failedFiles);
+
+    if (outcome.canCommit) {
+      try {
+        git('commit --no-edit');
+        return {
+          success: true,
+          hasConflict: false,
+          conflictFiles: [],
+          autoResolvedFiles: outcome.autoResolvedFiles,
+        };
+      } catch {
+        // commit 失败，仍然返回冲突
+      }
+    }
+
+    return {
+      success: false,
+      hasConflict: true,
+      conflictFiles: outcome.manualFiles,
+      autoResolvedFiles: outcome.autoResolvedFiles.length > 0 ? outcome.autoResolvedFiles : undefined,
+      isRebaseConflict: plan.isRebaseConflict || undefined,
+    };
+  }
+}
+
+/**
+ * 检测是否已有 upstream merge commit（用于首次迁移提示）
+ *
+ * 检查最近 20 个 merge commit，看是否有某个 parent 可从 upstream/main 到达。
+ * 如果有 → 之前已有 regular merge → 无需迁移。
+ * 如果没有 → 可能一直用 squash merge → 需要迁移提示。
  */
 export function hasUpstreamMergeHistory(): boolean {
   if (!hasUpstreamTrackingRef()) return false;
-  const merges = gitSafe('log --merges --format=%P -20 HEAD');
-  if (!merges) return false;
-  for (const line of merges.trim().split('\n')) {
-    if (!line.trim()) continue;
-    const parents = line.trim().split(' ');
-    // Internal implementation note.
-    // Internal implementation note.
-    // Internal implementation note.
-    for (const parent of parents.slice(1)) {
+  for (const line of parseGitLines(gitSafe('log --merges --format=%P -20 HEAD'))) {
+    // 跳过第一个 parent（本分支），检查后续 parent 是否在 upstream 历史中
+    // 注意: merge-base --is-ancestor 用 exit code 表示结果，gitSafe 失败时返回 null
+    for (const parent of line.split(' ').slice(1)) {
       if (gitSafe(`merge-base --is-ancestor ${parent} ${UPSTREAM_REMOTE}/${MAIN_BRANCH}`) !== null) {
         return true;
       }
@@ -417,175 +330,25 @@ export function hasUpstreamMergeHistory(): boolean {
 }
 
 /**
- * Internal implementation note.
- *
- * Internal implementation note.
- * Internal implementation note.
+ * 安装依赖（异步）
  */
-export function mergeUpstream(options: MergeOptions = {}): MergeResult {
-  const { targetTag, isDowngrade, rebase, clean } = options;
-  const normalizedTag = targetTag ? normalizeTag(targetTag) : null;
-  const targetRef = normalizedTag || `${UPSTREAM_REMOTE}/${MAIN_BRANCH}`;
-
-  try {
-    if (rebase) {
-      // Internal implementation note.
-      git(`rebase ${targetRef}`);
-    } else if (isDowngrade && normalizedTag) {
-      // Internal implementation note.
-      git(`checkout ${normalizedTag} -- .`);
-      const status = gitSafe('status --porcelain') || '';
-      if (status.trim().length > 0) {
-        git(`commit -m "Downgrade to ${normalizedTag}"`);
-      }
-    } else if (clean) {
-      // Internal implementation note.
-      // Internal implementation note.
-      const preCleanSha = git('rev-parse HEAD');
-      const versionInfo = getVersionInfo(targetRef, normalizedTag);
-      git(`merge -s ours --no-ff --allow-unrelated-histories ${targetRef} -m "chore: clean update to ${versionInfo}"`);
-      git(`checkout ${targetRef} -- .`);
-      removeDeletedUpstreamFiles(targetRef);
-      // Internal implementation note.
-      git('add -A');
-      git('commit --amend --no-edit');
-      return {
-        success: true,
-        hasConflict: false,
-        conflictFiles: [],
-        preCleanSha,
-      };
-    } else {
-      // Internal implementation note.
-      const versionInfo = getVersionInfo(targetRef, normalizedTag);
-      git(`merge --no-ff --allow-unrelated-histories ${targetRef} -m "chore: merge upstream theme ${versionInfo}"`);
-    }
-    return {
-      success: true,
-      hasConflict: false,
-      conflictFiles: [],
-    };
-  } catch (error) {
-    // Internal implementation note.
-    if (isDowngrade) {
-      return {
-        success: false,
-        hasConflict: false,
-        conflictFiles: [],
-        error: error instanceof Error ? error.message : String(error),
-      };
-    }
-
-    const conflictFiles = getConflictFiles();
-
-    if (conflictFiles.length > 0) {
-      // Internal implementation note.
-      if (!rebase && !clean) {
-        const { userFiles, themeFiles } = classifyConflicts(conflictFiles);
-        if (userFiles.length > 0) {
-          const failedFiles = autoResolveUserContent(userFiles);
-          // Internal implementation note.
-          if (failedFiles.length > 0) {
-            themeFiles.push(...failedFiles);
-          }
-        }
-        const resolvedFiles = userFiles.filter((f) => !themeFiles.includes(f));
-        // Internal implementation note.
-        if (themeFiles.length === 0) {
-          try {
-            git('commit --no-edit');
-            return {
-              success: true,
-              hasConflict: false,
-              conflictFiles: [],
-              autoResolvedFiles: resolvedFiles,
-            };
-          } catch {
-            // Internal implementation note.
-          }
-        }
-        // Internal implementation note.
-        return {
-          success: false,
-          hasConflict: true,
-          conflictFiles: themeFiles,
-          autoResolvedFiles: resolvedFiles.length > 0 ? resolvedFiles : undefined,
-        };
-      }
-
-      return {
-        success: false,
-        hasConflict: true,
-        conflictFiles,
-        isRebaseConflict: rebase,
-      };
-    }
-
-    return {
-      success: false,
-      hasConflict: false,
-      conflictFiles: [],
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
-function getConflictFiles(): string[] {
-  const diffOutput = gitSafe('diff --name-only --diff-filter=U') || '';
-  const diffFiles = diffOutput
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-
-  if (diffFiles.length > 0) {
-    return Array.from(new Set(diffFiles));
-  }
-
-  const statusOutput = gitSafe('status --porcelain') || '';
-  const statusFiles = statusOutput
-    .split('\n')
-    .filter((line) => line.trim().length > 0)
-    .filter((line) => {
-      const status = line.slice(0, 2);
-      return status.includes('U') || status === 'AA' || status === 'DD';
-    })
-    .map((line) => line.slice(3));
-
-  return Array.from(new Set(statusFiles));
-}
-
-/**
- * Internal implementation note.
- */
-export function abortMerge(): boolean {
-  try {
-    git('merge --abort');
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Internal implementation note.
- */
-export function abortRebase(): boolean {
-  try {
-    git('rebase --abort');
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Internal implementation note.
- */
-export function installDeps(onOutput?: (data: string) => void): Promise<{ success: boolean; error?: string }> {
+export function installDeps(
+  fallbackPackageManager: unknown,
+  onOutput?: (data: string) => void,
+): Promise<{ success: boolean; error?: string }> {
   return new Promise((resolve) => {
-    const child = spawn('pnpm', ['install'], {
+    let installCommand: PackageManagerInstallCommand;
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8')) as { packageManager?: unknown };
+      installCommand = getPackageManagerInstallCommand(packageJson.packageManager, fallbackPackageManager);
+    } catch (error) {
+      resolve({ success: false, error: error instanceof Error ? error.message : String(error) });
+      return;
+    }
+
+    const child = spawn(installCommand.command, installCommand.args, {
       cwd: PROJECT_ROOT,
-      shell: true,
+      shell: false,
     });
 
     let stderr = '';
@@ -613,98 +376,12 @@ export function installDeps(onOutput?: (data: string) => void): Promise<{ succes
   });
 }
 
-/**
- * Internal implementation note.
- */
+/** 检查 tag 是否存在于本地 */
 export function tagExists(tag: string): boolean {
-  const normalizedTag = normalizeTag(tag);
-  return Boolean(gitSafe(`show-ref --verify refs/tags/${normalizedTag}`));
+  return hasRef(`refs/tags/${normalizeTag(tag)}`);
 }
 
-/**
- * Internal implementation note.
- */
+/** 获取最近的 tags 列表 */
 export function listRecentTags(limit = 5): string[] {
-  const output = gitSafe('tag --sort=-creatordate --list "v*"') || '';
-  return output
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .slice(0, limit);
-}
-
-/**
- * Internal implementation note.
- */
-export async function fetchReleaseInfo(version: string): Promise<ReleaseInfo | null> {
-  const tag = normalizeTag(version);
-  const url = `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${tag}`;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'astro-koharu-cli',
-      },
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return {
-      tagName: data.tag_name,
-      url: data.html_url,
-      body: data.body || null,
-    };
-  } catch {
-    clearTimeout(timeoutId);
-    return null;
-  }
-}
-
-/**
- * Internal implementation note.
- */
-export function buildReleaseUrl(version: string): string {
-  const tag = normalizeTag(version);
-  return `https://github.com/${GITHUB_REPO}/releases/tag/${tag}`;
-}
-
-/**
- * Internal implementation note.
- */
-export function extractReleaseSummary(body: string | null, maxLines = 5, maxChars = 300): string[] {
-  if (!body) return [];
-
-  const lines = body
-    .split('\n')
-    .map((line) => line.trim())
-    // Internal implementation note.
-    .map((line) => line.replace(/^#{1,6}\s*/, ''))
-    // Internal implementation note.
-    .filter((line) => line.length > 0);
-
-  const result: string[] = [];
-  let totalChars = 0;
-
-  for (const line of lines) {
-    if (result.length >= maxLines || totalChars >= maxChars) break;
-    result.push(line);
-    totalChars += line.length;
-  }
-
-  // Internal implementation note.
-  if (result.length < lines.length) {
-    result.push('...');
-  }
-
-  return result;
+  return parseGitLines(gitSafe('tag --sort=-creatordate --list "v*"')).slice(0, limit);
 }

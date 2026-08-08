@@ -24,6 +24,7 @@ export const uiStrings: UIStrings = {
   'common.close': '閉じる',
   'common.copy': 'コピー',
   'common.copied': 'コピーしました',
+  'common.copyFailed': '自動コピーに失敗しました。リンクを手動でコピーしてください。',
   'common.loading': '読み込み中...',
   'common.noResults': '結果が見つかりません',
   'common.backToTop': 'トップに戻る',
@@ -123,6 +124,8 @@ export const uiStrings: UIStrings = {
   'code.wrapLines': '文字の折り返し',
   'code.viewSource': 'ソースを表示',
   'code.viewRendered': 'レンダリングされた表示',
+  'code.collapse': 'コードを折りたたむ',
+  'code.expand': 'コードを展開',
 
   // ── 図表 / インフォグラフィック ───────────────────────────────────
   'diagram.fullscreen': 'フルスクリーン',
@@ -176,8 +179,8 @@ export const uiStrings: UIStrings = {
   'footer.wordUnit': '文字',
   'footer.postUnit': '投稿',
 
-  // ── Analytics Stats ─────────────────────────────────────────
-  'stats.pageviews': 'アクセス数',
+  // ── 解析の統計 ─────────────────────────────────────────
+  'stats.pageviews': 'ページビュー',
 
   // ── ページ付け ──────────────────────────────────────────────
   'pagination.prev': '前へ',
@@ -197,6 +200,49 @@ export const uiStrings: UIStrings = {
   'floating.christmas': 'クリスマスエフェクトに切り替え',
   'floating.bgm': 'BGM',
   'floating.toggleToolbar': 'ツールバーを切り替え',
+  'floating.settings': '設定',
+
+  // ── Settings Panel ────────────────────────────────────────
+  'settings.title': '設定',
+  'settings.reader': '読書',
+  'settings.general': '一般',
+  'settings.closePanel': '設定パネルを閉じる',
+  'settings.fontPreset': 'フォント',
+  'settings.fontPreset.round': '丸ゴシック',
+  'settings.fontPreset.system': 'システム',
+  'settings.fontPreset.serif': 'セリフ',
+  'settings.fontPreset.wenkai': '文楷',
+  'settings.fontPreset.local': 'ローカルフォント',
+  'settings.localFont.title': 'ローカルフォントを選択',
+  'settings.localFont.description': 'この端末にインストールされているフォントを本文に使用します',
+  'settings.localFont.permission':
+    'ブラウザーがローカルフォント一覧へのアクセスを求めます。フォントデータはプレビューと選択にのみ使用され、アップロードされません。',
+  'settings.localFont.requestAccess': 'ローカルフォントを読み込む',
+  'settings.localFont.loading': 'フォントを読み込み中…',
+  'settings.localFont.search': 'フォントを検索',
+  'settings.localFont.preview': '春風が川辺を緑にする Aa 123',
+  'settings.localFont.empty': '一致するフォントがありません',
+  'settings.localFont.unsupported':
+    'このブラウザーではローカルフォントを一覧表示できませんが、正確なフォント名を入力できます。',
+  'settings.localFont.denied': 'ローカルフォントへのアクセスが許可されませんでした。フォント名を手動で入力できます。',
+  'settings.localFont.error': 'ローカルフォントを読み込めませんでした。フォント名を手動で入力できます。',
+  'settings.localFont.manualLabel': 'フォント名',
+  'settings.localFont.manualPlaceholder': '例：ヒラギノ角ゴシック',
+  'settings.localFont.useFont': '使用',
+  'settings.localFont.change': 'ローカルフォントを変更',
+  'settings.fontSize': '文字サイズ',
+  'settings.lineHeight': '行間',
+  'settings.measure': '行幅',
+  'settings.auto': '自動',
+  'settings.justify': '両端揃え',
+  'settings.scrollProgress': 'スクロール進捗バー',
+  'settings.christmas': 'クリスマスエフェクト',
+  'settings.bgmWidget': 'BGM ウィジェット',
+  'settings.masterMotion': 'アニメーションを減らす',
+  'settings.wave': 'カバーの波',
+  'settings.reset': 'デフォルトにリセット',
+  'settings.waveDisabledByMasterMotion': '「アニメーションを減らす」がオンの間は使用できません',
+  'settings.invalidNumber': '正の数を入力してください',
 
   // ── お知らせ ────────────────────────────────────────────
   'announcement.title': 'お知らせ',
@@ -237,8 +283,8 @@ export const uiStrings: UIStrings = {
 
   // ── 暗号化されたブロック ─────────────────────────────────────────
   'encrypted.locked': '暗号化されたコンテンツ',
-  'encrypted.placeholder': 'パスワードを入力でロックを解除',
-  'encrypted.submit': 'ロックを解除',
+  'encrypted.placeholder': 'パスワードを入力で解除',
+  'encrypted.submit': '解除',
   'encrypted.incorrect': 'パスワードが間違っています',
 
   // ── 暗号化された投稿 ─────────────────────────────────────────
@@ -307,6 +353,9 @@ export const uiStrings: UIStrings = {
   // ── 埋め込み ─────────────────────────────────────────────────
   'embed.loadingTweet': 'ポストを読み込み中',
 
+  // ── Content ───────────────────────────────────────────────
+  'content.revealSpoiler': '隠された内容を表示',
+
   // ── 検索ショートカット ───────────────────────────────────────
   'search.searchShortcut': '検索 ({shortcut})',
 
@@ -320,6 +369,8 @@ export const uiStrings: UIStrings = {
 
   // ── コメント ────────────────────────────────────────────────
   'comment.prompt': '気に入ったならばコメントを残してくださいね～',
+  'comment.error': 'コメントの読み込みに失敗しました。ページを再読み込みしてください。',
+  'comment.retry': '再読み込み',
 
   // ── Bangumi (Bangumiは日本語で提供されてないのでざっくりとした内容にしています) ──────
   'bangumi.title': 'オタ活の記録',
@@ -339,4 +390,67 @@ export const uiStrings: UIStrings = {
   'bangumi.noItems': 'コレクションがありません',
   'bangumi.error': '読み込みに失敗しました。もう一度お試しください。',
   'bangumi.retry': '再試行',
+
+  // ── Moments ────────────────────────────────────────────────
+  'nav.moments': 'つぶやき',
+  'moments.title': 'つぶやき',
+  'moments.description': '公開チャンネルの日々のメッセージ',
+  'moments.channels': 'つぶやきチャンネル',
+  'moments.search': 'つぶやきを検索',
+  'moments.searchForm': 'つぶやきの内容を検索',
+  'moments.searchQuery': '検索キーワード',
+  'moments.searchPlaceholder': '3文字以上入力してください',
+  'moments.searchEmpty': 'キーワードを入力して、公開チャンネルのメッセージを検索',
+  'moments.searchHint': 'Unicode文字を3文字以上入力してください',
+  'moments.searchTooLong': '検索キーワードはUnicode文字で200文字以内にしてください',
+  'moments.channel': 'チャンネル',
+  'moments.allChannels': 'すべてのチャンネル',
+  'moments.sort': '並び順',
+  'moments.relevance': '関連度',
+  'moments.newest': '新着順',
+  'moments.searchResults': '検索結果',
+  'moments.noResults': '一致するつぶやきはありません',
+  'moments.clearSearch': '検索条件をクリア',
+  'moments.updated': '更新済み',
+  'moments.permalink': '固定リンク',
+  'moments.copyLink': 'リンクをコピー',
+  'moments.copyFailed': 'コピーできませんでした。URLを手動でコピーしてください。',
+  'moments.viewSource': '元のメッセージを見る',
+  'moments.emptyMessage': '空のメッセージ',
+  'moments.mediaMessage': 'メディアメッセージ',
+  'moments.expand': '全文を表示',
+  'moments.collapse': '折りたたむ',
+  'moments.mediaProcessing': 'メディアを処理中',
+  'moments.mediaUnavailable': 'メディアを利用できません',
+  'moments.image': '画像',
+  'moments.video': '動画',
+  'moments.audio': '音声',
+  'moments.document': 'ファイル',
+  'moments.openDocument': 'ファイルを開く',
+  'moments.mediaMore': 'ほかに{count}件のメディア',
+  'moments.loadEarlier': '以前の内容を読み込む',
+  'moments.loadingEarlier': '以前の内容を読み込んでいます',
+  'moments.loadedEarlier': '以前の内容を読み込みました',
+  'moments.allLoaded': 'すべての内容を読み込みました',
+  'moments.loadEarlierFailed': '読み込めませんでした。もう一度お試しください。',
+  'moments.back': '戻る',
+  'moments.pagination': 'つぶやきのページ移動',
+  'moments.newer': '新しいつぶやき',
+  'moments.older': '以前のつぶやき',
+  'moments.contextNavigation': '前後のつぶやき',
+  'moments.tags': 'タグ',
+  'moments.emptyChannels': '表示できるチャンネルがありません',
+  'moments.emptyChannel': 'このチャンネルにはまだメッセージがありません',
+  'moments.notFound': 'つぶやきが見つかりません',
+  'moments.notFoundDescription': 'リンクが古いか、このチャンネルのメッセージではありません。',
+  'moments.rateLimited': 'リクエストが多すぎます',
+  'moments.rateLimitedDescription': 'サービスが一時的にリクエストを制限しています。しばらくしてから再試行してください。',
+  'moments.unavailable': 'つぶやきを一時的に利用できません',
+  'moments.unavailableDescription': '動的コンテンツサービスに接続できません。ブログ記事は引き続き閲覧できます。',
+  'moments.retry': '再試行',
+  'moments.backToIndex': 'つぶやきに戻る',
+  'moments.cacheNotice': '内容は最大5分遅れる場合があります',
+  'moments.rss': 'RSSフィード',
+  'moments.globalRss': 'すべてのつぶやきを購読',
+  'moments.channelRss': 'このチャンネルを購読',
 };

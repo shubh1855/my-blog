@@ -44,7 +44,7 @@ export interface ImageLightboxData {
   currentIndex: number;
 }
 
-export type ModalType = 'drawer' | 'search' | 'codeFullscreen' | 'diagramFullscreen' | 'imageLightbox' | null;
+export type ModalType = 'drawer' | 'search' | 'codeFullscreen' | 'diagramFullscreen' | 'imageLightbox' | 'settings' | null;
 
 export interface ModalState {
   type: ModalType;
@@ -54,7 +54,7 @@ export interface ModalState {
 /**
  * Single source of truth for modal state
  */
-const $activeModal = atom<ModalState>({ type: null });
+export const $activeModal = atom<ModalState>({ type: null });
 
 // Computed helpers for convenience
 export const $isDrawerOpen = computed($activeModal, (m) => m.type === 'drawer');
@@ -69,6 +69,7 @@ export const $imageLightboxData = computed($activeModal, (m) =>
   m.type === 'imageLightbox' ? (m.data as ImageLightboxData) : null,
 );
 export const $isAnyModalOpen = computed($activeModal, (m) => m.type !== null);
+export const $isSettingsOpen = computed($activeModal, (m) => m.type === 'settings');
 
 /**
  * Open a modal with optional data
@@ -84,8 +85,9 @@ export function openModal<T extends ModalType>(
         : never,
 ): void {
   $activeModal.set({ type, data });
-  if (type && typeof document !== 'undefined') {
-    document.body.style.overflow = 'hidden';
+  // Settings stays non-modal, so switching from another modal must release its scroll lock.
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = type && type !== 'settings' ? 'hidden' : '';
   }
 }
 
@@ -99,16 +101,36 @@ export function closeModal(): void {
   $activeModal.set({ type: null });
 }
 
-// Convenience functions for specific modals
-export const openDrawer = () => openModal('drawer');
-export const closeDrawer = () => closeModal();
-export const toggleDrawer = () => {
-  if ($activeModal.get().type === 'drawer') {
+/**
+ * Toggle a modal (open if closed, close if open)
+ */
+export function toggleModal(type: ModalType): void {
+  if ($activeModal.get().type === type) {
     closeModal();
   } else {
-    openModal('drawer');
+    openModal(type);
   }
-};
+}
+
+// Convenience functions for specific modals
+/** @deprecated Use `openModal('drawer')`. */
+export const openDrawer = () => openModal('drawer');
+export const closeDrawer = () => closeModal();
+export const toggleDrawer = () => toggleModal('drawer');
+
+/** @deprecated Use `openModal('search')`. */
+export const openSearch = () => openModal('search');
+/** @deprecated Use `closeModal()`. */
+export const closeSearch = () => closeModal();
+/** @deprecated Use `toggleModal('search')`. */
+export const toggleSearch = () => toggleModal('search');
+
+export const toggleSettings = () => toggleModal('settings');
+
+/** @deprecated Use `openModal('codeFullscreen', data)`. */
+export const openCodeFullscreen = (data: CodeBlockData) => openModal('codeFullscreen', data);
+/** @deprecated Use `closeModal()`. */
+export const closeCodeFullscreen = () => closeModal();
 
 /**
  * Navigate between images in the lightbox without re-triggering scroll lock.

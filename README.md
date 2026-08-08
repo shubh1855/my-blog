@@ -1,249 +1,275 @@
 # astro-koharu
 
-
+**Language:** **中文** | [English](./docs/README.en.md) | [日本語](./docs/README.ja.md)
 
 ![](https://r2.cosine.ren/i/2026/01/94383107ba4586f773938ed4dae34ff1.webp)
 
-A cute / anime-style / pink-blue themed blog, perfect for ACG, frontend dev, and journaling personal sites with excellent performance.
+一个萌系 / 二次元 / 粉蓝配色的博客主题，适合 ACG、前端、手账向个人站，性能优异。
 
-> The name is inspired by "Koharu-biyori" (こはるびより), which refers to the period from late autumn to early winter when there's a stretch of warm, spring-like sunny days — known as "Indian summer" in English.
+> 命名灵感来源于 “小春日和”（こはるびより）指的是晚秋到初冬这段时期，持续的一段似春天般温暖的晴天。也就是中文中的"小阳春"。
 
-The overall design is inspired by the Hexo [Shoka](https://shoka.lostyu.me/computer-science/note/theme-shoka-doc/) theme, rebuilt with a modern tech stack for your personal blog.
+博客整体设计灵感来自 Hexo 的 [Shoka](https://shoka.lostyu.me/computer-science/note/theme-shoka-doc/) 主题，用更现代的技术栈打造属于你的个人博客。
 
-This repository has been cleaned up as a demo repository. Visit the theme developer's blog at https://blog.cosine.ren/ — give it a star if you like it!
+本仓库已清理为示例仓库，主题开发者的博客可查看 https://blog.cosine.ren/ 喜欢的话欢迎 star ～
 
-Under active development
+持续迭代中
 
-- Built on **Astro**, static output, fast loading
-- Cute / anime-style / pink-blue color scheme, ideal for ACG, frontend, and journaling sites
-- Multi-category and multi-tag support without forcing complex information architecture
-- Minimal performance overhead
-- Serverless full-site search powered by Pagefind
-- LQIP (Low Quality Image Placeholders) — gradient placeholders shown before images load
+- 基于 **Astro**，静态输出，加载轻快
+- 萌系 / 二次元 / 粉蓝配色，适合 ACG、前端、手账向个人站
+- 支持多分类、多标签，但不会强迫你用复杂信息架构
+- 尽可能的减少性能开销
+- 使用 pagefind 实现无后端的全站搜索
+- LQIP（低质量图片占位符），图片加载前显示渐变色占位
 
-![Demo](https://r2.cosine.ren/i/2025/12/417b098dffce2ced9c0ff6009e5213df.gif)
+![演示图1](https://r2.cosine.ren/i/2025/12/417b098dffce2ced9c0ff6009e5213df.gif)
 
-[Excellent Performance](https://pagespeed.web.dev/analysis/https-blog-cosine-ren/w6qzrwbp9b?hl=en&form_factor=desktop): Aiming for all-green on desktop, though continuous checking is needed as features evolve!
+[性能优异](https://pagespeed.web.dev/analysis/https-blog-cosine-ren/w6qzrwbp9b?hl=zh-cn&form_factor=desktop)：目标是 PC 的全绿，但是随着功能迭代不可避免的需要反复检查！
 
-![Performance](https://r2.cosine.ren/i/2025/12/e93f40c340a626c4ab72212a84cf6d5d.webp)
+![性能优化](https://r2.cosine.ren/i/2025/12/e93f40c340a626c4ab72212a84cf6d5d.webp)
 
-You can provide [feedback](https://cos.featurebase.app/) and check the Roadmap here. Issues are also welcome — but since this is a personal project, feel free to fork and customize!
+可在此进行博客的[反馈](https://cos.featurebase.app/)以及查看 Roadmap，当然更欢迎在 issue 区域提 issue，不过这毕竟是个人项目，喜欢的也欢迎 fork 出去改。
 
 ![](https://r2.cosine.ren/i/2026/01/f1c239b4adf7771f10b954c389d87a74.webp)
 ![](https://r2.cosine.ren/i/2026/01/c962f82503abf68eb1f21b835873f241.webp)
 
-## Deployment
+## 部署
 
-Supports automatic deployment on mainstream platforms including **Vercel** and **Netlify**. The adapter is automatically selected based on the environment; unrecognized platforms fall back to the Node.js adapter (suitable for Docker or self-hosting).
+默认输出纯静态站，可直接部署到 **Vercel**、**Netlify**、nginx 等平台。只有启用可选的“碎碎念”动态归档时，才需要 Astro Node standalone 部署；两种模式的配置见[部署架构](./docs/overview/11-deployment-adapters.md)。
 
-### One-Click Deploy
+### 一键部署
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cosZone/astro-koharu&project-name=astro-koharu&repository-name=astro-koharu)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/cosZone/astro-koharu)
 
-### Docker Deployment
+### Docker 部署
 
-You can also run a container with Nginx via docker / docker-compose:
+也可以通过 docker / docker-compose 运行一个带 Nginx 的容器：
 
-1. Edit `config/site.yaml` to configure the `comment.remark42` and `analytics.umami` sections.
-2. Run `./docker/rebuild.sh` — the script will automatically stop old containers and rebuild/restart.
+1. 编辑 `config/site.yaml`，配置 `comment.remark42` 和 `analytics.umami` 部分。
+2. 执行 `./docker/rebuild.sh`，脚本会自动停止旧容器并重新构建/启动。
 
-> To customize the env file path or skip `docker compose down`, set `ENV_FILE=/path/to/.env` or `SKIP_DOWN=true` when running the script.
+> 想自定义环境文件位置或跳过 `docker compose down`，可在运行脚本时设置 `ENV_FILE=/path/to/.env` 或 `SKIP_DOWN=true`。
 
-To run Compose manually from the repository root:
+若需要手动运行 Compose，可在仓库根目录执行：
 
 ```bash
 docker compose --env-file ./.env -f docker/docker-compose.yml up -d --build
 ```
 
-### Local Development
+启用“碎碎念”后请改用 `pnpm docker:up:dynamic`。该功能默认关闭，完整配置与真实链路验收见[碎碎念指南](./docs/features/moments.md)。
 
-1. Clone the project
+### 本地开发
+
+开始前请确保已安装 Node.js 22.20.0 或更高版本，以及 pnpm 10.28.2。
+
+1. 克隆项目到本地
 
 ```bash
 git clone https://github.com/cosZone/astro-koharu
 ```
 
-2. Enter the project directory and install dependencies
+2. 进入项目目录并安装依赖
 
 ```bash
 cd astro-koharu
 pnpm i
 ```
 
-3. Start the dev server
+3. 启动项目
 
 ```bash
 pnpm dev
 ```
 
-## Features
+## 功能特性
 
-- Built on Astro 5.x with static site generation and excellent performance
-- Elegant dark/light theme toggle
-- Serverless full-site search powered by Pagefind
-- **Swappable comment systems**: Supports Waline (recommended), Giscus, Remark42, and Twikoo — one-click switch in config, theme auto-follows
-- Full Markdown enhancements (GFM, syntax highlighting, auto TOC, Mermaid diagrams, Infographic charts)
-- **Shoka-compatible Markdown syntax**: Text effects (underline/highlight/superscript & subscript/color), spoiler text, ruby annotations, admonition blocks, collapsible blocks, tab cards, friend link cards, audio/video players, quiz system (single choice/multiple choice/true-false/fill-in-the-blank), math formulas (KaTeX), code block enhancements (title/mark/command) — all features can be individually toggled
-- [Toggleable] **Content encryption**: Supports partial encryption (encrypted blocks) and full article encryption, using AES-256-GCM client-side decryption. Passwords are only used during build and not passed to the client
-- Flexible multi-level category and tag system
-- [Toggleable] Multi-series article support (weekly digest, book notes, etc. with custom URL slugs)
-  > **Note**: featuredSeries is designed for categories with many articles, separating them from the homepage main list to avoid clutter. Only the latest article in a series is highlighted on the homepage; the rest are accessed through the series' dedicated page, while still appearing normally in archive, category, and tag pages.
-- [Toggleable] **Bangumi Page**: Integrates [Bangumi API](https://bgm.tv) to display anime/book/music/game collections with category tabs, status filters, and pagination — data fetched in real-time
-- **Standalone page system**: Create `.md` files under `src/pages/` to add custom pages (about, playlists, etc.) with custom cover titles and comment toggles
-- Responsive design
-- Draft and pinned post support
-- Reading progress bar and estimated reading time
-- Smart TOC navigation with CSS counter auto-numbering (can be disabled per post)
-- Mobile article reading header (shows current section title, circular reading progress, expandable TOC)
-- Friend links system and archive page
-- **Internationalization (i18n)**: Built-in Chinese/English UI translations, custom language packs, content-level translations (category/series names), language switcher, hreflang SEO tags, and locale-aware RSS feeds. Default locale URLs have no prefix; other locales are prefixed (e.g., `/en/post/xxx`)
-- RSS feed support
-- LQIP support: Gradient placeholders before images load for better visual experience
-- [Toggleable] Semantic similarity-based smart article recommendation system using [transformers.js](https://huggingface.co/docs/transformers.js) to generate local article embedding vectors
-- [Toggleable] AI-powered automatic summary generation
-- [Toggleable] Christmas special: snowfall, Christmas colors, Santa hats, string lights, and other festive effects
-- Serverless site announcement system: Manage announcements via config file with time controls, stacking, custom colors, and hover-to-read
-- Styled [RSS](https://blog.cosine.ren/rss.xml) feed page
-- **Koharu CLI**: Interactive command-line tool for backup/restore, content generation, and backup management
-- **Local lightweight CMS app**: Run `pnpm cms` to launch a standalone CMS interface with article management, in-browser editing, and Markdown preview. The edit button on article pages supports one-click jump to local editors (VS Code / Cursor / Zed), configured in the `dev` section of `config/site.yaml`. (A backend version may be considered later; this version is static)
+- 基于 Astro 7.x，静态站点生成，性能优异
+- 优雅的深色/浅色主题切换
+- 基于 Pagefind 的无后端全站搜索
+- **可更换评论系统**：支持 Waline（推荐）、Giscus、Remark42、Twikoo 四种评论组件，配置文件一键切换，主题自动跟随
+- 完整的 Markdown 增强功能（GFM、代码高亮、自动目录、Mermaid 图表、Infographic 信息图）
+- **Shoka 兼容 Markdown 语法**：文字特效（下划线/高亮/上下标/颜色）、隐藏文字（Spoiler）、注音标注（Ruby）、提醒块、折叠块、标签卡、友链卡片、音视频播放器、练习题系统（单选/多选/判断/填空）、数学公式（KaTeX）、代码块增强（title/mark/command）—— 所有功能均可独立开关
+- [可开关] **内容加密**：支持文章局部加密（加密块）和整篇文章加密（加密文章），使用 AES-256-GCM 客户端解密，密码仅在构建时使用、不传递到客户端
+- 灵活的多级分类与标签系统
+- [可开关] 多系列文章支持（周刊、书摘等自定义系列，支持自定义 URL slug）
+  > 💡 **说明**：featuredSeries 适合文章数量较多的分类，将其从首页主列表分离以避免刷屏。系列文章仅最新一篇在首页高亮，其余通过系列专属页面访问，但在归档、分类、标签等页面仍正常展示。
+- [可开关] **追番页面（Bangumi）**：接入 [Bangumi API](https://bgm.tv)，展示动画/书籍/音乐/游戏收藏，支持分类切换、状态筛选、分页浏览，数据实时获取
+- [可开关] **碎碎念动态归档**：从 koharu-suite 的公开频道读取消息，提供频道、详情、搜索、cursor 分页和 branded RSS；默认静态部署完全不受影响，详见[配置指南](./docs/features/moments.md)
+- **独立页面系统**：在 `src/pages/` 下创建 `.md` 文件即可添加自定义页面（关于、歌单等），支持自定义封面标题和评论开关
+- 响应式设计
+- 草稿与置顶功能
+- 阅读进度条与阅读时间估算
+- 智能目录导航，支持 CSS 计数器自动编号（可按文章关闭）
+- 移动端文章阅读头部（显示当前章节标题、圆形阅读进度、可展开目录）
+- 友链系统与归档页面
+- **多语言支持（i18n）**：内置中英文 UI 翻译，支持自定义语言包、内容级翻译（分类名/系列名）、语言切换器、hreflang SEO 标签、locale-aware RSS 订阅。默认语言 URL 无前缀，其他语言自动加前缀（如 `/en/post/xxx`）
+- RSS 订阅支持
+- 支持 LQIP：图片加载前显示渐变色占位，提升视觉体验
+- [可开关] 基于语义相似度的智能文章推荐系统，使用 [transformers.js](https://huggingface.co/docs/transformers.js) 在本地生成文章嵌入向量，计算文章间的语义相似度
+- [可开关] AI 自动摘要生成，自动生成摘要。
+- [可开关] 圣诞特辑：包含雪花飘落、圣诞配色、圣诞帽装饰、灯串装饰等节日氛围效果
+- 无后端站点公告系统：可通过配置文件管理公告，支持时间控制、多条公告堆叠、自定义颜色、hover 已读
+- 有样式的 [RSS](https://blog.cosine.ren/rss.xml) 订阅源链接
+- **Koharu CLI**：交互式命令行工具，支持备份/还原、内容生成、备份管理
+- **本地轻 CMS 应用**：运行 `pnpm cms` 启动独立的 CMS 管理界面，支持文章管理、浏览器内编辑、Markdown 预览等功能。文章页的编辑按钮支持一键跳转到本地编辑器（VS Code / Cursor / Zed），配置见 `config/site.yaml` 的 `dev` 部分。(后期会考虑做个有后端的版本，这期先静态)
 
 ## Koharu CLI
 
-The blog comes with an interactive CLI tool for managing blog content:
+博客自带交互式 CLI 工具，方便管理博客内容：
 
 ```bash
-pnpm koharu              # Interactive main menu
-pnpm koharu new          # Create new content (post/friend link)
-pnpm koharu backup       # Backup blog content and config
-pnpm koharu restore      # Restore from backup
-pnpm koharu update       # Update theme
-pnpm koharu generate     # Generate content assets (LQIP, similarity, AI summaries)
-pnpm koharu clean        # Clean old backups
-pnpm koharu list         # List all backups
+pnpm koharu              # 交互式主菜单
+pnpm koharu new          # 新建内容（文章/友链）
+pnpm koharu backup       # 备份博客内容和配置
+pnpm koharu restore      # 从备份恢复
+pnpm koharu update       # 更新主题
+pnpm koharu migrate      # 一键迁移历史文章数据
+pnpm koharu generate     # 生成内容资产 (LQIP, 相似度, AI 摘要)
+pnpm koharu clean        # 清理旧备份
+pnpm koharu list         # 查看所有备份
 ```
 
-### Creating Content
+### 新建内容
 
-Quickly create blog posts and friend links:
+快速创建博客文章和友链：
 
 ```bash
-# Interactive type selection
+# 交互式选择创建类型
 pnpm koharu new
 
-# Or specify the type directly
-pnpm koharu new post     # Create a new blog post (interactive title, category, tags, etc.)
-pnpm koharu new friend   # Create a new friend link (auto-appended to config/site.yaml)
+# 或直接指定类型
+pnpm koharu new post     # 新建博客文章（交互式输入标题、分类、标签等）
+pnpm koharu new friend   # 新建友情链接（自动追加到 config/site.yaml）
 ```
 
-**New Post features**:
+**新建文章功能**：
 
-- Auto-generated pinyin slug
-- Select from existing categories
-- Multi-tag support
-- Duplicate file detection
-- Auto-generated frontmatter
+- 自动生成拼音 slug
+- 选择已有分类
+- 支持多标签
+- 检查文件重复
+- 自动创建 frontmatter
 
-**New Friend Link features**:
+**新建友链功能**：
 
-- Interactive friend site info input
-- Auto-appended to config file
-- Preserves YAML format and comments
+- 交互式输入友站信息
+- 自动追加到配置文件
+- 保留 YAML 格式和注释
 
-### Backup & Restore
+### 备份与还原
 
-Before updating the theme, use the CLI to backup your personal content:
+更新主题前，使用 CLI 备份你的个人内容：
 
 ```bash
-# Basic backup (blog posts, config, avatar, .env)
+# 基础备份（博客文章、配置、头像、.env）
 pnpm koharu backup
 
-# Full backup (includes all images and generated assets)
+# 完整备份（包含所有图片和生成的资产）
 pnpm koharu backup --full
 
-# Restore latest backup
+# 还原最新备份
 pnpm koharu restore --latest
 
-# Preview files to be restored (dry run)
+# 预览将要还原的文件（不实际还原）
 pnpm koharu restore --dry-run
 ```
 
-### Updating the Theme
+### 历史内容迁移
 
-Use the CLI to automatically update the theme (auto backup → pull → merge → install dependencies):
+升级到 Astro 6 或还原旧备份后，必须在运行 `pnpm dev` 或 `pnpm build` 前迁移文章链接。从旧版升级时，
+请先等 `pnpm koharu update` 进程完全退出，再执行：
 
 ```bash
-# Full update flow (backs up first by default)
+pnpm koharu migrate --dry-run
+pnpm koharu migrate
+```
+
+迁移会先自动创建基础备份，保留已有 `link`，将旧 `slug` 安全转换为 `link`，并为缺少两者的文章补充稳定链接。
+脚本可重复执行；发现重复链接或无法安全处理的 frontmatter 时会停止且不修改文件。通过 Koharu CLI 还原旧备份时会自动执行同一迁移。
+`pnpm dev` 和 `pnpm build` 也会先执行只读检查，在内容尚未迁移时停止并显示修复命令。
+
+### 更新主题
+
+使用 CLI 自动更新主题（会自动备份 → 拉取 → 合并 → 安装依赖）：
+
+```bash
+# 完整更新流程（默认会先备份）
 pnpm koharu update
 
-# Check for updates only
+# 仅检查更新
 pnpm koharu update --check
 
-# Skip backup and update directly
+# 跳过备份直接更新
 pnpm koharu update --skip-backup
 
-# Update to a specific version
+# 更新到指定版本
 pnpm koharu update --tag v2.1.0
 
-# Clean mode (zero conflicts, forced backup, ideal for first migration or heavy conflicts)
+# clean 模式（零冲突，强制备份，适合首次迁移或冲突较多时）
 pnpm koharu update --clean
 
-# Rebase mode (rewrites history, forced backup, for git-savvy users)
+# rebase 模式（重写历史，强制备份，适合熟悉 git 的用户）
 pnpm koharu update --rebase
 
-# Preview operations (dry run)
+# 预览操作（不实际执行）
 pnpm koharu update --dry-run
 ```
 
-> **Update Mode Details:**
+> **💡 更新模式说明：**
 >
-> - **Default mode**: Uses `git merge --no-ff` to merge upstream updates, preserving merge-base info. User content conflicts (blog posts, config, etc.) are automatically resolved in favor of the local version; only theme file conflicts require manual resolution.
-> - **Clean mode** (`--clean`): Replaces all theme files with the latest upstream version, then restores user content from backup for zero-conflict updates. Ideal for first-time migration or heavy conflicts. **Note: Custom modifications to theme files will not be preserved.**
-> - **Rebase mode** (`--rebase`): Replays local commits on top of upstream, rewriting commit history. Suitable for git-savvy users.
+> - **默认模式**：使用 `git merge --no-ff` 合并上游更新，保留 merge-base 信息。遇到用户内容（博客文章、配置等）冲突时自动保留本地版本，仅主题文件冲突需手动解决。
+> - **Clean 模式** (`--clean`)：用上游最新版本替换所有主题文件，然后从备份还原用户内容，实现零冲突更新。适合首次从旧版迁移或冲突较多时使用。**注意：用户对主题文件的自定义修改不会被保留。**
+> - **Rebase 模式** (`--rebase`)：将本地提交重放到上游之上，重写提交历史。适合熟悉 git 的用户。
 >
-> The CLI update command wraps git operations. Users familiar with git can also use `git merge`/`git rebase` manually.
+> CLI 更新命令是对 git 操作的封装，熟悉 git 的用户也可以直接使用 `git merge`/`git rebase` 手动操作。
 
-### Content Generation
+### 内容生成
 
 ```bash
-# Interactive type selection
+# 交互式选择生成类型
 pnpm koharu generate
 
-# Or specify the type directly
-pnpm koharu generate lqips        # Generate LQIP image placeholders
-pnpm koharu generate similarities # Generate similarity vectors
-pnpm koharu generate summaries    # Generate AI summaries
-pnpm koharu generate all          # Generate all
+# 或直接指定类型
+pnpm koharu generate lqips        # 生成 LQIP 图片占位符
+pnpm koharu generate similarities # 生成相似度向量
+pnpm koharu generate summaries    # 生成 AI 摘要
+pnpm koharu generate all          # 生成全部
 ```
 
-## Configuration
+## 构建缓存
 
-All blog configuration is managed through **`config/site.yaml`**, including:
+项目将 `.cache/og-data.json` 提交到 Git 仓库，用于缓存链接嵌入功能抓取的 OG 元数据（标题、描述、图片等）。这样在 Vercel、Netlify 等平台构建时可以直接复用已有缓存，避免每次构建都重新抓取外部链接的元信息，显著加速构建并减少对外部站点的请求。
 
-- Site information (title, subtitle, author, etc.)
-- Social media links
-- Navigation menu
-- Featured categories and series configuration
-- Category mapping (display name → URL slug)
-- Friend links list
-- Announcement system
-- **Bangumi page**: Set `bangumi.userId` to enable, comment out to disable
-- **Comment system** (Waline / Giscus / Remark42 / Twikoo, Waline recommended)
-- Analytics (Umami)
-- **Internationalization (i18n)**
-- **Background music (BGM)**: Configure `bgm.audio` to add playlists, and `bgm.metingApi` to customize the [Meting](https://github.com/metowolf/meting) API address (default: `https://163.hyc.moe/`, self-hosting recommended)
-- Christmas special toggle
-- Development tools (the `dev` section in `config/site.yaml` for local editor jump)
+`.cache/` 目录下的其他文件（如 transformers 模型缓存）仍被 `.gitignore` 忽略。
 
-See the documentation for detailed configuration instructions.
+## 配置说明
 
-### Multi-language Configuration (i18n)
+博客配置统一使用 **`config/site.yaml`** 文件管理，包括：
 
-Configure supported languages in the `i18n` section of `config/site.yaml`:
+- 站点基本信息（标题、副标题、作者等）
+- 社交媒体链接
+- 导航菜单
+- 特色分类和周刊配置
+- 分类映射（中文分类名 → URL slug）
+- 友链列表
+- 公告系统
+- **评论系统**（Waline / Giscus / Remark42 / Twikoo，推荐使用 Waline）
+- 数据统计（Umami）
+- **国际化配置（i18n）**
+- **背景音乐（BGM）**：配置 `bgm.audio` 添加歌单，`bgm.metingApi` 可自定义 [Meting](https://github.com/metowolf/meting) API 地址（默认 `https://163.hyc.moe/`，推荐自部署）
+- **追番页面（Bangumi）**：配置 `bangumi.userId` 即可开启，注释掉整段关闭
+- 圣诞特辑开关
+- 开发工具配置（`config/site.yaml` 的 `dev` 部分，用于本地编辑器跳转）
+
+详细配置说明请参考文档。
+
+### 多语言配置（i18n）
+
+在 `config/site.yaml` 的 `i18n` 部分配置支持的语言：
 
 ```yaml
 i18n:
-  defaultLocale: zh        # Default locale (no URL prefix)
+  defaultLocale: zh # 默认语言（URL 无前缀）
   locales:
     - code: zh
       label: 中文
@@ -251,7 +277,7 @@ i18n:
       label: English
 ```
 
-**Content translations**: Configure translations for category names, series names, and other content-level strings in `config/i18n-content.yaml`:
+**内容翻译**：在 `config/i18n-content.yaml` 中配置分类名、系列名等内容级字符串的翻译：
 
 ```yaml
 en:
@@ -265,85 +291,85 @@ en:
       fullName: My Tech Weekly
 ```
 
-**Adding translated posts**: Place translated posts under `src/content/blog/<locale>/`, mirroring the default locale's directory structure:
+**添加翻译文章**：将翻译文章放在 `src/content/blog/<locale>/` 目录下，保持与默认语言相同的路径结构：
 
 ```plain
 src/content/blog/
-├── tools/getting-started.md        # Default locale (zh)
-├── en/tools/getting-started.md     # English translation
-└── en/life/hello-world.md          # English translation
+├── tools/getting-started.md        # 默认语言 (zh)
+├── en/tools/getting-started.md     # 英文翻译
+└── en/life/hello-world.md          # 英文翻译
 ```
 
-Posts without a translation will automatically fall back to the default locale content, with a notice displayed.
+没有对应翻译的文章会自动回退显示默认语言内容，并标注提示。
 
-**Adding a new language**:
+**添加新语言**：
 
-1. Add the new locale to `i18n.locales` in `config/site.yaml`
-2. Create `src/i18n/translations/<code>.ts` — translate UI strings as needed (missing keys fall back to the default locale)
-3. Register the new locale in `src/i18n/translations/index.ts`
-4. Add content translations in `config/i18n-content.yaml` (optional)
+1. 在 `config/site.yaml` 的 `i18n.locales` 中添加新语言
+2. 创建 `src/i18n/translations/<code>.ts`，按需翻译 UI 字符串（未翻译的 key 会回退到默认语言）
+3. 在 `src/i18n/translations/index.ts` 中注册新语言
+4. 在 `config/i18n-content.yaml` 中添加内容翻译（可选）
 
-### Switching Comment Systems
+### 评论系统切换
 
-Switch comment systems via the `comment.provider` field in `config/site.yaml`:
+在 `config/site.yaml` 中通过 `comment.provider` 字段一键切换评论系统：
 
 ```yaml
 comment:
   provider: waline # 'waline' | 'giscus' | 'remark42' | 'twikoo' | 'none'
   waline:
     serverURL: https://your-waline-server.vercel.app
-    # ... other config
+    # ... 其他配置
 ```
 
-**Waline is recommended**: Easy self-deployment, feature-rich (Markdown, emoji, email notifications), with built-in pageview stats. See the [full usage guide](/src/content/blog/tools/astro-koharu-guide.md#如何添加评论功能) for detailed configuration.
+**推荐使用 Waline**：自部署简单、功能丰富（Markdown、表情、邮件通知）、带访问量统计。详细配置请参考[完整使用指南](/src/content/blog/tools/astro-koharu-guide.md#如何添加评论功能)。
 
-## Documentation
+## 文档
 
-- **[Getting Started](./GETTING-STARTED.md)** - Launch your blog
-- **[Updating the Theme](./GETTING-STARTED.md#7-updating-the-theme)** - How to safely update to a new version
-- **[Full Usage Guide](./src/content/blog/tools/astro-koharu-guide.md)** - Detailed configuration and usage for all features
+- **[快速开始](./GETTING-STARTED.md)** - 启动你的博客
+- **[更新主题](./GETTING-STARTED.md#7-更新主题)** - 如何安全地更新到新版本
+- **[完整使用指南](./src/content/blog/tools/astro-koharu-guide.md)** - 所有功能的详细配置和使用方法
 
-## Feature Showcase
+## 特色功能演示图片
 
-- Gradient placeholders before images load for better visual experience - [Blog Post](https://blog.cosine.ren/post/astro-lqip-implementation)
+- 图片加载前显示渐变色占位，提升视觉体验 - [介绍文章](https://blog.cosine.ren/post/astro-lqip-implementation)
   ![LQIP](https://r2.cosine.ren/i/2025/12/40e44c8ac166183d5f823d7aa81fa792.webp)
-- Smooth dark mode transition animation powered by View Transitions API
-  ![Theme Transition](https://r2.cosine.ren/i/2025/12/418c7602ce115660bed9db66739370d5.gif)
-- Markdown enhancement - Link embed feature - [Example](https://blog.cosine.ren/post/my-claude-code-record-2)
-  ![Link Embed](https://r2.cosine.ren/i/2026/01/6804aa167fd4cf7022a9b511d52017ce.webp)
-- Markdown enhancement - Create beautiful infographics with [@antv/infographic](https://github.com/antvis/Infographic)
-  [Infographic Guide](https://koharu.cosine.ren/post/infographic-guide)
-  ![Infographic Syntax](https://r2.cosine.ren/i/2026/01/581893e18557bcb837177cb2d6fb7af7.webp)
-- Styled RSS feed page - [Example](https://blog.cosine.ren/rss.xml)
-  ![RSS Feed](https://r2.cosine.ren/i/2026/01/4476f67d1acea2e0991cc70d1d3cf6a1.webp)
-- Announcement system
-  ![Announcements](https://r2.cosine.ren/i/2026/01/a4660955f52438b3cc2d21bdc931bbd4.gif)
-- Shoka-compatible Markdown syntax - Admonition blocks, collapsible blocks, tab cards, text effects, spoiler text, ruby annotations, quizzes, and more
-- Audio/video player - Supports NetEase Cloud Music playlists and video playback
+- 使用 view-transition 实现的流畅的深色模式切换主题过渡动画。
+  ![主题过渡动画](https://r2.cosine.ren/i/2025/12/418c7602ce115660bed9db66739370d5.gif)
+- Markdown 增强 - 链接嵌入功能 - [示例](https://blog.cosine.ren/post/my-claude-code-record-2)
+  ![链接嵌入功能](https://r2.cosine.ren/i/2026/01/6804aa167fd4cf7022a9b511d52017ce.webp)
+- Markdown 增强 - 使用 [@antv/infographic](https://github.com/antvis/Infographic) 创建各种精美的信息图表。
+  [Infographic 信息图指南](https://koharu.cosine.ren/post/infographic-guide)
+  ![信息图语法](https://r2.cosine.ren/i/2026/01/581893e18557bcb837177cb2d6fb7af7.webp)
+- 有样式的 RSS 订阅源链接 - [示例](https://blog.cosine.ren/rss.xml)
+  ![RSS 订阅源链接](https://r2.cosine.ren/i/2026/01/4476f67d1acea2e0991cc70d1d3cf6a1.webp)
+- 公告系统
+  ![公告系统](https://r2.cosine.ren/i/2026/01/a4660955f52438b3cc2d21bdc931bbd4.gif)
+- Shoka 兼容 Markdown 语法 - 提醒块、折叠块、标签卡、文字特效、隐藏文字、注音标注、练习题等
+- 音视频播放器 - 支持音乐歌单和视频播放，通过 [Meting](https://github.com/metowolf/meting) API 解析，推荐自部署
 
-## Blogs Using This Theme
+## 使用本主题的博客
 
-> Inspired by [Zhilu's Blog](https://github.com/L33Z22L11/blog-v3), here's a showcase of blogs using this theme.\
-> Join QQ group 598022684 for discussion, or chat in the comments of my [frontend channel](https://t.me/cosine_front_end).
+> 学习[纸鹿的博客](https://github.com/L33Z22L11/blog-v3)，我也弄一个放谁在用我的主题的区域。\
+> 欢迎加入 Q 群 598022684 进行讨论，或者在我的[前端频道](https://t.me/cosine_front_end)的评论区群聊讨论。
 
-| Blog                                         | Author     | Repository                                                      | Notes                                   |
-| -------------------------------------------- | ---------- | --------------------------------------------------------------- | --------------------------------------- |
-| **[Cosine's Blog](http://blog.cosine.ren/)** | **cosine** | [cosZone/astro-koharu](https://github.com/cosZone/astro-koharu) | This theme                              |
-| [XueHua's Blog](https://xhblog.top/)         | XueHua-s   | [XueHua-s/astro-snow](https://github.com/XueHua-s/astro-snow)   | Simplified features, added a start page |
-| [Ksable's Blog](https://blog.ksable.top/)    | Ksable     | -                                                               | Modified / added some features          |
+| 博客名称                                  | 作者       | 仓库                                                            | 特色功能 or 备注             |
+| ----------------------------------------- | ---------- | --------------------------------------------------------------- | ---------------------------- |
+| **[余弦の博客](http://blog.cosine.ren/)** | **cosine** | [cosZone/astro-koharu](https://github.com/cosZone/astro-koharu) | 本主题                       |
+| [雪花的博客](https://xhblog.top/)         | XueHua-s   | [XueHua-s/astro-snow](https://github.com/XueHua-s/astro-snow)   | 精简了很多功能，增加了起始页 |
+| [Ksable's 小屋](https://blog.ksable.top/) | Ksable    | [God-2077/astro-blog](https://github.com/God-2077/astro-blog) | 修改 / 新增了部分功能 |
 
-## Acknowledgements
+## 🙏 鸣谢
 
-Font used: [Chill Round](https://chinese-font.netlify.app/zh-cn/fonts/hcqyt/ChillRoundFRegular)
+使用字体[寒蝉全圆体](https://chinese-font.netlify.app/zh-cn/fonts/hcqyt/ChillRoundFRegular)
 
-Thanks to the following projects for providing inspiration and reference for astro-koharu:
+感谢以下项目对 astro-koharu 的开发提供的灵感及参考：
 
 - [mx-space](https://github.com/mx-space)
-- [Hexo Theme Shoka](https://shoka.lostyu.me/computer-science/note/theme-shoka-doc/)
+- [Hexo 主题 Shoka](https://shoka.lostyu.me/computer-science/note/theme-shoka-doc/)
 - [waterwater.moe](https://github.com/lawvs/lawvs.github.io)
 - [yfi.moe](https://github.com/yy4382/yfi.moe)
 - [4ark.me](https://github.com/gd4Ark/gd4Ark.github.io)
-- [Zhilu's Blog](https://blog.zhilu.site/)
+- [纸鹿摸鱼处](https://blog.zhilu.site/)
 
 ...
 

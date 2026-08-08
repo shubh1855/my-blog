@@ -1,11 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { unified } from '@astrojs/markdown-remark';
+import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import yaml from '@rollup/plugin-yaml';
 import tailwindcss from '@tailwindcss/vite';
-import umami from '@yeskunall/astro-umami';
-import { defineConfig } from 'astro/config';
+import { defineConfig, memoryCache } from 'astro/config';
 import icon from 'astro-icon';
 import mermaid from 'astro-mermaid';
 import pagefind from 'astro-pagefind';
@@ -15,10 +16,15 @@ import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import remarkDirective from 'remark-directive';
 import remarkMath from 'remark-math';
-import Sonda from 'sonda/astro';
+import Sonda from 'sonda/vite';
 import { loadEnv } from 'vite';
 import svgr from 'vite-plugin-svgr';
 import YAML from 'yaml';
+import { momentsRoutes } from './src/features/moments/integration/momentsRoutes.ts';
+import { normalizeContentConfig } from './src/lib/config/content.ts';
+import { enabledFeaturedSeriesSlugs, normalizeFeaturedSeries } from './src/lib/config/featured-series.ts';
+import { normalizeMomentsConfig } from './src/lib/config/moments.ts';
+import { RESERVED_ROUTES } from './src/lib/config/reserved-routes.ts';
 import { rehypeEncryptedBlock } from './src/lib/markdown/rehype-encrypted-block.ts';
 import { rehypeEncryptedPost } from './src/lib/markdown/rehype-encrypted-post.ts';
 import { rehypeImagePlaceholder } from './src/lib/markdown/rehype-image-placeholder.ts';
@@ -29,8 +35,8 @@ import { remarkIns, remarkMark } from './src/lib/markdown/remark-shoka-effects.t
 import { remarkShokaPreprocess } from './src/lib/markdown/remark-shoka-preprocess.ts';
 import { remarkShokaRuby } from './src/lib/markdown/remark-shoka-ruby.ts';
 import { remarkShokaSpoiler } from './src/lib/markdown/remark-shoka-spoiler.ts';
+import { collapsibleCodeTransformer } from './src/lib/markdown/shiki-collapsible-transformer.ts';
 import { shokaMetaTransformer } from './src/lib/markdown/shiki-meta-transformer.ts';
-import { normalizeUrl } from './src/lib/utils.ts';
 
 // Load YAML config directly with Node.js (before Vite plugins are available)
 // This is only used in astro.config.mjs - other files use @rollup/plugin-yaml
@@ -44,15 +50,9 @@ const yamlConfig = loadConfigForAstro();
 
 // Bundle analysis mode: ANALYZE=true pnpm build
 // Use loadEnv to read .env file (astro.config.mjs runs before Vite loads .env)
-const { ANALYZE } = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
+const env = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
+const { ANALYZE } = env;
 const isAnalyze = ANALYZE === 'true';
-// Get Umami analytics config from YAML
-const umamiConfig = yamlConfig.analytics?.umami;
-const umamiEnabled = umamiConfig?.enabled ?? false;
-const umamiId = umamiConfig?.id;
-// Normalize endpoint URL to remove trailing slashes
-const umamiEndpoint = normalizeUrl(umamiConfig?.endpoint);
-
 // Get robots.txt config from YAML
 const robotsConfig = yamlConfig.seo?.robots;
 
@@ -61,6 +61,47 @@ const i18nYaml = yamlConfig.i18n;
 const i18nDefaultLocale = i18nYaml?.defaultLocale ?? 'zh';
 const i18nLocales = (i18nYaml?.locales ?? [{ code: 'zh' }]).map((l) => l.code);
 const hasMultipleLocales = i18nLocales.length > 1;
+const enabledI18nLocales = (i18nYaml?.locales ?? [{ code: 'zh' }])
+  .filter((locale) => locale.enabled !== false)
+  .map((locale) => locale.code);
+
+const featuredSeries = normalizeFeaturedSeries(yamlConfig.featuredSeries, {
+  categoryMap: yamlConfig.categoryMap,
+  reservedRoutes: RESERVED_ROUTES,
+});
+const momentsConfig = normalizeMomentsConfig(yamlConfig.moments, {
+  reservedRoutes: RESERVED_ROUTES,
+  localeCodes: enabledI18nLocales,
+  seriesSlugs: enabledFeaturedSeriesSlugs(featuredSeries),
+});
+
+function assertMomentsOgImage(image, field) {
+  if (!image?.startsWith('/')) return;
+  const publicFile = path.join(process.cwd(), 'public', image.slice(1));
+  if (!fs.existsSync(publicFile) || !fs.statSync(publicFile).isFile()) {
+    throw new Error(`Moments configuration error: "${field}" does not exist in public: ${image}`);
+  }
+}
+
+if (momentsConfig.enabled) {
+  assertMomentsOgImage(momentsConfig.ogImage, 'ogImage');
+  for (const [index, channel] of momentsConfig.channels.entries()) {
+    assertMomentsOgImage(channel.ogImage, `channels[${index}].ogImage`);
+  }
+  const suiteUrl = env.KOHARU_SUITE_URL;
+  if (!suiteUrl) throw new Error('KOHARU_SUITE_URL is required when moments.enabled is true.');
+  const parsedSuiteUrl = new URL(suiteUrl);
+  if (
+    !['http:', 'https:'].includes(parsedSuiteUrl.protocol) ||
+    parsedSuiteUrl.username ||
+    parsedSuiteUrl.password ||
+    parsedSuiteUrl.pathname !== '/' ||
+    parsedSuiteUrl.search ||
+    parsedSuiteUrl.hash
+  ) {
+    throw new Error('KOHARU_SUITE_URL must be an HTTP(S) origin without credentials, query, or fragment.');
+  }
+}
 
 /**
  * Vite plugin for conditional Three.js bundling
@@ -92,36 +133,32 @@ function conditionalSnowfall() {
 }
 
 // Build conditional plugin lists based on content config
-const contentConfig = yamlConfig.content || {};
+const contentConfig = normalizeContentConfig(yamlConfig.content);
 
 // Remark plugins — order matters
 // remarkShokaPreprocess MUST be first: it re-parses raw text to fix GFM/remark conflicts
 // (+++, ~sub~, {% links %} YAML etc.) before any AST-level plugin runs.
 const remarkPlugins = [];
-{
-  const needsPreprocess =
-    contentConfig.enableShokaContainers !== false ||
-    contentConfig.enableShokaHexoTags !== false ||
-    contentConfig.enableShokaEffects !== false;
-  if (needsPreprocess) {
-    remarkPlugins.push([
-      remarkShokaPreprocess,
-      {
-        enableContainers: contentConfig.enableShokaContainers !== false,
-        enableHexoTags: contentConfig.enableShokaHexoTags !== false,
-        enableSuperSub: contentConfig.enableShokaEffects !== false,
-        enableMath: contentConfig.enableMath !== false,
-        enableEncryptedBlock: contentConfig.enableEncryptedBlock ?? false,
-      },
-    ]);
-  }
+if (contentConfig.enableShokaContainers || contentConfig.enableShokaHexoTags || contentConfig.enableShokaEffects) {
+  remarkPlugins.push([
+    remarkShokaPreprocess,
+    {
+      enableContainers: contentConfig.enableShokaContainers,
+      enableHexoTags: contentConfig.enableShokaHexoTags,
+      // The plugin option is named after what it parses (super/subscript);
+      // `enableShokaEffects` gates the whole ++ins++/==mark==/~sub~/^sup^ family.
+      enableSuperSub: contentConfig.enableShokaEffects,
+      enableMath: contentConfig.enableMath,
+      enableEncryptedBlock: contentConfig.enableEncryptedBlock,
+    },
+  ]);
 }
 // remarkMath must run BEFORE ruby/spoiler/effects so that $...$ content
 // is already parsed into inlineMath/math nodes and won't be touched by text-scanning plugins.
-if (contentConfig.enableMath !== false) remarkPlugins.push(remarkMath);
-if (contentConfig.enableShokaSpoiler !== false) remarkPlugins.push(remarkShokaSpoiler);
-if (contentConfig.enableShokaRuby !== false) remarkPlugins.push(remarkShokaRuby);
-if (contentConfig.enableShokaEffects !== false) {
+if (contentConfig.enableMath) remarkPlugins.push(remarkMath);
+if (contentConfig.enableShokaSpoiler) remarkPlugins.push(remarkShokaSpoiler);
+if (contentConfig.enableShokaRuby) remarkPlugins.push(remarkShokaRuby);
+if (contentConfig.enableShokaEffects) {
   remarkPlugins.push(remarkIns, remarkMark);
 }
 // Encrypted block: remarkDirective is registered in BOTH places —
@@ -134,11 +171,11 @@ if (contentConfig.enableEncryptedBlock) {
 remarkPlugins.push([
   remarkLinkEmbed,
   {
-    enableLinkEmbed: contentConfig.enableLinkEmbed ?? true,
-    enableTweetEmbed: contentConfig.enableTweetEmbed ?? true,
-    enableOGPreview: contentConfig.enableOGPreview ?? true,
-    enableCodePenEmbed: contentConfig.enableCodePenEmbed ?? true,
-    previewCacheTime: contentConfig.previewCacheTime ?? 30,
+    enableLinkEmbed: contentConfig.enableLinkEmbed,
+    enableTweetEmbed: contentConfig.enableTweetEmbed,
+    enableOGPreview: contentConfig.enableOGPreview,
+    enableCodePenEmbed: contentConfig.enableCodePenEmbed,
+    previewCacheTime: contentConfig.previewCacheTime,
   },
 ]);
 
@@ -156,9 +193,9 @@ const rehypePlugins = [
     },
   ],
 ];
-if (contentConfig.enableShokaAttrs !== false) rehypePlugins.push(rehypeShokaAttrs);
+if (contentConfig.enableShokaAttrs) rehypePlugins.push(rehypeShokaAttrs);
 rehypePlugins.push(rehypeImagePlaceholder);
-if (contentConfig.enableMath !== false) rehypePlugins.push(rehypeKatex);
+if (contentConfig.enableMath) rehypePlugins.push(rehypeKatex);
 // Encrypted block/post MUST be last rehype plugins — encrypt fully-rendered children
 if (contentConfig.enableEncryptedBlock) {
   rehypePlugins.push(rehypeEncryptedBlock);
@@ -167,17 +204,20 @@ if (contentConfig.enableEncryptedBlock) {
 
 // Shiki transformers
 const shikiTransformers = [];
-if (contentConfig.enableCodeMeta !== false) shikiTransformers.push(shokaMetaTransformer());
+if (contentConfig.enableCodeMeta) shikiTransformers.push(shokaMetaTransformer());
+if (contentConfig.enhanceCodeBlock) shikiTransformers.push(collapsibleCodeTransformer());
 
 // https://astro.build/config
 export default defineConfig({
   site: yamlConfig.site.url,
+  output: 'static',
   compressHTML: true,
   markdown: {
-    // Enable GitHub Flavored Markdown
-    gfm: true,
-    remarkPlugins,
-    rehypePlugins,
+    processor: unified({
+      gfm: true,
+      remarkPlugins,
+      rehypePlugins,
+    }),
     syntaxHighlight: {
       type: 'shiki',
       excludeLangs: ['mermaid'],
@@ -201,23 +241,19 @@ export default defineConfig({
         ri: ['*'],
       },
     }),
-    // Umami analytics - configured via config/site.yaml
-    ...(umamiEnabled && umamiId
-      ? [
-          umami({
-            id: umamiId,
-            endpointUrl: umamiEndpoint,
-            hostUrl: umamiEndpoint,
-          }),
-        ]
-      : []),
     pagefind(),
     mermaid({
       autoTheme: true,
     }),
     robotsTxt(robotsConfig || {}),
-    ...(isAnalyze ? [Sonda()] : []),
+    ...(momentsConfig.enabled ? [momentsRoutes(momentsConfig)] : []),
   ],
+  ...(momentsConfig.enabled
+    ? {
+        adapter: node({ mode: 'standalone' }),
+        cache: { provider: memoryCache({ max: 1000 }) },
+      }
+    : {}),
   devToolbar: {
     enabled: true,
   },
@@ -226,12 +262,19 @@ export default defineConfig({
       // Enable sourcemap for Sonda bundle analysis
       sourcemap: isAnalyze,
     },
-    plugins: [yaml(), conditionalSnowfall(), svgr(), tailwindcss()],
-    ssr: {
+    plugins: [...(isAnalyze ? [Sonda({ open: false })] : []), yaml(), conditionalSnowfall(), svgr(), tailwindcss()],
+    resolve: {
       noExternal: ['react-tweet'],
     },
     optimizeDeps: {
-      include: ['@antv/infographic'],
+      include: [
+        '@antv/infographic',
+        '@floating-ui/react',
+        '@hookform/resolvers/zod',
+        '@tanstack/react-virtual',
+        'react-hook-form',
+        'zod',
+      ],
     },
   },
   // Only enable Astro i18n routing when multiple locales are configured.
@@ -242,7 +285,6 @@ export default defineConfig({
       locales: i18nLocales,
       routing: {
         prefixDefaultLocale: false,
-        redirectToDefaultLocale: true,
       },
     },
   }),

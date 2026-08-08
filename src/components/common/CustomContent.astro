@@ -5,6 +5,7 @@ import type { ContentConfig } from '@constants/content-config';
 import { defaultContentConfig } from '@constants/content-config';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import { christmasConfig } from '@/constants/site-config';
+import { getLocaleFromUrl, t } from '@/i18n';
 
 interface Props {
   Content?: AstroComponentFactory;
@@ -13,11 +14,13 @@ interface Props {
 
 const { Content, config = {} } = Astro.props;
 const finalConfig = { ...defaultContentConfig, ...config };
+const spoilerRevealLabel = t(getLocaleFromUrl(Astro.url.pathname), 'content.revealSpoiler');
 ---
 
 <div
   class:list={['custom-content', { 'relative z-5': christmasConfig.enabled && christmasConfig.features.snowfall }]}
   data-config={JSON.stringify(finalConfig)}
+  data-spoiler-reveal-label={spoilerRevealLabel}
 >
   {Content ? <Content /> : <slot />}
 </div>
@@ -28,8 +31,8 @@ const finalConfig = { ...defaultContentConfig, ...config };
     client:idle
     enableCopy={finalConfig.enableCodeCopy}
     enableFullscreen={finalConfig.enableCodeFullscreen}
-    enableQuiz={finalConfig.enableQuiz ?? true}
-    enableEncryptedBlock={finalConfig.enableEncryptedBlock ?? false}
+    enableQuiz={finalConfig.enableQuiz}
+    enableEncryptedBlock={finalConfig.enableEncryptedBlock}
   />
 )}
 
@@ -39,24 +42,19 @@ const finalConfig = { ...defaultContentConfig, ...config };
 <script>
   import { enhanceImages } from '@lib/image-enhancer';
   import { enhanceLinkPreviews } from '@lib/link-preview-enhancer';
-
-  let spoilerJsLoaded = false;
+  import { enhanceSpoilers } from '@lib/spoiler-enhancer';
 
   // Content enhancement script - handles non-React enhancements
   function enhanceContent() {
     const contentContainer = document.querySelector('.custom-content');
     if (!contentContainer) return;
 
+    // Keep this outside the general enhancement guard so a transient module-load
+    // failure can retry without registering the other handlers again.
+    enhanceSpoilers(contentContainer);
+
     // Avoid re-enhancing
     if (contentContainer.getAttribute('data-enhanced') === 'true') return;
-
-    // Dynamically load spoilerjs when <spoiler-span> elements are present
-    if (!spoilerJsLoaded && contentContainer.querySelector('spoiler-span')) {
-      spoilerJsLoaded = true;
-      import('spoilerjs/spoiler-span').catch(() => {
-        spoilerJsLoaded = false;
-      });
-    }
 
     // Get configuration from data attribute
     const configData = contentContainer.getAttribute('data-config');
