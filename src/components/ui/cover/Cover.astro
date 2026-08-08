@@ -121,9 +121,8 @@ const copyFailedLabel = t(locale, 'common.copyFailed');
         </>
       ) : (
         <>
-          <h2 class="shadow-text font-chill-round text-5xl/[1.2]">{siteConfig?.alternate}</h2>
-          <h1 class="shadow-text font-chill-round mt-3 text-5xl/[1.2] font-bold tracking-widest">{siteConfig?.title}</h1>
-          <p class="shadow-text mt-5 text-sm">= {siteConfig?.subtitle} =</p>
+          <h1 class="shadow-text font-chill-round text-3xl/[1.2] font-bold tracking-widest sm:text-4xl/[1.2] md:text-5xl/[1.2]">{siteConfig?.title}</h1>
+          <p class="shadow-text mt-3 text-xs sm:mt-5 sm:text-sm">= {siteConfig?.subtitle} =</p>
         </>
       )
     }
