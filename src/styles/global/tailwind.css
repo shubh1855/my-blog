@@ -31,6 +31,7 @@
     scroll-behavior: smooth;
     letter-spacing: 0.02em;
     color: hsl(var(--foreground));
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   h1,
