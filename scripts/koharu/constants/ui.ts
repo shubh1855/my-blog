@@ -1,2 +1,3 @@
-/** 自动退出延迟（毫秒） */
+/** Automatic Exit delay (milliseconds) */
+
 export const AUTO_EXIT_DELAY = 100;

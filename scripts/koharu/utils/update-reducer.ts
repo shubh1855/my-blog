@@ -1,18 +1,18 @@
 import { MAIN_BRANCH, type UpdateAction, type UpdateOptions, type UpdateState } from '../constants/update';
 
-/** Rebase 和 clean 模式重写工作区，备份不可跳过（忽略 skipBackup 和 force） */
+/** Rebase and clean mode rewrite workspace, backup cannot be skipped (ignore skipBackup and force) */
 export function shouldForceBackup(options: UpdateOptions): boolean {
   return options.rebase || options.clean;
 }
 
 /**
- * 更新流程状态机 Reducer
- * 所有状态转换逻辑集中在此处，易于理解和测试
+ * Update process state machine Reducer
+ * All state transition logic is centralized here, easy to understand and test
  */
 export function updateReducer(state: UpdateState, action: UpdateAction): UpdateState {
   const { status, options } = state;
 
-  // 通用错误处理：任何状态都可以转换到 error
+  // Universal error handling: any state can be transitioned to error
   if (action.type === 'ERROR') {
     return { ...state, status: 'error', error: action.error };
   }
@@ -22,13 +22,13 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
       if (action.type !== 'GIT_CHECKED') return state;
       const { payload: gitStatus } = action;
 
-      // 分支检查 - 非 main 分支仅警告，不阻止更新
+      // Branch checking - non-main branches only warn, do not prevent Updates
       const branchWarning =
         gitStatus.currentBranch !== MAIN_BRANCH
-          ? `当前在 ${gitStatus.currentBranch} 分支，建议在 ${MAIN_BRANCH} 分支执行更新`
+          ? `Currently on ${gitStatus.currentBranch} branch, recommend updating on ${MAIN_BRANCH} branch`
           : '';
 
-      // 工作区脏检查
+      // Workspace dirty check
       if (!gitStatus.isClean && !options.force) {
         return { ...state, status: 'dirty-warning', gitStatus, branchWarning };
       }
@@ -40,11 +40,11 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
       if (action.type !== 'FETCHED') return state;
       const { payload: updateInfo, needsMigration } = action;
 
-      // 版本号相同时不需要更新
+      // No update is required when the version numbers are the same
       const versionsMatch = updateInfo.currentVersion === updateInfo.latestVersion && updateInfo.latestVersion !== 'unknown';
 
-      // 升级：behindCount > 0
-      // 降级：isDowngrade && aheadCount > 0
+      // Upgrade: behindCount > 0
+      // Downgrade: isDowngrade && aheadCount > 0
       const hasChanges =
         !versionsMatch && (updateInfo.behindCount > 0 || (updateInfo.isDowngrade && updateInfo.aheadCount > 0));
 
@@ -60,7 +60,7 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
       if (action.type === 'BACKUP_CONFIRM') {
         return { ...state, status: 'backing-up' };
       }
-      // Rebase 和 clean 模式下不允许跳过备份（防御性检查）
+      // Backup skipping is not allowed in Rebase and clean modes (defensive check)
       if (action.type === 'BACKUP_SKIP' && !shouldForceBackup(options)) {
         return { ...state, status: 'preview' };
       }
@@ -78,7 +78,7 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
       if (action.type === 'UPDATE_CONFIRM') {
         return { ...state, status: 'merging' };
       }
-      // UPDATE_CANCEL 由组件直接调用 onComplete，不经过 reducer
+      // UPDATE_CANCEL calls onComplete directly from the component without going through the reducer
       return state;
     }
 
@@ -90,9 +90,9 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
         return { ...state, status: 'conflict', mergeResult: result };
       }
       if (!result.success) {
-        return { ...state, status: 'error', error: result.error || '合并失败' };
+        return { ...state, status: 'error', error: result.error || 'Merge failed' };
       }
-      // Clean 模式：合并成功后需要还原用户内容
+      // Clean mode: User content needs to be restored after successful merger
       if (options.clean) {
         return { ...state, status: 'clean-restoring', mergeResult: result };
       }
@@ -113,7 +113,7 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
       return state;
     }
 
-    // 终态：不处理任何 action
+    // Final state: no action is processed
     case 'dirty-warning':
     case 'done':
     case 'conflict':
@@ -128,14 +128,14 @@ export function updateReducer(state: UpdateState, action: UpdateAction): UpdateS
 
 /** Everything the update screen needs to render, derived once instead of in JSX conditions. */
 export interface UpdatePresentation {
-  /** 操作标签，用于进度与完成提示 */
+  /** Operation label, used for progress and completion prompt */
   modeLabel: string;
   confirmMessage: string;
-  /** 备份不可跳过 */
+  /** Backup cannot be skipped */
   forceBackup: boolean;
-  /** 强制备份界面里的模式名 */
+  /** Mode name in forced backup screen */
   forcedBackupModeLabel: string;
-  /** 确认界面下方的策略说明 */
+  /** Strategy explanation below confirmation screen */
   strategyNote: string | null;
   showRebaseWarning: boolean;
   showDowngradeWarning: boolean;
@@ -143,25 +143,25 @@ export interface UpdatePresentation {
   showMigrationHint: boolean;
 }
 
-/** 生成确认提示文字 */
+/** Generate confirmation prompt text */
 function getConfirmMessage(options: UpdateOptions, latestVersion: string, isDowngrade: boolean): string {
-  const target = options.targetTag ? `版本 v${latestVersion}` : '最新版本';
-  if (options.rebase) return `确认执行 rebase 到${options.targetTag ? target : '上游最新'}？（历史将被重写）`;
-  if (options.clean) return `确认执行 clean 模式更新到${target}？`;
-  if (isDowngrade) return `确认回退到版本 v${latestVersion}？`;
-  return `确认更新到${target}？`;
+  const target = options.targetTag ? `Version v${latestVersion}` : 'latest version';
+  if (options.rebase) return `Confirm rebase to ${options.targetTag ? target : 'upstream latest'}? (History will be rewritten)`;
+  if (options.clean) return `Confirm clean mode update to ${target}?`;
+  if (isDowngrade) return `Confirm downgrade to version v${latestVersion}?`;
+  return `Confirm update to ${target}?`;
 }
 
 function getModeLabel(options: UpdateOptions, isDowngrade: boolean): string {
   if (options.rebase) return 'Rebase';
-  if (options.clean) return 'Clean 模式更新';
-  if (isDowngrade) return '版本回退';
-  return '更新';
+  if (options.clean) return 'Clean mode update';
+  if (isDowngrade) return 'Downgrade version';
+  return 'Update';
 }
 
 function getStrategyNote(options: UpdateOptions, isDowngrade: boolean): string | null {
-  if (options.clean) return '将使用 clean 模式：替换所有主题文件，还原用户内容';
-  if (!options.rebase && !isDowngrade) return '将使用 merge 合并上游更新';
+  if (options.clean) return 'Will use clean mode: replace all theme files, restore user content';
+  if (!options.rebase && !isDowngrade) return 'Will use merge to combine upstream updates';
   return null;
 }
 
@@ -182,7 +182,8 @@ export function selectUpdatePresentation(state: UpdateState): UpdatePresentation
   };
 }
 
-/** 创建初始状态 */
+/** Create initial state */
+
 export function createInitialState(options: UpdateOptions): UpdateState {
   return {
     status: 'checking',

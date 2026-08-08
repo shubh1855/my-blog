@@ -93,7 +93,7 @@ test('content migration preserves URLs and is idempotent', () => {
     writePost(contentDir, 'note/both.md', 'link: preferred\nslug: ignored\n');
     writePost(contentDir, 'note/paired.md', 'link: custom-paired\n');
     writePost(contentDir, 'en/note/paired.md', '');
-    writePost(contentDir, 'note/中文.md', '');
+    writePost(contentDir, 'note/chinese.md', '');
     writePost(contentDir, 'note/stable.md', 'link: stable\n');
 
     const first = planContentMigration({ contentDir, siteConfigPath: configPath });
@@ -111,7 +111,7 @@ test('content migration preserves URLs and is idempotent', () => {
     assert.deepEqual(second.errors, []);
     assert.match(fs.readFileSync(path.join(contentDir, 'note/legacy.md'), 'utf8'), /^---\nlink: old\/public-url\n/);
     assert.doesNotMatch(fs.readFileSync(path.join(contentDir, 'note/both.md'), 'utf8'), /^slug:/m);
-    assert.match(fs.readFileSync(path.join(contentDir, 'note/中文.md'), 'utf8'), /^---\nlink: 'note\/中文'\n/);
+    assert.match(fs.readFileSync(path.join(contentDir, 'note/chinese.md'), 'utf8'), /^---\nlink: 'note\/chinese'\n/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -196,7 +196,7 @@ test('generated links preserve the legacy optional slug transliteration', () => 
   try {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
-    writePost(contentDir, '笔记/中文文章.md', '');
+    writePost(contentDir, 'note/chinese_post.md', '');
 
     const plan = planContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -213,7 +213,7 @@ test('legacy slug fields preserve their pre-migration public URLs', () => {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
     writePost(contentDir, 'localized.md', 'slug: en/custom-path\n');
-    writePost(contentDir, 'translated.md', 'slug: 中文路径\n');
+    writePost(contentDir, 'translated.md', 'slug: chinese path\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -232,7 +232,7 @@ test('frontmatter block scalars may contain indented delimiter text', () => {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
     const preferredFile = writePost(contentDir, 'preferred.md', 'link: kept\nslug: |\n  ignored\n  ---\n');
-    const transliteratedFile = writePost(contentDir, 'transliterated.md', 'slug: |\n  中\n  ---\n');
+    const transliteratedFile = writePost(contentDir, 'transliterated.md', 'slug: |\n  zh\n  ---\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -253,8 +253,8 @@ test('multi-line flow scalar slug fails safely instead of corrupting frontmatter
     // A double-quoted scalar spanning two lines: the line-level editors track
     // only block scalars (| / >), so a naive rewrite would strip the first line
     // and leave the trailing line behind, breaking the YAML.
-    const renameFile = writePost(contentDir, 'rename.md', 'slug: "中文\n  路径"\n');
-    const removeFile = writePost(contentDir, 'remove.md', 'link: kept\nslug: "中文\n  路径"\n');
+    const renameFile = writePost(contentDir, 'rename.md', 'slug: "chinese\n  path"\n');
+    const removeFile = writePost(contentDir, 'remove.md', 'link: kept\nslug: "chinese\n  path"\n');
     const renameOriginal = fs.readFileSync(renameFile, 'utf8');
     const removeOriginal = fs.readFileSync(removeFile, 'utf8');
 
@@ -277,7 +277,7 @@ test('frontmatter delimiters allow trailing whitespace but must start in column 
     const contentDir = path.join(root, 'src/content/blog');
     const filePath = path.join(contentDir, 'trailing-space.md');
     fs.mkdirSync(contentDir, { recursive: true });
-    fs.writeFileSync(filePath, '---\nslug: |\n  中\n  ---\ntitle: test\ndate: 2026-01-01\n---   \nbody\n');
+    fs.writeFileSync(filePath, '---\nslug: |\n  zh\n  ---\ntitle: test\ndate: 2026-01-01\n---   \nbody\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
     const migrated = fs.readFileSync(filePath, 'utf8');

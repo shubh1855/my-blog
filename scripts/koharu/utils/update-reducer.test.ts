@@ -73,24 +73,24 @@ test('presentation derives labels, warnings and notes from one place', () => {
   const base = createInitialState(options);
 
   const upgrade = { ...base, updateInfo: { ...downgradeInfo, isDowngrade: false, latestVersion: '6.2.0' } };
-  assert.equal(selectUpdatePresentation(upgrade).modeLabel, '更新');
-  assert.equal(selectUpdatePresentation(upgrade).confirmMessage, '确认更新到最新版本？');
-  assert.equal(selectUpdatePresentation(upgrade).strategyNote, '将使用 merge 合并上游更新');
+  assert.equal(selectUpdatePresentation(upgrade).modeLabel, 'Update');
+  assert.equal(selectUpdatePresentation(upgrade).confirmMessage, 'Confirm update to latest version?');
+  assert.equal(selectUpdatePresentation(upgrade).strategyNote, 'Will use merge to combine upstream updates');
   assert.equal(selectUpdatePresentation(upgrade).showRebaseWarning, false);
 
   const downgrade = { ...base, updateInfo: downgradeInfo, options: { ...options, targetTag: 'v4.2.1' } };
   const downgradePresentation = selectUpdatePresentation(downgrade);
-  assert.equal(downgradePresentation.modeLabel, '版本回退');
-  assert.equal(downgradePresentation.confirmMessage, '确认回退到版本 v4.2.1？');
+  assert.equal(downgradePresentation.modeLabel, 'Downgrade version');
+  assert.equal(downgradePresentation.confirmMessage, 'Confirm downgrade to version v4.2.1?');
   assert.equal(downgradePresentation.showDowngradeWarning, true);
   assert.equal(downgradePresentation.showUnbackedDowngradeWarning, true);
   assert.equal(selectUpdatePresentation({ ...downgrade, backupFile: 'backup.tar.gz' }).showUnbackedDowngradeWarning, false);
 
   const clean = { ...base, options: { ...options, clean: true }, needsMigration: true };
   const cleanPresentation = selectUpdatePresentation(clean);
-  assert.equal(cleanPresentation.modeLabel, 'Clean 模式更新');
+  assert.equal(cleanPresentation.modeLabel, 'Clean mode update');
   assert.equal(cleanPresentation.forcedBackupModeLabel, 'Clean');
-  assert.equal(cleanPresentation.strategyNote, '将使用 clean 模式：替换所有主题文件，还原用户内容');
+  assert.equal(cleanPresentation.strategyNote, 'Will use clean mode: replace all theme files, restore user content');
   // Clean mode already removes conflicts, so the migration hint is redundant.
   assert.equal(cleanPresentation.showMigrationHint, false);
   assert.equal(selectUpdatePresentation({ ...base, needsMigration: true }).showMigrationHint, true);

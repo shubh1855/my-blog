@@ -35,11 +35,14 @@ export interface ContentMigrationPlan {
 }
 
 export interface ContentMigrationOptions {
-  /** 迁移的目标工作区，默认当前项目 */
+  /** The target workspace for migration, defaults to the current project */
+
   workspace?: KoharuWorkspace;
-  /** 覆盖 workspace 的内容目录（还原流程指向暂存副本） */
+  /** Overwrite the workspace's content directory (the restore process points to the staging copy) */
+
   contentDir?: string;
-  /** 覆盖 workspace 的站点配置路径 */
+  /** Override the site configuration path of the workspace */
+
   siteConfigPath?: string;
 }
 
@@ -249,7 +252,7 @@ function collectContentFiles(contentDir: string): {
       const stat = fs.lstatSync(sourcePath);
 
       if (stat.isSymbolicLink()) {
-        errors.push({ file: displayPath(sourcePath), message: '博客内容路径不能是符号链接' });
+        errors.push({ file: displayPath(sourcePath), message: 'Blog content path cannot be a symlink' });
         continue;
       }
       if (stat.isDirectory()) {
@@ -258,7 +261,7 @@ function collectContentFiles(contentDir: string): {
       }
       if (!isBlogContentFile(relativePath)) continue;
       if (!stat.isFile()) {
-        errors.push({ file: displayPath(sourcePath), message: '博客内容必须是普通文件' });
+        errors.push({ file: displayPath(sourcePath), message: 'Blog content must be a regular file' });
         continue;
       }
 
@@ -308,7 +311,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
   const siteConfigPath = path.resolve(options.siteConfigPath ?? workspace.siteConfigPath);
   const snapshot = createContentMigrationSnapshot(contentDir, siteConfigPath);
   if (!fs.existsSync(contentDir)) {
-    return emptyPlan(snapshot, [{ file: displayPath(contentDir), message: '博客内容目录不存在' }]);
+    return emptyPlan(snapshot, [{ file: displayPath(contentDir), message: 'Blog content directory does not exist' }]);
   }
 
   let localeConfig: LocaleConfig;
@@ -318,7 +321,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
     return emptyPlan(snapshot, [
       {
         file: displayPath(siteConfigPath),
-        message: `无法解析站点配置: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Cannot parse site config: ${error instanceof Error ? error.message : String(error)}`,
       },
     ]);
   }
@@ -361,7 +364,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
     try {
       data = matter(raw).data;
     } catch (error) {
-      errors.push({ file, message: `无法解析 frontmatter: ${error instanceof Error ? error.message : String(error)}` });
+      errors.push({ file, message: `Cannot parse frontmatter: ${error instanceof Error ? error.message : String(error)}` });
       continue;
     }
 
@@ -371,11 +374,11 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
     const slug = typeof data.slug === 'string' && data.slug.trim() ? data.slug : null;
 
     if (hasLinkField && !link) {
-      errors.push({ file, message: 'link 必须是非空字符串，请先手动修正' });
+      errors.push({ file, message: 'link must be a non-empty string, please fix manually' });
       continue;
     }
     if (hasSlugField && !slug) {
-      errors.push({ file, message: 'slug 必须是非空字符串，无法安全迁移' });
+      errors.push({ file, message: 'slug must be non-empty string, cannot safely migrate' });
       continue;
     }
 
@@ -402,7 +405,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
       if (counterpartCandidates && counterpartCandidates.size > 1) {
         errors.push({
           file,
-          message: `同路径的多语言文章使用了不同 link，无法自动选择: ${[...counterpartCandidates].join(', ')}`,
+          message: `Multilingual posts at same path use different links, cannot auto-select: ${[...counterpartCandidates].join(', ')}`,
         });
         continue;
       }
@@ -412,7 +415,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
     }
 
     if (!targetLink) {
-      errors.push({ file, message: '无法计算稳定链接' });
+      errors.push({ file, message: 'Cannot calculate stable link' });
       continue;
     }
 
@@ -427,11 +430,11 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
       continue;
     }
     if (updated === null) {
-      errors.push({ file, message: '无法安全定位顶层 slug 字段，请手动迁移为 link' });
+      errors.push({ file, message: 'Cannot safely locate top-level slug field, please migrate to link manually' });
       continue;
     }
     if (!isMigratedFrontmatterValid(updated, targetLink)) {
-      errors.push({ file, message: '无法安全改写 slug 字段（可能是多行标量），请手动迁移为 link' });
+      errors.push({ file, message: 'Cannot safely rewrite slug field (might be multiline scalar), please migrate to link manually' });
       continue;
     }
 
@@ -442,7 +445,7 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
     if (collisionFiles.length < 2) continue;
     const link = key.slice(key.indexOf('\0') + 1);
     for (const file of collisionFiles) {
-      errors.push({ file, message: `同一语言下存在重复链接 "${link}": ${collisionFiles.join(', ')}` });
+      errors.push({ file, message: `Duplicate link "${link}" under same language: ${collisionFiles.join(', ')}` });
     }
   }
 
@@ -460,7 +463,7 @@ function readRegularFileState(filePath: string): RegularFileState {
   const handle = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
   try {
     const stat = fs.fstatSync(handle);
-    if (!stat.isFile()) throw new Error(`${displayPath(filePath)} 不再是普通文件，请重新运行迁移`);
+    if (!stat.isFile()) throw new Error(`${displayPath(filePath)} is no longer a regular file, please re-run migration`);
     return {
       content: fs.readFileSync(handle, 'utf8'),
       device: stat.dev,
@@ -475,7 +478,7 @@ function readRegularFileState(filePath: string): RegularFileState {
 function writeFileAtomically(filePath: string, expected: string, replacement: string): void {
   const initial = readRegularFileState(filePath);
   if (initial.content !== expected) {
-    throw new Error(`${displayPath(filePath)} 在扫描后发生变化，请重新运行迁移`);
+    throw new Error(`${displayPath(filePath)} changed after scanning, please re-run migration`);
   }
 
   const tempPath = path.join(path.dirname(filePath), `.koharu-migrate-${process.pid}-${randomBytes(6).toString('hex')}.tmp`);
@@ -491,7 +494,7 @@ function writeFileAtomically(filePath: string, expected: string, replacement: st
 
     const current = readRegularFileState(filePath);
     if (current.content !== expected || current.device !== initial.device || current.inode !== initial.inode) {
-      throw new Error(`${displayPath(filePath)} 在写入前发生变化，请重新运行迁移`);
+      throw new Error(`${displayPath(filePath)} changed before writing, please re-run migration`);
     }
 
     fs.renameSync(tempPath, filePath);
@@ -504,27 +507,27 @@ function writeFileAtomically(filePath: string, expected: string, replacement: st
 /** Apply a previously validated plan. All source files are rechecked before the first write. */
 export function applyContentMigration(plan: ContentMigrationPlan): void {
   if (plan.errors.length > 0) {
-    throw new Error(`内容迁移存在 ${plan.errors.length} 个错误，未修改任何文件`);
+    throw new Error(`Content migration has ${plan.errors.length} errors, no files modified`);
   }
 
   const current = createContentMigrationSnapshot(plan.snapshot.contentDir, plan.snapshot.siteConfigPath);
   if (current.errors.length > 0) {
-    throw new Error(`博客内容文件集合在扫描后变得不安全: ${current.errors.map((issue) => issue.file).join(', ')}`);
+    throw new Error(`Blog content file set became unsafe after scanning: ${current.errors.map((issue) => issue.file).join(', ')}`);
   }
   if (current.siteConfigOriginal !== plan.snapshot.siteConfigOriginal) {
-    throw new Error(`${displayPath(plan.snapshot.siteConfigPath)} 在扫描后发生变化，请重新运行迁移`);
+    throw new Error(`${displayPath(plan.snapshot.siteConfigPath)} changed after scanning, please re-run migration`);
   }
   if (
     current.files.length !== plan.snapshot.files.length ||
     current.files.some((file, index) => file.sourcePath !== plan.snapshot.files[index]?.sourcePath)
   ) {
-    throw new Error('博客内容文件集合在扫描后发生变化，请重新运行迁移');
+    throw new Error('Blog content file set changed after scanning, please re-run migration');
   }
   for (let index = 0; index < current.files.length; index++) {
     const currentFile = current.files[index];
     const plannedFile = plan.snapshot.files[index];
     if (currentFile.original !== plannedFile.original) {
-      throw new Error(`${displayPath(currentFile.sourcePath)} 在扫描后发生变化，请重新运行迁移`);
+      throw new Error(`${displayPath(currentFile.sourcePath)} changed after scanning, please re-run migration`);
     }
   }
   const appliedChanges: ContentMigrationChange[] = [];
@@ -549,7 +552,7 @@ export function applyContentMigration(plan: ContentMigrationPlan): void {
     const writeMessage = writeError instanceof Error ? writeError.message : String(writeError);
     throw new AggregateError(
       [writeError, ...rollbackErrors],
-      `内容迁移写入失败: ${writeMessage}；回滚失败: ${rollbackErrors.map((error) => error.message).join('; ')}`,
+      `Content migration write failed: ${writeMessage}; Rollback failed: ${rollbackErrors.map((error) => error.message).join('; ')}`,
     );
   }
 }

@@ -32,10 +32,10 @@ export interface ValidatedBackupArchive {
 }
 
 /**
- * 验证路径是否在指定目录内（防止路径遍历攻击）
- * @param targetPath 目标路径
- * @param allowedDir 允许的目录
- * @returns 是否在允许目录内
+ * Verify whether the path is within the specified directory (to prevent path traversal attacks)
+ * @param targetPath target path
+ * @param allowedDir allowed directory
+ * @returns is in the allowed directory
  */
 export function isPathWithinDir(targetPath: string, allowedDir: string): boolean {
   const resolvedTarget = path.resolve(targetPath);
@@ -44,29 +44,29 @@ export function isPathWithinDir(targetPath: string, allowedDir: string): boolean
 }
 
 /**
- * 验证路径是否在备份目录内
+ * Verify that the path is within the backup directory
  */
 export function isPathWithinBackupDir(targetPath: string, backupDir = DEFAULT_WORKSPACE.backupDir): boolean {
   return isPathWithinDir(targetPath, backupDir);
 }
 
 /**
- * 验证是否为有效的备份文件
- * @param filePath 文件路径
- * @returns 是否有效
+ * Verify if it is a valid backup file
+ * @param filePath file path
+ * Is @returns valid?
  */
 export function isValidBackupFile(filePath: string): boolean {
-  // 检查扩展名
+  // Check extension
   if (!filePath.endsWith(BACKUP_FILE_EXTENSION)) {
     return false;
   }
 
-  // 检查文件是否存在
+  // Check if the file exists
   if (!fs.existsSync(filePath)) {
     return false;
   }
 
-  // 检查是否为文件（不是目录）
+  // Check if it is a file (not directory)
   try {
     const stats = fs.lstatSync(filePath);
     return stats.isFile() && !stats.isSymbolicLink();
@@ -79,11 +79,11 @@ function validateBackupPath(filePath: string, backupDir: string): string {
   const resolved = path.resolve(filePath);
 
   if (!isPathWithinBackupDir(resolved, backupDir)) {
-    throw new Error(`备份文件不在备份目录内: ${filePath}`);
+    throw new Error(`Backup file not in backup directory: ${filePath}`);
   }
 
   if (!isValidBackupFile(resolved)) {
-    throw new Error(`无效的备份文件: ${filePath}`);
+    throw new Error(`Invalid backup file: ${filePath}`);
   }
 
   return resolved;
@@ -115,12 +115,12 @@ function resolveManifestItems(schemaVersion: number, type: BackupType, fileKeys:
   }
 
   if (!expectedDestinations) {
-    throw new Error(`备份 manifest files 与 ${type} 备份类型不一致: ${archivePath}`);
+    throw new Error(`Backup manifest files inconsistent with ${type} backup type: ${archivePath}`);
   }
 
   return expectedDestinations.map((destination) => {
     const item = BACKUP_ITEM_BY_DESTINATION.get(destination);
-    if (!item) throw new Error(`备份 manifest files 包含未知路径: ${destination}`);
+    if (!item) throw new Error(`Backup manifest files contain unknown path: ${destination}`);
     return item;
   });
 }
@@ -133,16 +133,16 @@ function parseBackupManifest(
   try {
     value = JSON.parse(rawManifest);
   } catch {
-    throw new Error(`备份 manifest.json 不是有效 JSON: ${archivePath}`);
+    throw new Error(`Backup manifest.json is not valid JSON: ${archivePath}`);
   }
 
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error(`备份 manifest.json 格式无效: ${archivePath}`);
+    throw new Error(`Backup manifest.json format invalid: ${archivePath}`);
   }
 
   const manifest = value as Record<string, unknown>;
   if (manifest.name !== MANIFEST_NAME) {
-    throw new Error(`备份 manifest 名称无效: ${archivePath}`);
+    throw new Error(`Backup manifest name invalid: ${archivePath}`);
   }
 
   const schemaVersion = manifest.schemaVersion === undefined ? 1 : manifest.schemaVersion;
@@ -152,14 +152,14 @@ function parseBackupManifest(
     schemaVersion < 1 ||
     schemaVersion > BACKUP_SCHEMA_VERSION
   ) {
-    throw new Error(`不支持的备份 schemaVersion: ${String(schemaVersion)}`);
+    throw new Error(`Unsupported backup schemaVersion: ${String(schemaVersion)}`);
   }
 
   if (manifest.type !== 'basic' && manifest.type !== 'full') {
-    throw new Error(`备份 manifest 类型无效: ${archivePath}`);
+    throw new Error(`Backup manifest type invalid: ${archivePath}`);
   }
   if (!manifest.files || typeof manifest.files !== 'object' || Array.isArray(manifest.files)) {
-    throw new Error(`备份 manifest files 无效: ${archivePath}`);
+    throw new Error(`Backup manifest files invalid: ${archivePath}`);
   }
 
   const files = manifest.files as Record<string, unknown>;
@@ -167,7 +167,7 @@ function parseBackupManifest(
   const items = resolveManifestItems(schemaVersion, manifest.type, fileKeys, archivePath);
   for (const destination of fileKeys) {
     if (typeof files[destination] !== 'boolean') {
-      throw new Error(`备份 manifest files.${destination} 必须为布尔值`);
+      throw new Error(`Backup manifest files.${destination} must be boolean`);
     }
   }
 
@@ -193,7 +193,7 @@ function assertManifestMatchesArchive(manifest: ValidatedBackupManifest, rawEntr
   const entries = rawEntries.map((raw) => ({ raw, path: normalizeArchiveEntry(raw) }));
   const manifestEntries = entries.filter((entry) => entry.path === 'manifest.json');
   if (manifestEntries.length !== 1 || manifestEntries[0].raw.endsWith('/')) {
-    throw new Error(`备份必须且只能包含一个 manifest.json: ${archivePath}`);
+    throw new Error(`Backup must contain exactly one manifest.json: ${archivePath}`);
   }
 
   const presentDestinations = Object.entries(manifest.files)
@@ -203,7 +203,7 @@ function assertManifestMatchesArchive(manifest: ValidatedBackupManifest, rawEntr
   for (const [destination, present] of Object.entries(manifest.files)) {
     const hasArchivedContent = entries.some((entry) => entry.path === destination || entry.path.startsWith(`${destination}/`));
     if (present !== hasArchivedContent) {
-      throw new Error(`备份 manifest files.${destination} 与归档内容不一致`);
+      throw new Error(`Backup manifest files.${destination} inconsistent with archive content`);
     }
   }
 
@@ -215,7 +215,7 @@ function assertManifestMatchesArchive(manifest: ValidatedBackupManifest, rawEntr
     const isParentDirectory =
       entry.raw.endsWith('/') && presentDestinations.some((destination) => destination.startsWith(`${entry.path}/`));
     if (!belongsToDeclaredItem && !isParentDirectory) {
-      throw new Error(`备份包含 manifest 未声明的内容: ${entry.path}`);
+      throw new Error(`Backup contains content undeclared in manifest: ${entry.path}`);
     }
   }
 }
@@ -224,7 +224,7 @@ function validateBackupArchiveContents(archivePath: string, diagnosticPath = arc
   const entries = tarList(archivePath);
   const rawManifest = tarExtractManifest(archivePath);
   if (!rawManifest) {
-    throw new Error(`备份缺少 manifest.json: ${diagnosticPath}`);
+    throw new Error(`Backup missing manifest.json: ${diagnosticPath}`);
   }
 
   const { manifest, items } = parseBackupManifest(rawManifest, diagnosticPath);
@@ -246,7 +246,7 @@ function createPrivateArchiveSnapshot(
     fs.chmodSync(snapshotDir, 0o700);
     sourceHandle = fs.openSync(resolved, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
     if (!fs.fstatSync(sourceHandle).isFile()) {
-      throw new Error(`无效的备份文件: ${filePath}`);
+      throw new Error(`Invalid backup file: ${filePath}`);
     }
 
     snapshotHandle = fs.openSync(snapshotPath, 'wx', 0o600);
@@ -308,16 +308,16 @@ export function validateBackupFilePath(filePath: string, backupDir = DEFAULT_WOR
 }
 
 /**
- * 验证路径是否在备份目录内，并返回规范化路径
- * @param filePath 文件路径
- * @throws Error 如果路径不在备份目录内
- * @returns 规范化后的路径
+ * Verify that the path is within the backup directory and return the normalized path
+ * @param filePath file path
+ * @throws Error if the path is not in the backup directory
+ * @returns normalized path
  */
 export function validatePathInBackupDir(filePath: string, backupDir = DEFAULT_WORKSPACE.backupDir): string {
   const resolved = path.resolve(filePath);
 
   if (!isPathWithinBackupDir(resolved, backupDir)) {
-    throw new Error(`路径不在备份目录内: ${filePath}`);
+    throw new Error(`Path not in backup directory: ${filePath}`);
   }
 
   return resolved;

@@ -244,16 +244,16 @@ test('backup source validation rejects contract mismatches and nested symlinks',
 
     const wrongDirectory = path.join(root, 'wrong-directory');
     fs.writeFileSync(wrongDirectory, 'not a directory');
-    assert.throws(() => validateBackupSource(directoryItem, wrongDirectory), /类型无效，应为目录/);
+    assert.throws(() => validateBackupSource(directoryItem, wrongDirectory), /type invalid, should be directory/);
 
     const wrongFile = path.join(root, 'wrong-file');
     fs.mkdirSync(wrongFile);
-    assert.throws(() => validateBackupSource(fileItem, wrongFile), /类型无效，应为普通文件/);
+    assert.throws(() => validateBackupSource(fileItem, wrongFile), /type invalid, should be regular file/);
 
     const sourceDirectory = path.join(root, 'content');
     fs.mkdirSync(sourceDirectory);
     fs.symlinkSync(external, path.join(sourceDirectory, 'linked'), 'dir');
-    assert.throws(() => validateBackupSource(directoryItem, sourceDirectory), /包含符号链接/);
+    assert.throws(() => validateBackupSource(directoryItem, sourceDirectory), /contains symlink/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
     fs.rmSync(external, { recursive: true, force: true });
@@ -267,7 +267,7 @@ test('restore rejects missing or inconsistent manifests before preview', () => {
   try {
     fs.writeFileSync(path.join(missingStage, 'unexpected.txt'), 'unexpected');
     const missingArchive = createArchive(workspace, missingStage);
-    assert.throws(() => getRestorePreview(missingArchive, { workspace }), /缺少 manifest\.json/);
+    assert.throws(() => getRestorePreview(missingArchive, { workspace }), /missing manifest\.json/);
     assert.equal(
       getBackupList(workspace).some((backup) => backup.path === missingArchive),
       true,
@@ -281,7 +281,7 @@ test('restore rejects missing or inconsistent manifests before preview', () => {
     fs.writeFileSync(path.join(inconsistentStage, 'img/restored.txt'), 'restored');
     writeBasicManifest(inconsistentStage, []);
     const inconsistentArchive = createArchive(workspace, inconsistentStage);
-    assert.throws(() => getRestorePreview(inconsistentArchive, { workspace }), /files\.img 与归档内容不一致/);
+    assert.throws(() => getRestorePreview(inconsistentArchive, { workspace }), /files\.img inconsistent with archive content/);
   } finally {
     fs.rmSync(missingStage, { recursive: true, force: true });
     fs.rmSync(inconsistentStage, { recursive: true, force: true });
@@ -307,10 +307,10 @@ test('restore rejects archive items whose type disagrees with the backup contrac
     writeBasicManifest(fileAsDirectoryStage, ['env']);
     const fileAsDirectoryArchive = createArchive(workspace, fileAsDirectoryStage);
 
-    assert.throws(() => getRestorePreview(directoryAsFileArchive, { workspace }), /content\/blog 类型无效，应为目录/);
-    assert.throws(() => restoreBackup(directoryAsFileArchive, { workspace }), /content\/blog 类型无效，应为目录/);
-    assert.throws(() => getRestorePreview(fileAsDirectoryArchive, { workspace }), /env 类型无效，应为普通文件/);
-    assert.throws(() => restoreBackup(fileAsDirectoryArchive, { workspace }), /env 类型无效，应为普通文件/);
+    assert.throws(() => getRestorePreview(directoryAsFileArchive, { workspace }), /content\/blog type invalid, should be directory/);
+    assert.throws(() => restoreBackup(directoryAsFileArchive, { workspace }), /content\/blog type invalid, should be directory/);
+    assert.throws(() => getRestorePreview(fileAsDirectoryArchive, { workspace }), /env type invalid, should be regular file/);
+    assert.throws(() => restoreBackup(fileAsDirectoryArchive, { workspace }), /env type invalid, should be regular file/);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/old.md')), true);
   } finally {
     fs.rmSync(directoryAsFileStage, { recursive: true, force: true });
@@ -350,7 +350,7 @@ test('content migration errors leave every existing restore target unchanged', (
     writeBasicManifest(stage, ['content/blog']);
     const archive = createArchive(workspace, stage);
 
-    assert.throws(() => restoreBackup(archive, { workspace }), /内容迁移存在 2 个错误/);
+    assert.throws(() => restoreBackup(archive, { workspace }), /Content migration has 2 errors/);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/old.md')), true);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/first.md')), false);
     assert.equal(

@@ -5,7 +5,8 @@ import { normalizeTag } from './update-policy';
 
 const RELEASE_FETCH_TIMEOUT = 3000;
 
-/** 从 GitHub API 获取 Release 信息 */
+/** Get Release information from GitHub API */
+
 export async function fetchReleaseInfo(version: string): Promise<ReleaseInfo | null> {
   const tag = normalizeTag(version);
   const url = `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${tag}`;
@@ -40,12 +41,14 @@ export async function fetchReleaseInfo(version: string): Promise<ReleaseInfo | n
   }
 }
 
-/** 构建 Release 页面 URL (不依赖 API) */
+/** Build Release page URL (does not rely on API) */
+
 export function buildReleaseUrl(version: string): string {
   return `https://github.com/${GITHUB_REPO}/releases/tag/${normalizeTag(version)}`;
 }
 
-/** 从 Release body 提取简要内容 */
+/** Extract brief content from Release body */
+
 export function extractReleaseSummary(body: string | null, maxLines = 5, maxChars = 300): string[] {
   if (!body) return [];
 

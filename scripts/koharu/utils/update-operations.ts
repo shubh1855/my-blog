@@ -55,7 +55,7 @@ export interface PackageManagerInstallCommand {
 
 function parsePackageManager(packageManager: unknown): string {
   if (typeof packageManager !== 'string' || !/^pnpm@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(packageManager)) {
-    throw new Error('package.json 必须声明精确的 packageManager，例如 pnpm@10.28.2');
+    throw new Error('package.json must declare exact packageManager, e.g. pnpm@10.28.2');
   }
 
   return packageManager;
@@ -92,7 +92,7 @@ export interface EnsureUpstreamResult {
 }
 
 /**
- * 检查 Git 状态
+ * Check Git status
  */
 export function checkGitStatus(): GitStatusInfo {
   const currentBranch = getCurrentBranch();
@@ -123,7 +123,7 @@ export function addUpstreamRemote(): boolean {
 }
 
 /**
- * 确保 upstream remote 已配置
+ * Make sure upstream remote Already is configured
  */
 export function ensureUpstreamRemote(options: EnsureUpstreamOptions = {}): EnsureUpstreamResult {
   const allowAdd = options.allowAdd ?? true;
@@ -157,8 +157,8 @@ function readVersionFromRef(ref: string): string | null {
 }
 
 /**
- * 获取更新信息
- * @param targetTag 可选的目标版本 tag，不指定时更新到 upstream/main
+ * Get Update information
+ * @param targetTag Optional target version tag, if not specified, Update to upstream/main
  */
 export function getUpdateInfo(targetTag?: string): UpdateInfo {
   if (!hasUpstreamRemote()) {
@@ -179,10 +179,10 @@ export function getUpdateInfo(targetTag?: string): UpdateInfo {
   const isDowngrade = decideDowngrade({ normalizedTag, aheadCount, behindCount });
 
   const commitFormat = '%h|%s|%ar|%an';
-  // 降级列出将被移除的 commits，升级列出新增的 commits
+  // Downgrading lists Will's removed commits, upgrading lists new commits.
   const commitsRange = isDowngrade ? `${targetRef}..HEAD` : `HEAD..${targetRef}`;
   const commits = parseCommits(gitSafe(`log ${commitsRange} --pretty=format:"${commitFormat}" --no-merges`) || '');
-  // 本地领先于 target 的 commits（rebase 时将被重放）
+  // Local commits ahead of target (will be replayed during rebase)
   const localCommits = parseCommits(gitSafe(`log ${targetRef}..HEAD --pretty=format:"${commitFormat}" --no-merges`) || '');
 
   const latestVersion = normalizedTag
@@ -201,19 +201,23 @@ export function getUpdateInfo(targetTag?: string): UpdateInfo {
   };
 }
 
-/** 合并操作选项 */
+/** Merge operation options */
 export interface MergeOptions {
-  /** 目标版本 tag（如 "v2.1.0"），不指定时使用 upstream/main */
+  /** Target version tag (such as "v2.1.0"), use upstream/main if not specified */
+
   targetTag?: string;
-  /** 是否为降级操作，降级时使用 checkout + commit 保留历史 */
+  /** Whether it is a downgrade operation, use checkout + commit to retain the history when downgrading */
+
   isDowngrade?: boolean;
-  /** 使用 rebase 模式：将本地提交重放到目标引用之上（重写历史） */
+  /** Use rebase mode: Will local commits be replayed on top of the target reference (rewrite history) */
+
   rebase?: boolean;
-  /** 使用 clean 模式：替换所有主题文件，后续从备份还原用户内容 */
+  /** Use clean mode: replace all theme files and later restore user content from backup */
+
   clean?: boolean;
 }
 
-/** 获取目标版本信息用于 commit message */
+/** Get target version info for commit message */
 function getVersionInfo(targetRef: string, normalizedTag: string | null): string {
   if (normalizedTag) return normalizedTag;
   const version = readVersionFromRef(targetRef);
@@ -226,7 +230,8 @@ function getConflictFiles(): string[] {
   return parseConflictStatusLines(getStatusLines());
 }
 
-/** Clean 模式：删除上游已移除的非用户内容文件 */
+/** Clean mode: delete non-user content files removed by upstream Already */
+
 function removeDeletedUpstreamFiles(targetRef: string): void {
   const plan = planCleanRemovals({
     localFiles: parseGitLines(gitSafe('ls-files')),
@@ -237,10 +242,10 @@ function removeDeletedUpstreamFiles(targetRef: string): void {
 }
 
 /**
- * 执行合并、降级、rebase 或 clean 操作
+ * Perform a merge, downgrade, rebase or clean operation
  *
- * @param options - 合并选项
- * @returns 合并结果，包含成功状态、冲突信息等
+ * @param options - merge options
+ * @returns merge results, including success status, conflict information, etc.
  */
 export function mergeUpstream(options: MergeOptions = {}): MergeResult {
   const { normalizedTag, targetRef } = resolveTargetRef(options.targetTag);
@@ -248,13 +253,13 @@ export function mergeUpstream(options: MergeOptions = {}): MergeResult {
 
   try {
     if (strategy === 'clean') {
-      // 保存合并前 SHA，用于还原失败时回滚
+      // Save the pre-merge SHA for rollback if restore fails
       const preCleanSha = getHeadSha();
       runGitCommands(
         planStrategyCommands(strategy, { targetRef, normalizedTag, versionInfo: getVersionInfo(targetRef, normalizedTag) }),
       );
       removeDeletedUpstreamFiles(targetRef);
-      // 暂存覆盖后的文件状态（用户内容将在 clean-restoring 阶段还原）
+      // Temporarily overwrites the file state (user content will be restored in the clean-restoring phase)
       runGitCommands(planCleanFinalizeCommands());
       return { success: true, hasConflict: false, conflictFiles: [], preCleanSha };
     }
@@ -270,7 +275,7 @@ export function mergeUpstream(options: MergeOptions = {}): MergeResult {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
-    // 降级不会留下可解决的冲突状态
+    // Downgrade does not leave a conflict state that can be resolved
     if (strategy === 'downgrade') {
       return { success: false, hasConflict: false, conflictFiles: [], error: errorMessage };
     }
@@ -294,7 +299,7 @@ export function mergeUpstream(options: MergeOptions = {}): MergeResult {
           autoResolvedFiles: outcome.autoResolvedFiles,
         };
       } catch {
-        // commit 失败，仍然返回冲突
+        // Commit failed and still returned conflicts
       }
     }
 
@@ -309,17 +314,17 @@ export function mergeUpstream(options: MergeOptions = {}): MergeResult {
 }
 
 /**
- * 检测是否已有 upstream merge commit（用于首次迁移提示）
+ * Detect whether Already has upstream merge commit (used for first migration prompt)
  *
- * 检查最近 20 个 merge commit，看是否有某个 parent 可从 upstream/main 到达。
- * 如果有 → 之前已有 regular merge → 无需迁移。
- * 如果没有 → 可能一直用 squash merge → 需要迁移提示。
+ * Check the last 20 merge commits to see if there is a parent reachable from upstream/main.
+ * If there is → Already had regular merge before → No migration needed.
+ * If not → you may always use squash merge → a migration prompt is required.
  */
 export function hasUpstreamMergeHistory(): boolean {
   if (!hasUpstreamTrackingRef()) return false;
   for (const line of parseGitLines(gitSafe('log --merges --format=%P -20 HEAD'))) {
-    // 跳过第一个 parent（本分支），检查后续 parent 是否在 upstream 历史中
-    // 注意: merge-base --is-ancestor 用 exit code 表示结果，gitSafe 失败时返回 null
+    // Skip the first parent (this branch) and check whether subsequent parents are in the upstream history
+    // Note: merge-base --is-ancestor uses exit code to represent the result, and gitSafe returns null when it fails.
     for (const parent of line.split(' ').slice(1)) {
       if (gitSafe(`merge-base --is-ancestor ${parent} ${UPSTREAM_REMOTE}/${MAIN_BRANCH}`) !== null) {
         return true;
@@ -330,7 +335,7 @@ export function hasUpstreamMergeHistory(): boolean {
 }
 
 /**
- * 安装依赖（异步）
+ * Install dependencies (asynchronous)
  */
 export function installDeps(
   fallbackPackageManager: unknown,
@@ -376,12 +381,12 @@ export function installDeps(
   });
 }
 
-/** 检查 tag 是否存在于本地 */
+/** Check if tag exists locally */
 export function tagExists(tag: string): boolean {
   return hasRef(`refs/tags/${normalizeTag(tag)}`);
 }
 
-/** 获取最近的 tags 列表 */
+/** Get recent tags list */
 export function listRecentTags(limit = 5): string[] {
   return parseGitLines(gitSafe('tag --sort=-creatordate --list "v*"')).slice(0, limit);
 }

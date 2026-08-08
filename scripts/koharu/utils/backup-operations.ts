@@ -14,7 +14,7 @@ import { tarCreate } from './tar';
 import { getVersion } from './version';
 
 /**
- * 备份结果
+ * Backup results
  */
 export interface BackupResult {
   item: BackupItem;
@@ -23,7 +23,7 @@ export interface BackupResult {
 }
 
 /**
- * 备份输出
+ * Backup output
  */
 export interface BackupOutput {
   results: BackupResult[];
@@ -36,13 +36,13 @@ export interface BackupOutput {
 export function validateBackupSource(item: BackupItem, sourcePath: string): void {
   const stat = fs.lstatSync(sourcePath);
   if (stat.isSymbolicLink()) {
-    throw new Error(`备份源不能是符号链接: ${item.src}`);
+    throw new Error(`Backup source cannot be a symlink: ${item.src}`);
   }
 
   const matchesExpectedType = item.kind === 'directory' ? stat.isDirectory() : stat.isFile();
   if (!matchesExpectedType) {
-    const expected = item.kind === 'directory' ? '目录' : '普通文件';
-    throw new Error(`备份源 ${item.src} 类型无效，应为${expected}`);
+    const expected = item.kind === 'directory' ? 'directory' : 'regular file';
+    throw new Error(`Backup source ${item.src} type invalid, should be ${expected}`);
   }
 
   if (!stat.isDirectory() || item.pattern) return;
@@ -54,11 +54,11 @@ export function validateBackupSource(item: BackupItem, sourcePath: string): void
 function validateBackupTree(sourcePath: string, itemSource: string): void {
   const stat = fs.lstatSync(sourcePath);
   if (stat.isSymbolicLink()) {
-    throw new Error(`备份源 ${itemSource} 包含符号链接: ${sourcePath}`);
+    throw new Error(`Backup source ${itemSource} contains symlink: ${sourcePath}`);
   }
   if (stat.isFile()) return;
   if (!stat.isDirectory()) {
-    throw new Error(`备份源 ${itemSource} 包含不支持的文件类型: ${sourcePath}`);
+    throw new Error(`Backup source ${itemSource} contains unsupported file type: ${sourcePath}`);
   }
 
   for (const entry of fs.readdirSync(sourcePath)) {
@@ -67,10 +67,10 @@ function validateBackupTree(sourcePath: string, itemSource: string): void {
 }
 
 /**
- * 执行备份操作
- * @param isFullBackup 是否完整备份
- * @param onProgress 进度回调
- * @param workspace 备份读写的根目录集合
+ * Perform a backup operation
+ * @param isFullBackup Whether to back up completely
+ * @param onProgress progress callback
+ * @param workspace Backup the root directory collection for reading and writing
  */
 export function runBackup(
   isFullBackup: boolean,
@@ -81,11 +81,11 @@ export function runBackup(
   fs.mkdirSync(backupDir, { recursive: true, mode: 0o700 });
   const backupDirStat = fs.lstatSync(backupDir);
   if (!backupDirStat.isDirectory() || backupDirStat.isSymbolicLink()) {
-    throw new Error(`备份目录无效或为符号链接: ${backupDir}`);
+    throw new Error(`Backup directory invalid or symlink: ${backupDir}`);
   }
   fs.chmodSync(backupDir, 0o700);
 
-  // 生成时间戳
+  // Generate timestamp
   const now = new Date();
   const timestamp = now.toISOString().replace(/[:.]/g, '-').replace('T', '-').replace(/Z$/, '');
   const backupName = `backup-${timestamp}-${randomBytes(4).toString('hex')}`;
@@ -96,7 +96,7 @@ export function runBackup(
 
   const results: BackupResult[] = [];
 
-  // 过滤要备份的项目
+  // Filter items to back up
   const itemsToBackup = BACKUP_ITEMS.filter((item) => item.required || isFullBackup);
 
   try {

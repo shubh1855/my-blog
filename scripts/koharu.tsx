@@ -22,27 +22,27 @@ if (args.help) {
   console.log(`
 koharu - astro-koharu CLI
 
-用法:
+Usage:
   pnpm koharu              交互式主菜单
   pnpm koharu backup       备份博客内容和配置
   pnpm koharu restore      从备份恢复
-  pnpm koharu update       更新主题
+  pnpm koharu update       Update主题
   pnpm koharu clean        清理旧备份
   pnpm koharu list         查看所有备份
   pnpm koharu generate     生成内容资产
   pnpm koharu migrate      一键迁移历史文章数据
   pnpm koharu new          新建内容
 
-备份选项:
+Backup options:
   --full                   完整备份（包含所有图片和资产）
 
-还原选项:
+Restore options:
   --latest                 还原最新备份
-  --dry-run                预览将要还原的文件
+  --dry-run                预览Will要还原的文件
   --force                  跳过确认提示
 
-更新选项:
-  --check                  仅检查更新（不执行）
+Update options:
+  --check                  仅检查Update（不执行）
   --skip-backup            跳过备份步骤
   --force                  跳过确认提示
   --tag <version>          指定目标版本（如 v2.0.0）
@@ -50,28 +50,28 @@ koharu - astro-koharu CLI
   --clean                  使用 clean 模式（零冲突，强制备份）
   --dry-run                预览操作（不实际执行）
 
-清理选项:
+Clean options:
   --keep N                 保留最近 N 个备份，删除其余
 
-生成选项:
+Generate options:
   pnpm koharu generate lqips        生成 LQIP 图片占位符
-  pnpm koharu generate similarities 生成相似度向量
+  pnpm koharu generate similarities generate similarity vectors
   pnpm koharu generate summaries    生成 AI 摘要
   pnpm koharu generate all          生成全部
   --model <name>                    指定 LLM 模型 (用于 summaries)
   --force                           强制重新生成 (用于 summaries)
 
-新建选项:
+New options:
   pnpm koharu new                   交互式选择内容类型
-  pnpm koharu new post              新建博客文章
+  pnpm koharu new post              新建Blog post
   pnpm koharu new friend            新建友情链接
 
-迁移选项:
+Migration options:
   --dry-run                仅扫描并预览迁移内容
   --check                  仅扫描，需要迁移时返回非零状态
   --force                  跳过确认提示（仍会自动备份）
 
-通用选项:
+General options:
   --help, -h               显示帮助信息
 `);
   process.exit(0);
@@ -102,7 +102,7 @@ function KoharuApp() {
       // 从主菜单进入的，返回主菜单
       setMode('menu');
     } else {
-      // 命令行直接进入的，完成后退出
+      // 命令行直接进入的，完成后Exit
       setTimeout(() => exit(), 100);
     }
   };
@@ -145,20 +145,20 @@ function KoharuApp() {
 
       {mode === 'menu' && (
         <Box flexDirection="column">
-          <Text>请选择操作:</Text>
+          <Text>Please select an operation:</Text>
           <Select
             visibleOptionCount={10}
             options={[
-              { label: '新建 - 创建博客文章或友链', value: 'new' },
-              { label: '备份 - 备份博客内容和配置', value: 'backup' },
-              { label: '还原 - 从备份恢复', value: 'restore' },
-              { label: '更新 - 更新主题', value: 'update' },
-              { label: '生成 - 生成内容资产 (LQIP, 相似度, 摘要)', value: 'generate' },
-              { label: '迁移 - 兼容历史文章与旧备份', value: 'migrate' },
-              { label: '清理 - 清理旧备份', value: 'clean' },
-              { label: '列表 - 查看所有备份', value: 'list' },
-              { label: '帮助 - 查看命令用法', value: 'help' },
-              { label: '退出', value: 'exit' },
+              { label: 'New - Create blog post or friend link', value: 'new' },
+              { label: 'Backup - Backup blog content and config', value: 'backup' },
+              { label: 'Restore - Restore from backup', value: 'restore' },
+              { label: 'Update - Update theme', value: 'update' },
+              { label: 'Generate - Generate content assets (LQIP, Similarity, Summary)', value: 'generate' },
+              { label: 'Migrate - Compatibility for historical posts and old backups', value: 'migrate' },
+              { label: 'Clean - Clean old backups', value: 'clean' },
+              { label: 'List - View all backups', value: 'list' },
+              { label: 'Help - View command usage', value: 'help' },
+              { label: 'Exit', value: 'exit' },
             ]}
             onChange={handleMenuSelect}
           />

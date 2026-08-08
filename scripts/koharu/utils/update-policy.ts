@@ -57,7 +57,8 @@ export interface CleanRemovalPlan {
 /** `git rm` batch size that keeps arguments below ARG_MAX. */
 const REMOVAL_BATCH_SIZE = 100;
 
-/** 规范化版本号为带 v 前缀的格式 */
+/** Normalized version numbers are in format prefixed with v */
+
 export function normalizeTag(tag: string): string {
   return tag.startsWith('v') ? tag : `v${tag}`;
 }

@@ -7,7 +7,7 @@ import { tarExtractManifest } from './tar';
 import { validateBackupArchive } from './validation';
 
 /**
- * 备份信息接口
+ * Backup information interface
  */
 export interface BackupInfo {
   name: string;
@@ -19,7 +19,7 @@ export interface BackupInfo {
 }
 
 /**
- * 解析备份 manifest
+ * Parse backup manifest
  */
 export function parseBackupManifest(manifest: string): { type: string; timestamp: string } {
   try {
@@ -34,7 +34,7 @@ export function parseBackupManifest(manifest: string): { type: string; timestamp
 }
 
 /**
- * 获取备份列表
+ * Get backup list
  */
 export function getBackupList(workspace: KoharuWorkspace = DEFAULT_WORKSPACE): BackupInfo[] {
   const { backupDir } = workspace;

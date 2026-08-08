@@ -7,6 +7,7 @@
  * - Expand/collapse toggle
  */
 
+import geassSymbol from '@assets/svg/geass-symbol.svg?url';
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { preloadSettingsPanel } from '@components/settings/SettingsPanel';
 import { bgmConfig, christmasConfig } from '@constants/site-config';
@@ -162,9 +163,15 @@ export default function FloatingGroup() {
           onClick={toggleExpand}
           ariaLabel={t('floating.toggleToolbar')}
           title={t('floating.toggleToolbar')}
-          className="size-9 flex-center"
+          className="flex size-12 items-center justify-center border border-primary/30"
         >
-          <Icon icon={isExpanded ? 'ri:close-large-fill' : 'ri:magic-fill'} className="size-4" />
+          {isExpanded ? (
+            <Icon icon="ri:close-large-fill" className="size-6" />
+          ) : (
+            <span className="geass-btn-icon flex items-center justify-center">
+              <img src={geassSymbol} alt="geass" className="size-9" />
+            </span>
+          )}
         </FloatingButton>
       </m.div>
     </LazyMotionProvider>

@@ -7,11 +7,14 @@ import { type ContentMigrationPlan, runContentMigration } from './migration-oper
 import { tarExtract } from './tar';
 import { type ValidatedBackupArchive, withValidatedBackupArchiveSnapshot } from './validation';
 
-/** 还原预览项 */
+/** Restore preview items */
+
 export interface RestorePreviewItem {
-  /** 目标路径 (e.g., 'src/content/blog') */
+  /** Target path (e.g., 'src/content/blog') */
+
   path: string;
-  /** 文件数量 */
+  /** Number of files */
+
   fileCount: number;
   /** Existing files that will be removed before the archive is copied. */
   deletedFiles: string[];
@@ -28,7 +31,8 @@ export interface RestoreOutput {
 }
 
 export interface RestoreOptions {
-  /** 还原的目标工作区，默认当前项目 */
+  /** The target workspace to restore, defaulting to the current project */
+
   workspace?: KoharuWorkspace;
 }
 
@@ -62,12 +66,12 @@ function resolveSafeRestoreTarget(projectRoot: string, relativeTarget: string): 
   const rootPath = path.resolve(projectRoot);
   const rootStat = fs.lstatSync(rootPath, { throwIfNoEntry: false });
   if (!rootStat?.isDirectory() || rootStat.isSymbolicLink()) {
-    throw new Error(`还原目标根目录无效或为符号链接: ${rootPath}`);
+    throw new Error(`Restore target root invalid or symlink: ${rootPath}`);
   }
 
   const destPath = path.resolve(rootPath, relativeTarget);
   if (!isPathWithin(rootPath, destPath)) {
-    throw new Error(`还原目标超出项目根目录: ${relativeTarget}`);
+    throw new Error(`Restore target out of project root: ${relativeTarget}`);
   }
 
   const realRoot = fs.realpathSync(rootPath);
@@ -77,10 +81,10 @@ function resolveSafeRestoreTarget(projectRoot: string, relativeTarget: string): 
     const stat = fs.lstatSync(currentPath, { throwIfNoEntry: false });
     if (!stat) break;
     if (stat.isSymbolicLink()) {
-      throw new Error(`还原目标路径包含符号链接: ${path.relative(rootPath, currentPath)}`);
+      throw new Error(`Restore target path contains symlink: ${path.relative(rootPath, currentPath)}`);
     }
     if (!isPathWithin(realRoot, fs.realpathSync(currentPath))) {
-      throw new Error(`还原目标真实路径超出项目根目录: ${path.relative(rootPath, currentPath)}`);
+      throw new Error(`Restore target real path out of project root: ${path.relative(rootPath, currentPath)}`);
     }
   }
 
@@ -90,13 +94,13 @@ function resolveSafeRestoreTarget(projectRoot: string, relativeTarget: string): 
 function assertArchiveItemMatchesContract(item: BackupItem, itemPath: string): void {
   const stat = fs.lstatSync(itemPath);
   if (stat.isSymbolicLink()) {
-    throw new Error(`备份内容包含符号链接: ${itemPath}`);
+    throw new Error(`Backup content contains symlink: ${itemPath}`);
   }
 
   const matchesExpectedType = item.kind === 'directory' ? stat.isDirectory() : stat.isFile();
   if (!matchesExpectedType) {
-    const expected = item.kind === 'directory' ? '目录' : '普通文件';
-    throw new Error(`备份项 ${item.dest} 类型无效，应为${expected}`);
+    const expected = item.kind === 'directory' ? 'directory' : 'regular file';
+    throw new Error(`Backup item ${item.dest} type invalid, should be ${expected}`);
   }
 
   if (!stat.isDirectory()) return;
@@ -109,11 +113,11 @@ function assertArchiveItemMatchesContract(item: BackupItem, itemPath: string): v
 function assertArchiveTreeContainsOnlyFilesAndDirectories(itemPath: string): void {
   const stat = fs.lstatSync(itemPath);
   if (stat.isSymbolicLink()) {
-    throw new Error(`备份内容包含符号链接: ${itemPath}`);
+    throw new Error(`Backup content contains symlink: ${itemPath}`);
   }
   if (stat.isFile()) return;
   if (!stat.isDirectory()) {
-    throw new Error(`备份内容包含不支持的文件类型: ${itemPath}`);
+    throw new Error(`Backup content contains unsupported file type: ${itemPath}`);
   }
 
   for (const entry of fs.readdirSync(itemPath)) {
@@ -254,7 +258,7 @@ function commitRestoreCandidates(
     const commitMessage = commitError instanceof Error ? commitError.message : String(commitError);
     throw new RestoreRollbackError(
       [commitError, ...rollbackErrors],
-      `还原提交失败: ${commitMessage}；回滚失败: ${rollbackErrors.map((error) => error.message).join('; ')}；事务数据保留在 ${transactionDir}`,
+      `Restore commit failed: ${commitMessage}; Rollback failed: ${rollbackErrors.map((error) => error.message).join('; ')}; Transaction data kept at ${transactionDir}`,
     );
   }
 }
@@ -368,7 +372,7 @@ export function restoreBackup(backupPath: string, options: RestoreOptions = {}):
         })
       : null;
     if (migration && migration.errors.length > 0) {
-      throw new Error(`恢复内容迁移存在 ${migration.errors.length} 个错误，未修改现有文件`);
+      throw new Error(`Restore content migration has ${migration.errors.length} errors, no files modified`);
     }
 
     for (const candidate of candidates) {
