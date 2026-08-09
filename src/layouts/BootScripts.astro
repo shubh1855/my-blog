@@ -27,8 +27,8 @@ import {
       // 用户明确选择了主题
       if (localStorage.theme === 'dark') return 'dark';
       if (localStorage.theme === 'light') return 'light';
-      // 未设置，跟随系统偏好
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      // 未设置，默认使用暗色主题
+      return 'dark';
     }
 
     function applyTheme(theme) {
