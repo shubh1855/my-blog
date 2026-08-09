@@ -3,11 +3,6 @@
 @import "./utils.css";
 @config "../../../tailwind.config.mjs";
 
-@font-face {
-  font-family: "Bear Days";
-  src: url("/fonts/bear-days.woff2") format("woff2");
-  font-display: swap;
-}
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -144,7 +139,7 @@
     letter-spacing: 1px;
     line-height: 0.95;
     text-align: center;
-    font-family: "Bear Days", sans-serif;
+    font-family: "JetBrains Mono", monospace;
     font-weight: 700;
     color: #e9546b;
   }
