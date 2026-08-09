@@ -264,7 +264,9 @@ export function RestoreApp({
           )}
           {dryRun && migration && migration.changes.length > 0 && migration.errors.length === 0 && (
             <Box marginTop={1}>
-              <Text color="yellow">Will auto-migrate stable links for {migration.changes.length} historical posts after restore</Text>
+              <Text color="yellow">
+                Will auto-migrate stable links for {migration.changes.length} historical posts after restore
+              </Text>
             </Box>
           )}
           {dryRun && migration && migration.errors.length > 0 && (
@@ -287,7 +289,9 @@ export function RestoreApp({
           {!dryRun && (
             <Box flexDirection="column" marginTop={1}>
               {manifest?.type === 'basic' && (
-                <Text color="yellow">Basic backup excludes generated assets; please run pnpm koharu generate all when posts change</Text>
+                <Text color="yellow">
+                  Basic backup excludes generated assets; please run pnpm koharu generate all when posts change
+                </Text>
               )}
               <Text dimColor>Next steps:</Text>
               <Text dimColor>{'  '}1. pnpm install # install dependencies</Text>

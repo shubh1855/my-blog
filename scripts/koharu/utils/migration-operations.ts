@@ -434,7 +434,10 @@ export function planContentMigration(options: ContentMigrationOptions = {}): Con
       continue;
     }
     if (!isMigratedFrontmatterValid(updated, targetLink)) {
-      errors.push({ file, message: 'Cannot safely rewrite slug field (might be multiline scalar), please migrate to link manually' });
+      errors.push({
+        file,
+        message: 'Cannot safely rewrite slug field (might be multiline scalar), please migrate to link manually',
+      });
       continue;
     }
 
@@ -512,7 +515,9 @@ export function applyContentMigration(plan: ContentMigrationPlan): void {
 
   const current = createContentMigrationSnapshot(plan.snapshot.contentDir, plan.snapshot.siteConfigPath);
   if (current.errors.length > 0) {
-    throw new Error(`Blog content file set became unsafe after scanning: ${current.errors.map((issue) => issue.file).join(', ')}`);
+    throw new Error(
+      `Blog content file set became unsafe after scanning: ${current.errors.map((issue) => issue.file).join(', ')}`,
+    );
   }
   if (current.siteConfigOriginal !== plan.snapshot.siteConfigOriginal) {
     throw new Error(`${displayPath(plan.snapshot.siteConfigPath)} changed after scanning, please re-run migration`);

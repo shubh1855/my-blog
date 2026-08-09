@@ -119,19 +119,19 @@ export interface ReleaseInfo {
 /** Update process status */
 
 export type UpdateStatus =
-| 'checking' // Check Git status
-| 'dirty-warning' // There are uncommitted changes in the workspace
-| 'backup-confirm' // Confirm backup
-| 'backing-up' // Backing up
-| 'fetching' // Get Update
-| 'preview' // Show Update preview
-| 'merging' // merging
-| 'clean-restoring' // clean mode restores user content
-| 'installing' // Installing dependencies
-| 'done' // Done
-| 'conflict' // There is a conflict
-| 'up-to-date' // Already is the latest
-| 'error'; // Error
+  | 'checking' // Check Git status
+  | 'dirty-warning' // There are uncommitted changes in the workspace
+  | 'backup-confirm' // Confirm backup
+  | 'backing-up' // Backing up
+  | 'fetching' // Get Update
+  | 'preview' // Show Update preview
+  | 'merging' // merging
+  | 'clean-restoring' // clean mode restores user content
+  | 'installing' // Installing dependencies
+  | 'done' // Done
+  | 'conflict' // There is a conflict
+  | 'up-to-date' // Already is the latest
+  | 'error'; // Error
 
 /** Update process configuration options */
 

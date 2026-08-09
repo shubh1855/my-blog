@@ -131,7 +131,11 @@ export function MigrateApp({
           {status === 'done' && plan.errors.length === 0 && !check && (
             <Box flexDirection="column" marginTop={1}>
               <Text bold color="green">
-                {dryRun ? 'Preview completed, no files modified' : plan.changes.length === 0 ? 'No migration needed' : 'Migration completed'}
+                {dryRun
+                  ? 'Preview completed, no files modified'
+                  : plan.changes.length === 0
+                    ? 'No migration needed'
+                    : 'Migration completed'}
               </Text>
               {backupFile && <Text dimColor>Backup file: {backupFile}</Text>}
             </Box>

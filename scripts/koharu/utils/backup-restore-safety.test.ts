@@ -307,8 +307,14 @@ test('restore rejects archive items whose type disagrees with the backup contrac
     writeBasicManifest(fileAsDirectoryStage, ['env']);
     const fileAsDirectoryArchive = createArchive(workspace, fileAsDirectoryStage);
 
-    assert.throws(() => getRestorePreview(directoryAsFileArchive, { workspace }), /content\/blog type invalid, should be directory/);
-    assert.throws(() => restoreBackup(directoryAsFileArchive, { workspace }), /content\/blog type invalid, should be directory/);
+    assert.throws(
+      () => getRestorePreview(directoryAsFileArchive, { workspace }),
+      /content\/blog type invalid, should be directory/,
+    );
+    assert.throws(
+      () => restoreBackup(directoryAsFileArchive, { workspace }),
+      /content\/blog type invalid, should be directory/,
+    );
     assert.throws(() => getRestorePreview(fileAsDirectoryArchive, { workspace }), /env type invalid, should be regular file/);
     assert.throws(() => restoreBackup(fileAsDirectoryArchive, { workspace }), /env type invalid, should be regular file/);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/old.md')), true);

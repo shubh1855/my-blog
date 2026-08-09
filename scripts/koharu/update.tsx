@@ -299,8 +299,14 @@ export function UpdateApp({
               <Text color="yellow" bold>
                 ⚠ This is a downgrade operation, will roll back to an older version
               </Text>
-              <Text color="yellow">{'  '}Downgrading will overwrite all theme files, ensure you have backed up custom content</Text>
-              {!backupFile && <Text color="red">{'  '}⚠ You haven't performed a backup! Strongly recommend cancelling and backing up first</Text>}
+              <Text color="yellow">
+                {'  '}Downgrading will overwrite all theme files, ensure you have backed up custom content
+              </Text>
+              {!backupFile && (
+                <Text color="red">
+                  {'  '}⚠ You haven't performed a backup! Strongly recommend cancelling and backing up first
+                </Text>
+              )}
             </Box>
           )}
 
@@ -369,7 +375,9 @@ export function UpdateApp({
 
           {/* Commit list */}
           <Text bold>
-            {updateInfo.isDowngrade ? `Will remove ${updateInfo.aheadCount} commits:` : `Found ${updateInfo.behindCount} new commits:`}
+            {updateInfo.isDowngrade
+              ? `Will remove ${updateInfo.aheadCount} commits:`
+              : `Found ${updateInfo.behindCount} new commits:`}
           </Text>
           <Box marginTop={1} flexDirection="column">
             {updateInfo.commits.slice(0, 10).map((commit) => (
@@ -399,7 +407,9 @@ export function UpdateApp({
           {/* First migration hint */}
           {presentation.showMigrationHint && (
             <Box marginTop={1}>
-              <Text color="yellow">⚠ Detected first-time migration from squash merge, --clean mode is recommended for zero conflicts</Text>
+              <Text color="yellow">
+                ⚠ Detected first-time migration from squash merge, --clean mode is recommended for zero conflicts
+              </Text>
             </Box>
           )}
 
@@ -547,31 +557,31 @@ export function UpdateApp({
               Backup file: <Text color="cyan">{backupFile}</Text>
             </Text>
           )}
-{/* Warning after Rebase is completed */}
+          {/* Warning after Rebase is completed */}
           {stateOptions.rebase && (
             <Box marginTop={1} flexDirection="column">
               <Text color="yellow" bold>
-⚠ Your Commit history has been synchronized with upstream
+                ⚠ Your Commit history has been synchronized with upstream
               </Text>
               <Text color="yellow">{'  '}To restore, please execute:</Text>
               <Text color="cyan">{'  '}pnpm koharu restore --latest</Text>
             </Box>
           )}
-{/* Display Release link when upgrading */}
+          {/* Display Release link when upgrading */}
           {!updateInfo?.isDowngrade &&
             !stateOptions.rebase &&
             updateInfo?.latestVersion &&
             updateInfo.latestVersion !== 'unknown' && (
               <Box marginTop={1}>
                 <Text>
-View Changes:{' '}
+                  View Changes:{' '}
                   <Text color="blue" underline>
                     {buildReleaseUrl(updateInfo.latestVersion)}
                   </Text>
                 </Text>
               </Box>
             )}
-{/* Recovery tips after downgrading */}
+          {/* Recovery tips after downgrading */}
           {updateInfo?.isDowngrade && !stateOptions.rebase && (
             <Box marginTop={1} flexDirection="column">
               <Text color="yellow" bold>
@@ -583,7 +593,9 @@ View Changes:{' '}
                   <Text color="cyan">{'  '}pnpm koharu restore --latest</Text>
                 </>
               ) : (
-                <Text color="red">{'  '}You didn't perform a backup, please manually restore src/content/blog and config/site.yaml</Text>
+                <Text color="red">
+                  {'  '}You didn't perform a backup, please manually restore src/content/blog and config/site.yaml
+                </Text>
               )}
             </Box>
           )}
@@ -609,7 +621,7 @@ View Changes:{' '}
             {stateOptions.targetTag ? 'Already this version' : 'Already latest version'}
           </Text>
           <Text>
-Current version: <Text color="cyan">v{updateInfo?.currentVersion}</Text>
+            Current version: <Text color="cyan">v{updateInfo?.currentVersion}</Text>
           </Text>
           {showReturnHint && (
             <Box marginTop={1}>
@@ -678,7 +690,7 @@ Current version: <Text color="cyan">v{updateInfo?.currentVersion}</Text>
       {status === 'error' && (
         <Box flexDirection="column">
           <Text bold color="red">
-Update failed
+            Update failed
           </Text>
           <Text color="red">{error}</Text>
           {showReturnHint && (
