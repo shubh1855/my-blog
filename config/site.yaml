@@ -62,6 +62,8 @@ categoryMap:
   # CTF groups
   RAIT-CTF 2026 Finals: rait-ctf-2026-finals
   Technovate CTF: technovate-ctf
+  "HTB Cyber Apocalypse CTF 2026: The Salt Crown": htb-cyber-apocalypse-2026
+  Xploitathon CTF: xploitathon-ctf
   # Add more as needed:
   # 书摘: reading
   # 后端: back-end
