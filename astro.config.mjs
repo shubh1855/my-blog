@@ -261,6 +261,21 @@ export default defineConfig({
     build: {
       // Enable sourcemap for Sonda bundle analysis
       sourcemap: isAnalyze,
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('@antv') || id.includes('mermaid') || id.includes('katex')) {
+                return 'vendor-renderers';
+              }
+              if (id.includes('motion') || id.includes('@floating-ui')) {
+                return 'vendor-ui';
+              }
+            }
+          },
+        },
+      },
     },
     plugins: [...(isAnalyze ? [Sonda({ open: false })] : []), yaml(), conditionalSnowfall(), svgr(), tailwindcss()],
     resolve: {
