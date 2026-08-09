@@ -19,18 +19,19 @@ import {
   scanVideoPlayers,
   type ToolbarEntry,
 } from '@lib/content-scanner';
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AudioPlayer } from './AudioPlayer';
 import { CodeBlockToolbar } from './CodeBlockToolbar';
-import { EncryptedBlock } from './EncryptedBlock';
-import { EncryptedPost } from './EncryptedPost';
-import { FriendLinksGrid } from './FriendLinksGrid';
-import { InfographicToolbar } from './InfographicToolbar';
-import { MermaidToolbar } from './MermaidToolbar';
 import { extractNoteType, NoteBlockIcon } from './NoteBlockIcon';
-import { QuizBlock } from './QuizBlock';
-import { VideoPlayer } from './VideoPlayer';
+
+const AudioPlayer = lazy(() => import('./AudioPlayer').then((m) => ({ default: m.AudioPlayer })));
+const EncryptedBlock = lazy(() => import('./EncryptedBlock').then((m) => ({ default: m.EncryptedBlock })));
+const EncryptedPost = lazy(() => import('./EncryptedPost').then((m) => ({ default: m.EncryptedPost })));
+const FriendLinksGrid = lazy(() => import('./FriendLinksGrid').then((m) => ({ default: m.FriendLinksGrid })));
+const InfographicToolbar = lazy(() => import('./InfographicToolbar').then((m) => ({ default: m.InfographicToolbar })));
+const MermaidToolbar = lazy(() => import('./MermaidToolbar').then((m) => ({ default: m.MermaidToolbar })));
+const QuizBlock = lazy(() => import('./QuizBlock').then((m) => ({ default: m.QuizBlock })));
+const VideoPlayer = lazy(() => import('./VideoPlayer').then((m) => ({ default: m.VideoPlayer })));
 
 interface ContentEnhancerProps {
   enableCopy?: boolean;
@@ -102,7 +103,7 @@ export default function ContentEnhancer({
   }, [scan]);
 
   return (
-    <>
+    <Suspense fallback={null}>
       {entries.map((entry) => {
         switch (entry.type) {
           case 'code':
@@ -140,6 +141,6 @@ export default function ContentEnhancer({
             return null;
         }
       })}
-    </>
+    </Suspense>
   );
 }
