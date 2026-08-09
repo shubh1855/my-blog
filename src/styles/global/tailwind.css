@@ -110,7 +110,7 @@
     /* Pseudo-element for gradient background with opacity transition */
     &::before {
       content: "";
-      @apply pointer-events-none absolute inset-0 -z-1 bg-gradient-header opacity-0 transition-opacity duration-300 ease-out;
+      @apply pointer-events-none absolute inset-0 -z-1 bg-background/95 dark:bg-[#0c0a1d]/95 backdrop-blur-md border-b border-white/10 shadow-md opacity-0 transition-opacity duration-300 ease-out;
     }
 
     button,
