@@ -48,11 +48,7 @@ const isPostPage = stripLocaleFromPath(Astro.url.pathname).startsWith('/post/');
   <head>
     <HeadMeta meta={meta} />
 
-    {/* Load JetBrains Mono from Google Fonts — non-render-blocking */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
 
     <ClientRouter />
     <UmamiAnalytics />

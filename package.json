@@ -62,6 +62,7 @@
     "@blocknote/shadcn": "^0.46.1",
     "@coszone/koharu-astro": "0.2.0",
     "@floating-ui/react": "^0.27.16",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@giscus/react": "^3.1.0",
     "@hookform/resolvers": "^5.2.2",
     "@iconify-json/fa6-regular": "^1.2.4",
