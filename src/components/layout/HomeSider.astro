@@ -36,10 +36,11 @@ const nextPost = adjacentPosts.nextPost ? toPostRef(adjacentPosts.nextPost) : nu
 
 <div
   class={cn(
-    'page-home-sider bg-gradient-start dark:bg-[#0f0c1e] shadow-home-sider sticky top-0 tablet:overscroll-none self-start flex min-w-64 max-w-64 flex-col items-stretch tablet:hidden px-2',
+    'page-home-sider bg-gradient-start dark:bg-[#0f0c1e] shadow-home-sider sticky top-0 tablet:overscroll-none self-start flex flex-col items-stretch tablet:hidden px-2',
     isDrawer ? 'flex-1 min-h-0 overflow-auto' : 'h-screen overflow-auto',
     className,
   )}
+  style="min-width: 340px; max-width: 340px;"
   transition:name={isDrawer ? 'page-home-sider-drawer' : 'page-home-sider'}
   data-drawer={isDrawer ? '' : undefined}
 >
