@@ -80,26 +80,26 @@ export function SeriesNavigation({ prevPost, nextPost, className, locale }: Seri
             onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior })}
             className={cn(
               'flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground',
+              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground whitespace-nowrap',
             )}
             title={t('floating.backToTop')}
             aria-label={t('floating.backToTop')}
           >
-            <RiArrowUpSLine className="h-4 w-4" />
-            {t('floating.backToTop')}
+            <RiArrowUpSLine className="h-4 w-4 shrink-0" />
+            <span>{t('floating.backToTop')}</span>
           </button>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: scrollBehavior })}
             className={cn(
               'flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-colors',
-              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground',
+              'text-muted-foreground text-xs hover:bg-accent hover:text-accent-foreground whitespace-nowrap',
             )}
             title={t('floating.scrollToBottom')}
             aria-label={t('floating.scrollToBottom')}
           >
-            <RiArrowDownSLine className="h-4 w-4" />
-            {t('floating.scrollToBottom')}
+            <RiArrowDownSLine className="h-4 w-4 shrink-0" />
+            <span>{t('floating.scrollToBottom')}</span>
           </button>
         </div>
       )}
