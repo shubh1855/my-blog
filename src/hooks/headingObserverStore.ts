@@ -67,8 +67,24 @@ function createHeadingObserverStore({ selector, offsetTop, scopeSelector }: Head
     });
   };
 
+  /** Check if the user has scrolled to (or very near) the bottom of the page */
+  const isAtPageBottom = (): boolean => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    // Allow a small tolerance (2px) for rounding
+    return scrollTop + clientHeight >= scrollHeight - 2;
+  };
+
   /** Last heading already scrolled past — IO never fires for those */
   const findLastHeadingAboveOffset = (): ObservedHeading | null => {
+    if (trackedHeadings.length === 0) return null;
+
+    // When at page bottom, always highlight the last heading
+    if (isAtPageBottom()) {
+      return toObservedHeading(trackedHeadings[trackedHeadings.length - 1]);
+    }
+
     for (let i = trackedHeadings.length - 1; i >= 0; i--) {
       const heading = trackedHeadings[i];
       if (heading.getBoundingClientRect().top < offsetTop) return toObservedHeading(heading);
