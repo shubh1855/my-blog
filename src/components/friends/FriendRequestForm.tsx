@@ -1,9 +1,8 @@
 import { friendsIntro } from '@constants/friends-config';
 import { useTranslation } from '@hooks/useTranslation';
 import { useClipboard } from 'foxact/use-clipboard';
+import { Icon } from '@iconify/react';
 import { useCallback, useState } from 'react';
-import SakuraSVG from '../svg/SakuraSvg';
-
 interface FormData {
   site: string;
   owner: string;
@@ -63,7 +62,7 @@ color: "${formData.color || '#ffc0cb'}"`;
           <div className="relative z-10">
             <div className="mb-6">
               <h2 className="mb-2 flex items-center gap-2 font-black text-2xl text-gray-800 dark:text-white">
-                <SakuraSVG className="size-6 animate-spin text-[#FFC0CB] duration-10000" />
+                <Icon icon="mingcute:loading-fill" className="size-6 animate-spin text-[#FFC0CB] duration-10000" />
                 {t('friends.applyTitle')}
               </h2>
               <p className="font-medium text-gray-500 text-sm dark:text-gray-400">{friendsIntro.applyDesc}</p>

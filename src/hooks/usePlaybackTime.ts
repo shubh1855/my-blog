@@ -6,7 +6,10 @@
  * - `usePlaybackFormattedTime` — discrete sync for time text (max 1 re-render/s)
  */
 
-import type { LrcLine } from '@components/markdown/audio-player/LrcParser';
+export interface LrcLine {
+  time: number;
+  text: string;
+}
 import { formatTime } from '@components/markdown/audio-player/utils';
 import type { PlaybackTimeStore } from '@lib/playback-time-store';
 import { type RefObject, useEffect, useRef, useSyncExternalStore } from 'react';

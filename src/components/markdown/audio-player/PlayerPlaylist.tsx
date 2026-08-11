@@ -93,7 +93,7 @@ export const PlayerPlaylist = memo(function PlayerPlaylist({
 
           return (
             <button
-              key={track.url}
+              key={track.youtubeId}
               type="button"
               className={cn('audio-player-song-item', isCurrent && 'current')}
               onClick={(e) => handleClick(e, globalIdx)}
