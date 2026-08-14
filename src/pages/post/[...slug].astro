@@ -172,11 +172,11 @@ if (post.data.description) {
       class={`shadow-box bg-gradient-start flex min-w-0 w-full max-w-full flex-col gap-2 overflow-x-clip ${CONTENT_PADDING.standard}`}
     >
       <!-- Breadcrumb Navigation -->
-      <nav class="text-muted-foreground flex items-center justify-between gap-2 text-sm">
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1">
+      <nav class="text-muted-foreground flex min-w-0 items-center justify-between gap-2 text-sm">
+        <div class="flex min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap">
+          <div class="flex shrink-0 items-center gap-1">
             <!-- Home Icon and Link -->
-            <Icon name="fa6-solid:house-chimney" class="h-4 w-4" />
+            <Icon name="fa6-solid:house-chimney" class="h-4 w-4 shrink-0" />
             <a href={localizedPath('/', locale)} aria-label={homeName}>
               <span class="hover:text-blue transition-colors duration-300">{homeName}</span>
             </a>
@@ -185,10 +185,10 @@ if (post.data.description) {
           {
             breadcrumbCategories.map((category, index) => (
               <>
-                <Icon name="ri:arrow-right-s-line" class="text-muted-foreground/60 h-4 w-4" />
+                <Icon name="ri:arrow-right-s-line" class="text-muted-foreground/60 h-4 w-4 shrink-0" />
                 <a
                   href={category.link}
-                  class={`hover:text-blue transition-colors duration-300 ${index === breadcrumbCategories.length - 1 ? 'text-primary bg-primary/10 hover:text-primary hover:bg-primary/20 rounded-full px-2.5 py-1' : ''}`}
+                  class={`shrink-0 whitespace-nowrap hover:text-blue transition-colors duration-300 ${index === breadcrumbCategories.length - 1 ? 'text-primary bg-primary/10 hover:text-primary hover:bg-primary/20 rounded-full px-2.5 py-1' : ''}`}
                   aria-label={t(locale, 'breadcrumb.goToCategory', { name: category.name })}
                 >
                   {category.name}

@@ -40,7 +40,7 @@ const nextPost = adjacentPosts.nextPost ? toPostRef(adjacentPosts.nextPost) : nu
     isDrawer ? 'flex-1 min-h-0 overflow-auto' : 'h-screen overflow-auto',
     className,
   )}
-  style="min-width: 340px; max-width: 340px;"
+  style={isDrawer ? undefined : 'min-width: 340px; max-width: 340px;'}
   transition:name={isDrawer ? 'page-home-sider-drawer' : 'page-home-sider'}
   data-drawer={isDrawer ? '' : undefined}
 >
