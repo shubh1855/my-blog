@@ -3,21 +3,19 @@
  *
  * Floating action buttons for navigation and utilities.
  * - Scroll to top/bottom
- * - Christmas effects toggle
  * - Expand/collapse toggle
  */
 
 import geassSymbol from '@assets/svg/geass-symbol.svg?url';
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { preloadSettingsPanel } from '@components/settings/SettingsPanel';
-import { bgmConfig, christmasConfig } from '@constants/site-config';
+import { bgmConfig } from '@constants/site-config';
 import { useIsMounted } from '@hooks/useIsMounted';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { cn } from '@lib/utils';
 import { useStore } from '@nanostores/react';
 import { $bgmPanelOpen, toggleBgmPanel } from '@store/bgm';
-import { christmasEnabled, disableChristmasCompletely, enableChristmas, initChristmasState } from '@store/christmas';
 import { $isDrawerOpen, $isSettingsOpen, toggleSettings } from '@store/modal';
 import { bgmWidgetEnabled, initSettings } from '@store/settings';
 import { AnimatePresence, m } from 'motion/react';
@@ -43,14 +41,6 @@ function scrollToTop() {
 
 function scrollToBottom() {
   window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
-}
-
-function toggleChristmas() {
-  if (christmasEnabled.get()) {
-    disableChristmasCompletely();
-  } else {
-    enableChristmas();
-  }
 }
 
 function FloatingButton({
@@ -90,14 +80,12 @@ export default function FloatingGroup() {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const isDrawerOpen = useStore($isDrawerOpen);
-  const isChristmasEnabled = useStore(christmasEnabled);
   const isBgmPanelOpen = useStore($bgmPanelOpen);
   const isSettingsOpen = useStore($isSettingsOpen);
   const isBgmWidgetEnabled = useStore(bgmWidgetEnabled);
 
-  // Initialize christmas & settings state on mount
+  // Initialize settings state on mount
   useEffect(() => {
-    initChristmasState();
     initSettings();
   }, []);
 
@@ -126,11 +114,6 @@ export default function FloatingGroup() {
               exit={{ y: 50, opacity: 0 }}
               transition={{ duration: 0.15, ease: 'easeInOut' }}
             >
-              {christmasConfig.enabled && (
-                <FloatingButton onClick={toggleChristmas} ariaLabel={t('floating.christmas')} title={t('floating.christmas')}>
-                  <Icon icon={isChristmasEnabled ? 'ri:snowy-fill' : 'ri:snowy-line'} className="h-5 w-5" />
-                </FloatingButton>
-              )}
               {bgmConfig.enabled && bgmConfig.audio.length > 0 && isBgmWidgetEnabled && (
                 <FloatingButton onClick={toggleBgmPanel} ariaLabel={t('floating.bgm')} title={t('floating.bgm')} dataBgmToggle>
                   <Icon icon={isBgmPanelOpen ? 'ri:music-2-fill' : 'ri:music-2-line'} className="h-5 w-5" />

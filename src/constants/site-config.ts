@@ -19,7 +19,6 @@ import type {
   AnalyticsConfig,
   BangumiConfig,
   BgmAudioGroup,
-  ChristmasConfig,
   CommentConfig,
   DevConfig,
   RouterItem,
@@ -74,27 +73,6 @@ export function createArticleStatsConfig(href: string): UmamiStatsConfig | null 
     ? createUmamiStatsConfig(_umami, href)
     : null;
 }
-
-// Map YAML christmas config with defaults
-export const christmasConfig: ChristmasConfig = yamlConfig.christmas || {
-  enabled: false,
-  features: {
-    snowfall: true,
-    christmasColorScheme: true,
-    christmasCoverDecoration: true,
-    christmasHat: true,
-    readingTimeSnow: true,
-  },
-  snowfall: {
-    speed: 0.5,
-    intensity: 0.7,
-    mobileIntensity: 0.4,
-    maxLayers: 6,
-    maxIterations: 8,
-    mobileMaxLayers: 4,
-    mobileMaxIterations: 6,
-  },
-};
 
 // Map YAML bgm config
 export const bgmConfig: { enabled: boolean; metingApi?: string; audio: BgmAudioGroup[] } = {

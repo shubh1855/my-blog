@@ -12,7 +12,6 @@ interface Props {
 
 import AnnouncementProvider from '@components/announcement/AnnouncementProvider.astro';
 import GlobalBGMPlayer from '@components/bgm/GlobalBGMPlayer';
-import ChristmasEffects from '@components/christmas/ChristmasEffects.astro';
 import CodePenEmbed from '@components/embed/CodePenEmbed.astro';
 import FloatingGroup from '@components/layout/FloatingGroup';
 import Header from '@components/layout/Header.astro';
@@ -29,7 +28,6 @@ import { bgmConfig } from '@constants/site-config';
 const { post, siderType, isPostPage } = Astro.props;
 ---
 
-<ChristmasEffects transition:persist="christmas-snowfall" />
 <div class="flex min-h-screen flex-col text-black dark:text-white">
   <Header isPostPage={isPostPage} tocNumbering={post?.data.tocNumbering ?? true} />
   <main class="relative flex grow flex-col gap-4">

@@ -78,7 +78,6 @@ const pageStatsConfig = createArticleStatsConfig(href);
   class={cn(
     'hover:shadow-card-darker group text-card-foreground shadow-card relative flex rounded-lg bg-white transition-shadow md:flex-col dark:bg-transparent',
     '[content-visibility:auto] [contain-intrinsic-size:auto_250px]',
-    'post-item-card',
   )}
 >
   {
@@ -250,14 +249,3 @@ const pageStatsConfig = createArticleStatsConfig(href);
   </div>
 </div>
 
-<style>
-  /* 圣诞特效开启时的卡片样式 */
-  :global(html.christmas) .post-item-card {
-    position: relative;
-    z-index: 5;
-  }
-
-  :global(html.christmas.dark) .post-item-card {
-    background-color: #1a1512;
-  }
-</style>

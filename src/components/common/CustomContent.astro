@@ -4,7 +4,6 @@ import ContentEnhancer from '@components/markdown/ContentEnhancer';
 import type { ContentConfig } from '@constants/content-config';
 import { defaultContentConfig } from '@constants/content-config';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import { christmasConfig } from '@/constants/site-config';
 import { getLocaleFromUrl, t } from '@/i18n';
 
 interface Props {
@@ -18,7 +17,7 @@ const spoilerRevealLabel = t(getLocaleFromUrl(Astro.url.pathname), 'content.reve
 ---
 
 <div
-  class:list={['custom-content', { 'relative z-5': christmasConfig.enabled && christmasConfig.features.snowfall }]}
+  class="custom-content"
   data-config={JSON.stringify(finalConfig)}
   data-spoiler-reveal-label={spoilerRevealLabel}
 >

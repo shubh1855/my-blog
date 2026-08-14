@@ -14,7 +14,6 @@ import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { cn } from '@lib/utils';
 import { useStore } from '@nanostores/react';
-import { christmasEnabled, toggleChristmas } from '@store/christmas';
 import { $isSettingsOpen, closeModal } from '@store/modal';
 import {
   bgmWidgetEnabled,
@@ -71,7 +70,6 @@ export default function SettingsPanelContent() {
   const bgmWidget = useStore(bgmWidgetEnabled);
   const masterMotion = useStore(masterMotionEnabled);
   const wave = useStore(waveEnabled);
-  const isChristmasEnabled = useStore(christmasEnabled);
   const [fontPickerLoaded, setFontPickerLoaded] = useState(false);
   const [fontPickerOpen, setFontPickerOpen] = useState(false);
   const fontPickerTriggerRef = useRef<HTMLButtonElement>(null);
@@ -86,7 +84,6 @@ export default function SettingsPanelContent() {
   const switchBindings: Record<string, { checked: boolean; onChange: (checked: boolean) => void }> = {
     justify: { checked: justify, onChange: setJustify },
     scrollProgress: { checked: scrollProgress, onChange: setScrollProgressEnabled },
-    christmas: { checked: isChristmasEnabled, onChange: () => toggleChristmas() },
     bgmWidget: { checked: bgmWidget, onChange: setBgmWidgetEnabled },
     masterMotion: { checked: masterMotion, onChange: setMasterMotionEnabled },
     wave: { checked: wave, onChange: setWaveEnabled },

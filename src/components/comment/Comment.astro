@@ -7,8 +7,6 @@
  */
 import { commentConfig } from '@/constants/site-config';
 import { getLocaleFromUrl, t } from '@/i18n';
-import { cn } from '@/lib/utils';
-import { christmasEnabled } from '@/store/christmas';
 
 const provider = commentConfig.provider ?? 'none';
 const locale = getLocaleFromUrl(Astro.url.pathname);
@@ -27,7 +25,7 @@ if (provider === 'remark42') {
 
 {
   provider !== 'none' && Provider && (
-    <div class={cn('comments w-full', { 'z-5': christmasEnabled.get() })}>
+    <div class="comments w-full">
       <p class="text-muted-foreground mb-4 text-center text-sm">{t(locale, 'comment.prompt')}</p>
       <Provider />
     </div>

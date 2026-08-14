@@ -399,25 +399,6 @@ navigation:
     path: /music
     icon: ri:music-2-fill
     # =============================================================================
-    # Christmas/Seasonal Features
-    # 圣诞/季节性装饰功能 - 节日期间的特殊视觉效果 后续考虑新增 theme.yaml 来管理
-    # =============================================================================
-    # enabled: 总开关，设为 false 关闭所有节日效果
-    # features: 各功能独立开关
-    #   snowfall: 飘雪动画效果
-    #   christmasColorScheme: 圣诞主题配色
-    #   christmasCoverDecoration: 封面圣诞装饰
-    #   christmasHat: 头像添加圣诞帽
-    #   readingTimeSnow: 阅读时间旁显示雪花图标
-    # snowfall: 飘雪效果参数（影响性能，移动端建议降低）
-    #   speed: 下落速度 (0-1)，越大越快
-    #   intensity: 雪花密度 (0-1)，越大越密
-    #   mobileIntensity: 移动端密度，建议低于桌面端
-    #   maxLayers: 最大层数，影响立体感
-    #   maxIterations: 最大迭代次数，影响雪花数量
-    #   mobileMaxLayers: 移动端最大层数
-    #   mobileMaxIterations: 移动端最大迭代次数
-    # =============================================================================
     # Comment System
     # =============================================================================
     # provider: 评论系统提供商 ('remark42' | 'giscus' | 'waline' | 'twikoo' | 'none')
@@ -574,9 +555,6 @@ seo:
   #     disallow:
   #       - '/api/'
   # host: true                       # 可选：添加 Host 指令（Yandex）
-  # =============================================================================
-  # Christmas/Seasonal Features
-  # =============================================================================
 bgm:
   enabled: true
   audio:
@@ -591,22 +569,7 @@ bgm:
         - name: "Fade to Black"
           artist: "Metallica"
           youtubeId: "9HZ_tx8aWuA"
-christmas:
-  enabled: false # 总开关
-  # features: # 各功能独立开关
-  #   snowfall: true # 飘雪效果
-  #   christmasColorScheme: true # 圣诞配色
-  #   christmasCoverDecoration: true # 封面装饰
-  #   christmasHat: true # 头像圣诞帽
-  #   readingTimeSnow: true # 阅读时间雪花图标
-  # snowfall: # 飘雪参数配置
-  #   speed: 0.5 # 下落速度 (0-1)
-  #   intensity: 0.7 # 雪花密度 (0-1)
-  #   mobileIntensity: 0.4 # 移动端密度（建议较低）
-  #   maxLayers: 6 # 最大层数
-  #   maxIterations: 8 # 最大迭代次数
-  #   mobileMaxLayers: 4 # 移动端最大层数
-  #   mobileMaxIterations: 6 # 移动端最大迭代次数
+
   # =============================================================================
   # Bangumi (Media Tracking)
   # 追番页面 - 注释掉整个 bangumi 段即可关闭（页面 + 导航自动隐藏）

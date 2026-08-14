@@ -1,12 +1,9 @@
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { microDampingPreset } from '@constants/anim/spring';
 import type { FriendLink } from '@constants/friends-config';
-import { useIsMounted } from '@hooks/useIsMounted';
-import { useStore } from '@nanostores/react';
 import { m, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { type MouseEvent, useRef } from 'react';
-import { cn, normalizeHexColor } from '@/lib/utils';
-import { christmasEnabled } from '@/store/christmas';
+import { normalizeHexColor } from '@/lib/utils';
 
 interface FriendCardProps {
   friend: FriendLink;
@@ -33,8 +30,6 @@ const DEFAULT_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
 
 export default function FriendCard({ friend, index }: FriendCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
-  const isMounted = useIsMounted();
-  const isChristmasEnabled = useStore(christmasEnabled);
 
   // Motion values for magnetic hover
   const x = useMotionValue(0);
@@ -82,10 +77,7 @@ export default function FriendCard({ friend, index }: FriendCardProps) {
         href={friend.url}
         target="_blank"
         ref={cardRef}
-        className={cn(
-          'friend-card group !no-underline hover:!no-underline relative block h-[200px] w-full cursor-pointer select-none transition-transform duration-300 ease-easeOut',
-          { 'z-5': isMounted && isChristmasEnabled },
-        )}
+        className="friend-card group !no-underline hover:!no-underline relative block h-[200px] w-full cursor-pointer select-none transition-transform duration-300 ease-easeOut"
         style={{ perspective: '1000px' }}
         transition={{
           duration: 0.5,

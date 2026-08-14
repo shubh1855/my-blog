@@ -538,34 +538,6 @@ export interface SeoConfig {
 }
 
 // =============================================================================
-// Christmas/Seasonal Features
-// =============================================================================
-
-export interface ChristmasFeatures {
-  snowfall: boolean;
-  christmasColorScheme: boolean;
-  christmasCoverDecoration: boolean;
-  christmasHat: boolean;
-  readingTimeSnow: boolean;
-}
-
-export interface SnowfallConfig {
-  speed: number;
-  intensity: number;
-  mobileIntensity: number;
-  maxLayers: number;
-  maxIterations: number;
-  mobileMaxLayers: number;
-  mobileMaxIterations: number;
-}
-
-export interface ChristmasConfig {
-  enabled: boolean;
-  features: ChristmasFeatures;
-  snowfall: SnowfallConfig;
-}
-
-// =============================================================================
 // Dev Tools Configuration (Dev Only - Local Editor Integration)
 // =============================================================================
 
@@ -676,7 +648,6 @@ export interface SiteYamlConfig {
   bgm?: BgmConfig;
   /** Bangumi media tracking page — comment out to disable */
   bangumi?: BangumiConfig;
-  christmas?: ChristmasConfig;
   /** Development tools configuration (dev only) */
   dev?: DevConfig;
   /** Internationalization configuration */
