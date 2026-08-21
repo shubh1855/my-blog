@@ -55,6 +55,7 @@ categoryMap:
   笔记: note
   Notes: note
   工具: tools
+  Linux: linux
   周刊: weekly
   # Secondary categories (for nested paths)
   前端: front-end
@@ -92,6 +93,10 @@ featuredCategories:
     label: Tools
     image: /img/cover/tools.webp
     description: Tools and productivity tips
+  - link: linux
+    label: Linux
+    image: /img/cover/lelouch-inside-mech.webp
+    description: Linux internals and administration
 # =============================================================================
 # Featured Series
 # 精选系列功能 - 用于展示定期更新的系列内容（支持多个系列）
