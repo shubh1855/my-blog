@@ -5,6 +5,8 @@
  * this component injects decrypted HTML directly into the DOM and dispatches
  * 'content:decrypted' to trigger ContentEnhancer re-scan, TOC rebuild, etc.
  */
+
+import geassSymbol from '@assets/svg/geass-symbol.svg?url';
 import { useRetimer } from '@hooks/useRetimer';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
@@ -78,9 +80,13 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
 
   return (
     <div className="encrypted-post-locked">
-      <Icon
-        icon="ri:lock-2-fill"
-        className={cn('encrypted-post-icon', state === 'error' && 'encrypted-post-icon-error')}
+      <img
+        src={geassSymbol}
+        alt="Locked"
+        className={cn(
+          'size-16 opacity-90 brightness-125 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]',
+          state === 'error' && 'encrypted-post-icon-error',
+        )}
         aria-label={t('encrypted.post.title')}
       />
       <p className="encrypted-post-title">{t('encrypted.post.title')}</p>
@@ -97,16 +103,16 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
         />
         <button
           type="button"
-          className={cn('encrypted-post-btn', state === 'error' && 'encrypted-shake')}
+          className={cn('encrypted-post-btn flex-shrink-0', state === 'error' && 'encrypted-shake')}
           onClick={handleDecrypt}
           disabled={state === 'decrypting'}
+          title={t('encrypted.submit')}
         >
           {state === 'decrypting' ? (
             <Icon icon="ri:loader-4-line" className="animate-spin" />
           ) : (
-            <Icon icon="ri:lock-unlock-line" />
+            <img src={geassSymbol} alt="Unlock" className="size-5 brightness-125 drop-shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
           )}
-          <span>{t('encrypted.submit')}</span>
         </button>
       </div>
       {state === 'error' && <p className="encrypted-post-error-text">{t('encrypted.incorrect')}</p>}

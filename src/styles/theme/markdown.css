@@ -80,14 +80,14 @@
   /* ========== 标题样式优化 ========== */
 
   /* For headings with anchor links */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h1:target,
+  h2, h2:target,
+  h3, h3:target,
+  h4, h4:target,
+  h5, h5:target,
+  h6, h6:target {
     position: relative;
-    scroll-margin-top: 4rem;
+    scroll-margin-top: 7rem; /* Increased further to ensure header clearance on mobile */
     &:hover .anchor-link::before {
       opacity: 1;
     }

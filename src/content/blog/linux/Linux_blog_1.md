@@ -17,14 +17,13 @@ password: d34db33f
 
 # Introduction
 
-Every process in Linux has an identity. This identity determines what it can read, write and also what it can execute.
-So the usual model is files have permissions, users have certain ownership and if they match then the access is granted.
+Every process in Linux has an identity. This identity determines what it can read, write and also what it can execute. The usual model is files have permissions, users have ownership, and if they match, access is granted.
 
-But the more you learn about the security model in Linux this simple idea falls apart. So this blog is about that.
+But the more I dug into how Linux actually enforces this, the more I realised the model was more layered than it first appears. The [article by Nathaniel](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles) talked about how permissions are the primitive in IAM systems, not roles. Linux has the same problem, just one layer lower. Thanks to [Adhokshaj Mishra](https://www.linkedin.com/in/adhokshajmishra/) for further encouragement to dig into this.
 
 # The Traditional Model
 
-Linux inherited its permission model from the erstwhile Unix. Unix was designed in the early 1970s for shared systems where multiple users needed isolated access to files.
+Linux inherited its permission model from the Unix. Unix was designed in the early 1970s for shared systems where multiple users needed isolated access to files.
 
 The solution for this problem was simple. Create 3 classes for the owner, the group and a class for others(this includes everyone else). Each file has permissions set for these 3 classes.
 
@@ -65,7 +64,7 @@ A process can have several identities and the kernel uses different ones for dif
 
 There are 4 distinct UIDs:
 
-### Read UID
+### Real UID
 
 The real UID is who you actually are. It is set when you log in and it does not change when you run a privileged program.
 If you log in as a user name Lelouch (UID 1000), your real UID is 1000 for the entire session.
@@ -85,7 +84,7 @@ This allows `passwd` to write to /etc/shadow even though the user cannot.
 
 ### Saved Set-User-ID
 
-The saved set-user-ID exists for processes that need to temporarily drop privilege and pick it back up later. A first process starts with elevated effective UID.
+The saved set-user-ID exists for processes that need to temporarily drop privilege and pick it back up later. A process starts initially with an elevated effective UID.
 
 It then drops to a lower effective UID to do unprivileged work.
 
@@ -122,7 +121,7 @@ One thing that becomes clear is that the UIDs and capabilities both are not sepa
 
 # Objective and Subjective Context
 
-The [Kernel documentation](https://github.com/torvalds/linux/blob/master/include/linux/cred.h) makes a distinction between these two.
+The [Kernel documentation](https://docs.kernel.org/security/credentials.html) makes a distinction between these two.
 
 A process functions in two contexts.
 
@@ -139,7 +138,7 @@ This distinction is very important since the kernel needs to check permissions i
 
 # Cracks Appear
 
-DAC works by delegating access decisions to resource owners. This delegation allows the owner of a resource to ensure that they give proper permissions to the resource they created or use.
+The DAC model works by delegating access decisions to resource owners. This delegation allows the owner of a resource to ensure that they give proper permissions to the resource they created or use.
 
 Any misconfiguration, a careless `chmod 777`, or a process running with a wrong UID can silently open access to anything the owner controls.
 
@@ -155,7 +154,7 @@ UID 0 since is a privilege level of its own. There are essentially no checks her
 
 Let us say we want to open port 80. Since, this is a port of low number and requires privileged access then we will need root access to open this port, right ?
 
-So how do we ensure that we only give process capabilities(yup thats the name we will discuss about it) that are needed ?
+The answer already exists in the kernel. It has since 1999. We kept reaching for the root instead. So how do we ensure that we only give process capabilities that are needed ?
 
 How a process that drops it privileges for a task later regains it ? (passwd does this btw).
 
@@ -171,4 +170,4 @@ Running processes need different identities for different purposes. They might d
 
 All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h). These along with the capability set handles all these nuances.
 
-We discuss them in the next part.
+Permissions are the primitive in IAM. Capabilities are the primitive in Linux. Root is a bundle that gives you all of them at once.
