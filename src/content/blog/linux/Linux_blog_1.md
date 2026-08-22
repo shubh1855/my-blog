@@ -50,7 +50,7 @@ neither?                     --> apply other bits
 
 This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c) line 521.
 
-If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACESS`.
+If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`.
 
 ![Permission Checks](/img/linux/permission_check.webp)
 
@@ -88,11 +88,11 @@ The saved set-user-ID exists for processes that need to temporarily drop privile
 
 It then drops to a lower effective UID to do unprivileged work.
 
-The saved UID preserves the original elevated value so the process can restore it when needed without the Saved UID, a process which drops its privilege will never get it back.
+The saved UID preserves the original elevated value so the process can restore it when needed. Without the Saved UID, a process which drops its privilege will never get it back.
 
 ### Filesystem UID
 
-The filesystem UID is the 4th identity. This exists to solve a very specific issue. In the early 90s, when NFS server implementations on Linux could not function properly.
+The filesystem UID is the 4th identity. This exists to solve a very specific issue. In the early 90s, NFS server implementations on Linux could not function properly.
 
 A server process needed to drop filesystem access for a particular client request without dropping its other network privileges. The way this worked was using `setuid()`, but this also affected a number of other things. So Linux introduced `fsuid` for the sole purpose of filesystem permission checks.
 
@@ -150,19 +150,19 @@ If someone is `root` then they can easily bypass all these checks.
 is  euid == 0 ? // skips any check and allows everything
 ```
 
-UID 0 since is a privilege level of its own. There are essentially no checks here.
+UID 0 is a privilege level of its own. There are essentially no checks here.
 
 Let us say we want to open port 80. Since, this is a port of low number and requires privileged access then we will need root access to open this port, right ?
 
 The answer already exists in the kernel. It has since 1999. We kept reaching for the root instead. So how do we ensure that we only give process capabilities that are needed ?
 
-How a process that drops it privileges for a task later regains it ? (passwd does this btw).
+How a process that drops its privileges for a task later regains it ? (passwd does this btw).
 
 We discuss more about this in the later articles.
 
 # Final Thoughts
 
-Linux inherited its earlier model of security and permission model from the Unix systems that preceded it. This model worked fine for workstations that were either single-user or multi-user in nature.
+Linux inherited its earlier model of security and permission model from Unix systems that preceded it. This model worked fine for workstations that were either single-user or multi-user in nature.
 
 But once you start using it to do things like host servers. Accept files and other resources through the internet it breaks.
 

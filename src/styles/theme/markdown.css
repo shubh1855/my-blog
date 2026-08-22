@@ -92,40 +92,6 @@
       opacity: 1;
     }
   }
-
-  /* 级别标签 */
-  h1::before,
-  h2::before,
-  h3::before,
-  h4::before,
-  h5::before,
-  h6::before {
-    content: attr(data-level);
-    position: absolute;
-    left: -1.5em;
-    bottom: 0;
-
-    /* 样式 */
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: hsl(var(--muted-foreground));
-    opacity: 0.5;
-
-    /* 等宽字体 */
-    font-family: ui-monospace, SFMono-Regular, monospace;
-
-    transition: opacity 0.3s ease;
-  }
-
-  h1:hover::before,
-  h2:hover::before,
-  h3:hover::before,
-  h4:hover::before,
-  h5:hover::before,
-  h6:hover::before {
-    opacity: 0.8;
-  }
-
   /* 调整锚点链接居中对齐 */
   a.anchor-link {
     display: inline-flex;
