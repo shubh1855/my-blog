@@ -1,6 +1,6 @@
 ---
 link: "linux/linux-privilege-internals-part-1"
-title: "Linux Privilege Internals — Part 1: Identity and Access"
+title: "Linux Privilege Internals - Part 1: Identity and Access"
 description: "What does it actually mean to have privilege on Linux? This first article traces how the kernel checks permissions, why processes carry multiple UIDs, and where the traditional DAC model starts to crack."
 date: 2026-08-22
 categories:
@@ -10,7 +10,6 @@ tags:
   - Security
   - Kernel
   - Privilege Escalation
-password: d34db33f
 ---
 
 > This is the first article in a series on Linux privilege internals. The series traces a single question: what does it actually mean to have privilege on Linux, and how did we get here.
@@ -19,7 +18,7 @@ password: d34db33f
 
 Every process in Linux has an identity. This identity determines what it can read, write and also what it can execute. The usual model is files have permissions, users have ownership, and if they match, access is granted.
 
-But the more I dug into how Linux actually enforces this, the more I realised the model was more layered than it first appears. The [article by Nathaniel](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles) talked about how permissions are the primitive in IAM systems, not roles. Linux has the same problem, just one layer lower. Thanks to [Adhokshaj Mishra](https://www.linkedin.com/in/adhokshajmishra/) for further encouragement to dig into this.
+But the more I dug into how Linux actually enforces this, the more I realised the model was more layered than it first appears. The [article by Nathaniel Fernandes](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles) talked about how permissions are the primitive in IAM systems, not roles. Linux has the same problem, just one layer lower. Thanks to [Adhokshaj Mishra](https://www.linkedin.com/in/adhokshajmishra/) for further encouragement to dig into this.
 
 # The Traditional Model
 
@@ -60,6 +59,12 @@ So there is an interesting caveat. The process when started has the identity and
 
 A process can have several identities and the kernel uses different ones for different checks.
 
+```bash
+cat /proc/$$/status | grep Uid
+Uid:  1000  1000  1000  1000
+      real   eff  saved   fs
+```
+
 ![Task Struct](/img/linux/task_struct.webp)
 
 There are 4 distinct UIDs:
@@ -88,7 +93,15 @@ The saved set-user-ID exists for processes that need to temporarily drop privile
 
 It then drops to a lower effective UID to do unprivileged work.
 
-The saved UID preserves the original elevated value so the process can restore it when needed. Without the Saved UID, a process which drops its privilege will never get it back.
+The saved UID preserves the original elevated value so the process can restore it when needed.
+
+```bash
+start:    euid = 0,    suid = 0
+drop:     euid = 1000, suid = 0
+restore:  euid = 0,    suid = 0
+```
+
+Without the Saved UID, a process which drops its privilege will never get it back.
 
 ### Filesystem UID
 
@@ -164,10 +177,21 @@ We discuss more about this in the later articles.
 
 Linux inherited its earlier model of security and permission model from Unix systems that preceded it. This model worked fine for workstations that were either single-user or multi-user in nature.
 
-But once you start using it to do things like host servers. Accept files and other resources through the internet it breaks.
+But once you start using it to do things like host servers, accept files and handle resources through the internet, it breaks.
 
 Running processes need different identities for different purposes. They might drop their privilege for some task then, they will need to regain their privilege back. So the model adapted itself for these changing needs.
 
 All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h). These along with the capability set handles all these nuances.
 
 Permissions are the primitive in IAM. Capabilities are the primitive in Linux. Root is a bundle that gives you all of them at once.
+
+# References
+
+- [Roles are just an abstraction by Nathaniel Fernandes](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles)
+- [man 7 credentials](https://man7.org/linux/man-pages/man7/credentials.7.html)
+- [Credentials in Linux — kernel.org](https://docs.kernel.org/security/credentials.html)
+- [man 2 execve](https://man7.org/linux/man-pages/man2/execve.2.html)
+- [man 2 setuid](https://man7.org/linux/man-pages/man2/setuid.2.html)
+- [man 2 setfsuid](https://man7.org/linux/man-pages/man2/setfsuid.2.html)
+- [fs/namei.c — Linux kernel source](https://github.com/torvalds/linux/blob/master/fs/namei.c)
+- [include/linux/cred.h — Linux kernel source](https://github.com/torvalds/linux/blob/master/include/linux/cred.h)
