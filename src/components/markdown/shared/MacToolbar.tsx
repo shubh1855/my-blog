@@ -12,11 +12,13 @@ interface MacToolbarProps {
   linkText?: string;
   className?: string;
   children?: React.ReactNode;
+  /** @deprecated Traffic lights removed; prop kept for API compatibility */
   onClose?: () => void;
+  /** @deprecated Traffic lights removed; prop kept for API compatibility */
   onFullscreen?: () => void;
 }
 
-export function MacToolbar({ language, title, url, linkText, className, children, onClose, onFullscreen }: MacToolbarProps) {
+export function MacToolbar({ language, title, url, linkText, className, children }: MacToolbarProps) {
   return (
     <div
       className={cn(
