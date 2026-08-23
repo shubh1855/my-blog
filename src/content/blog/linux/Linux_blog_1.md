@@ -29,21 +29,9 @@ The solution for this problem was simple. Create 3 classes for the owner, the gr
 Each permission is shown by 9 bits.
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014", "clusterBkg": "none", "clusterBorder": "none"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect, .cluster rect { rx: 14; ry: 14; }"}}%%
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "edgeLabelBackground": "#141014"}, "themeCSS": ".node rect { rx: 14; ry: 14; }"}}%%
 flowchart LR
-    subgraph owner
-        direction LR
-        o_r["&nbsp; r &nbsp;"] --- o_w["&nbsp; w &nbsp;"] --- o_x["&nbsp; x &nbsp;"]
-    end
-    subgraph group
-        direction LR
-        g_r["&nbsp; r &nbsp;"] --- g_w["&nbsp; w &nbsp;"] --- g_x["&nbsp; x &nbsp;"]
-    end
-    subgraph others
-        direction LR
-        ot_r["&nbsp; r &nbsp;"] --- ot_w["&nbsp; w &nbsp;"] --- ot_x["&nbsp; x &nbsp;"]
-    end
-    owner ~~~ group ~~~ others
+    O["owner<br/>r &nbsp; w &nbsp; x"] ~~~ G["group<br/>r &nbsp; w &nbsp; x"] ~~~ OT["others<br/>r &nbsp; w &nbsp; x"]
 ```
 
 This is `Discretionary Access Control`. It means the owner of a resource can control who can access that resource. The system enforces these permissions. There is no external entity that can override the decision.
