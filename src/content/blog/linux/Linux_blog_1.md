@@ -28,7 +28,23 @@ The solution for this problem was simple. Create 3 classes for the owner, the gr
 
 Each permission is shown by 9 bits.
 
-![Permission bits](/img/linux/permission_bits.webp)
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014", "clusterBkg": "none", "clusterBorder": "none"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect, .cluster rect { rx: 14; ry: 14; }"}}%%
+flowchart LR
+    subgraph owner
+        direction LR
+        o_r["&nbsp; r &nbsp;"] --- o_w["&nbsp; w &nbsp;"] --- o_x["&nbsp; x &nbsp;"]
+    end
+    subgraph group
+        direction LR
+        g_r["&nbsp; r &nbsp;"] --- g_w["&nbsp; w &nbsp;"] --- g_x["&nbsp; x &nbsp;"]
+    end
+    subgraph others
+        direction LR
+        ot_r["&nbsp; r &nbsp;"] --- ot_w["&nbsp; w &nbsp;"] --- ot_x["&nbsp; x &nbsp;"]
+    end
+    owner ~~~ group ~~~ others
+```
 
 This is `Discretionary Access Control`. It means the owner of a resource can control who can access that resource. The system enforces these permissions. There is no external entity that can override the decision.
 
@@ -51,7 +67,35 @@ This permission check happens inside the generic_permission() in [fs/namei.c](ht
 
 If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`.
 
-![Permission Checks](/img/linux/permission_check.webp)
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect, .node polygon { rx: 14; ry: 14; }"}}%%
+flowchart TD
+    classDef allowed fill:#1a3d2b,stroke:#3fb950,color:#3fb950
+    classDef denied fill:#3d1a1a,stroke:#f85149,color:#f85149
+    classDef root fill:#3d1a1a,stroke:#f85149,color:#f85149
+
+    A["process calls open()"] --> B{"euid<br/>== 0?"}
+    B -- yes --> C["ALLOWED root bypass"]:::root
+    B -- no --> D{"euid == file<br/>owner UID?"}
+    D -- yes --> E["apply owner bits<br/>rwx------"]
+    D -- no --> I{"egid or<br/>supplementary<br/>GID matches<br/>file group?"}
+    
+    E --> F{"bit<br/>set?"}
+    F -- yes --> G["ALLOWED"]:::allowed
+    F -- no --> H["EACCES"]:::denied
+    
+    I -- yes --> J["apply group bits<br/>---rwx---"]
+    J --> K{"bit<br/>set?"}
+    K -- yes --> L["ALLOWED"]:::allowed
+    K -- no --> M["EACCES"]:::denied
+    
+    I -- no --> N["apply other bits<br/>------rwx"]
+    N --> O{"bit<br/>set?"}
+    O -- yes --> Q["ALLOWED"]:::allowed
+    O -- no --> R2["EACCES"]:::denied
+    
+    G & L & Q --> Z["LSM hooks fire next<br/>generic_permission in<br/>fs/namei.c"]
+```
 
 ## No one identity
 
@@ -65,7 +109,28 @@ Uid:  1000  1000  1000  1000
       real   eff  saved   fs
 ```
 
-![Task Struct](/img/linux/task_struct.webp)
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect { rx: 14; ry: 14; }"}}%%
+flowchart TD
+    P["PROCESS<br>task_struct"]
+    
+    R["ruid: Real UID<br>who you actually are"]
+    E["euid: Effective UID<br>kernel checks this for<br>access decisions"]
+    S["suid: Saved set-user-ID<br>preserved for priv drop<br>and restore"]
+    F["fsuid: Filesystem UID<br>used only for filesystem<br>checks"]
+    
+    U["Uid: 1000 1000 1000 1000<br>real eff saved fs"]
+    
+    P --> R
+    P --> E
+    P --> S
+    P --> F
+    
+    R --> U
+    E --> U
+    S --> U
+    F --> U
+```
 
 There are 4 distinct UIDs:
 
@@ -126,7 +191,28 @@ So, if a user is not part of the `docker` user group they will need sudo access 
 
 All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h) defines all this at line 115.
 The structure of the folder is essentially like this:
-![Cred Struct](/img/linux/cred_struct.webp)
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect { rx: 14px !important; ry: 14px !important; } g.classGroup rect { rx: 14px !important; ry: 14px !important; }"}}%%
+classDiagram
+    class identity_fields {
+        kuid_t uid : real UID
+        kgid_t gid : real GID
+        kuid_t euid : effective UID
+        kgid_t egid : effective GID
+        kuid_t suid : saved set-user-ID
+        kgid_t sgid : saved set-group-ID
+        kuid_t fsuid : filesystem UID
+        kgid_t fsgid : filesystem GID
+        group_info* group_info : supplementary groups
+    }
+    class capability_sets {
+        kernel_cap_t cap_inheritable
+        kernel_cap_t cap_permitted
+        kernel_cap_t cap_effective
+        kernel_cap_t cap_bset
+        kernel_cap_t cap_ambient
+    }
+```
 
 The different types of UIDs are what we are essentially focussing on this article we will talk about the capabilities in the next few articles.
 
@@ -145,7 +231,27 @@ When `generic_permission()` runs, it compares the Subjective context (effective 
 
 The flow of the check is:
 
-![Checking flow](/img/linux/Checking_flow.webp)
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; }"}}%%
+sequenceDiagram
+participant P as Process
+participant O as open()
+participant I as inode_permissions()
+participant G as generic_permissions()
+participant S as security_inode_permission()
+participant L as LSM Hooks
+
+P->>O: open(path, flags)
+O->>I: inode_permission(inode, mask)
+I->>G: generic_permission(inode, mask)
+Note over G: DAC check
+G-->>I: 0 or -EACCES
+I->>S: security_inode_permission()
+Note over S: LSM<br/>(discussed in later parts)
+S->>L: SELinux · AppArmor · BPF-LSM
+Note over L: Discussed Later
+L-->>P: 0 or -EACCES
+```
 
 This distinction is very important since the kernel needs to check permissions in contexts where the same process is both the subject and the object.
 
