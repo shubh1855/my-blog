@@ -3,7 +3,7 @@ import HomeSider from '@components/layout/HomeSider.astro';
 import PostList from '@components/post/PostList.astro';
 import Cover from '@components/ui/cover/Cover.astro';
 import { CONTENT_PADDING, PAGINATION } from '@constants/layout';
-import { seoConfig, siteConfig } from '@constants/site-config';
+import { defaultCoverList, seoConfig, siteConfig } from '@constants/site-config';
 import Layout from '@layouts/Layout.astro';
 import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
 import { getHomePagePosts } from '@lib/content';
@@ -52,9 +52,16 @@ const page: Page<BlogPost> = {
     last: `${postsBaseUrl}/${Math.ceil(totalRegularPosts / pageSize)}`,
   },
 };
+
+// Determine the LCP image: the first post card cover visible on load.
+// Sticky posts appear first if present; otherwise the first regular post.
+// Match the exact .webp transformation used in PostItemCard.
+const firstVisiblePost = stickyPosts[0] ?? posts[0];
+const firstCoverRaw = firstVisiblePost?.cover ?? defaultCoverList[0];
+const lcpImageUrl = firstCoverRaw?.replace(/\.(png|jpg|jpeg)$/i, '.webp');
 ---
 
-<Layout locale={locale} title={seoConfig.title}>
+<Layout locale={locale} title={seoConfig.title} lcpImageUrl={lcpImageUrl}>
   <TwoColumnLayout>
     <Cover slot="cover" />
     <HomeSider slot="sider" />
@@ -64,11 +71,11 @@ const page: Page<BlogPost> = {
       {stickyPosts.length > 0 && (
         <>
           <Divider>{t(locale, 'post.stickyPosts')}</Divider>
-          <PostList posts={stickyPosts} showPaginator={false} />
+          <PostList posts={stickyPosts} showPaginator={false} markFirstAsLCP={true} />
         </>
       )}
       <Divider>{t(locale, 'post.postList')}</Divider>
-      <PostList posts={posts} page={page} showPaginator={true} baseUrl={postsBaseUrl} isHomePage={true} />
+      <PostList posts={posts} page={page} showPaginator={true} baseUrl={postsBaseUrl} isHomePage={true} markFirstAsLCP={stickyPosts.length === 0} />
       {!!siteConfig?.featuredCategories?.length && (
         <>
           <Divider className="mt-6">{t(locale, 'post.featuredCategories')}</Divider>

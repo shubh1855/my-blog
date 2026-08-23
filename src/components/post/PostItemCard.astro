@@ -23,6 +23,7 @@ export interface PostItemCardProps {
   hideCover?: boolean; // 隐藏图片，让内容铺满
   isSimple?: boolean; // 是否简单模式
   isUniformPosition?: boolean; // 是否统一图片位置（非交替模式）
+  isFirst?: boolean; // 是否是列表中第一张卡片（用于 LCP 优先加载）
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   showTags: showTagsProp,
   isSimple = false,
   isUniformPosition = false,
+  isFirst = false,
 } = Astro.props as PostItemCardProps;
 
 const showTags = showTagsProp ?? !isSimple;
@@ -77,7 +79,7 @@ const pageStatsConfig = createArticleStatsConfig(href);
 <div
   class={cn(
     'hover:shadow-card-darker group text-card-foreground shadow-card relative flex rounded-lg bg-white transition-shadow md:flex-col dark:bg-transparent',
-    '[content-visibility:auto] [contain-intrinsic-size:auto_250px]',
+    !isFirst && '[content-visibility:auto] [contain-intrinsic-size:auto_250px]',
   )}
 >
   {
@@ -97,7 +99,8 @@ const pageStatsConfig = createArticleStatsConfig(href);
           <source media="(max-width: 768px)" srcset={finalCover.replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" />
           <img
             src={finalCover.replace(/\.(png|jpg|jpeg)$/i, '.webp')}
-            loading="lazy"
+            loading={isFirst ? 'eager' : 'lazy'}
+            fetchpriority={isFirst ? 'high' : 'auto'}
             decoding="async"
             width="800"
             height="450"

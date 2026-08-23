@@ -31,6 +31,12 @@ export interface PageMetaProps {
   rssFeeds?: RssFeedLink[];
   /** Disable locale hreflang links for a canonical route that is not duplicated per locale. */
   includeLocaleAlternates?: boolean;
+  /**
+   * URL of the page's LCP (Largest Contentful Paint) element image.
+   * When set, HeadMeta emits a `<link rel="preload" fetchpriority="high">` for this image.
+   * Only set this for images genuinely above-the-fold on initial load.
+   */
+  lcpImageUrl?: string;
 }
 
 export interface PageMeta extends PageMetaProps {

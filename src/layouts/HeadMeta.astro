@@ -6,6 +6,7 @@ interface Props {
 }
 
 import { siteConfig } from '@constants/site-config';
+import jetBrainsMonoLatinUrl from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
 import { getOgImageUrl } from '@lib/seo/og-image';
 import { SEO } from 'astro-seo';
 import { defaultLocale, getAlternateUrl, getHtmlLang, isI18nEnabled, localeList, localizedPath } from '@/i18n';
@@ -37,6 +38,33 @@ const hreflangLinks = showLocaleAlternates
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="generator" content={Astro.generator} />
+
+{/* Preload the primary font file to break the HTML→CSS→font network dependency chain.
+    The browser discovers fonts only after parsing CSS; preloading eliminates that delay. */}
+<link rel="preload" href={jetBrainsMonoLatinUrl} as="font" type="font/woff2" crossorigin="anonymous" />
+
+{/* Preload the page's LCP image when the caller knows which image is above-the-fold.
+    This eliminates resource-load delay by telling the browser before layout runs.
+    Two preloads with media queries match the responsive <picture> in PostItemCard:
+    mobile gets the smaller -mobile.webp, desktop gets the full-size .webp. */}
+{meta.lcpImageUrl && (
+  <>
+    <link
+      rel="preload"
+      as="image"
+      href={meta.lcpImageUrl.replace(/\.(webp)$/i, '-mobile.webp')}
+      media="(max-width: 768px)"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href={meta.lcpImageUrl}
+      media="(min-width: 769px)"
+      fetchpriority="high"
+    />
+  </>
+)}
 
 <!-- SEO 元数据由 astro-seo 管理 -->
 <SEO

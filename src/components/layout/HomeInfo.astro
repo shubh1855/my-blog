@@ -43,8 +43,7 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
         class="shadow-card-darker h-full w-full rounded-lg object-cover transition"
         src={(siteConfig.avatar ?? '/img/avatar.webp').replace(/\.(png|jpg|jpeg)$/i, '.webp')}
         alt={`${siteConfig.name ?? ''} avatar`}
-        loading="eager"
-        fetchpriority="high"
+        loading="lazy"
         decoding="async"
         width="160"
         height="160"
@@ -206,17 +205,20 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
 
           const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
 
-          if (isExpanded) {
-            // 折叠
-            content.classList.add('collapse-hidden');
-            icon.style.transform = 'rotate(0deg)';
-            trigger.setAttribute('aria-expanded', 'false');
-          } else {
-            // 展开
-            content.classList.remove('collapse-hidden');
-            icon.style.transform = 'rotate(180deg)';
-            trigger.setAttribute('aria-expanded', 'true');
-          }
+          // Batch all DOM writes in rAF to avoid forced synchronous reflow
+          requestAnimationFrame(() => {
+            if (isExpanded) {
+              // 折叠
+              content.classList.add('collapse-hidden');
+              icon.style.transform = 'rotate(0deg)';
+              trigger.setAttribute('aria-expanded', 'false');
+            } else {
+              // 展开
+              content.classList.remove('collapse-hidden');
+              icon.style.transform = 'rotate(180deg)';
+              trigger.setAttribute('aria-expanded', 'true');
+            }
+          });
         });
       });
     });
@@ -230,21 +232,32 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
   }
 
   function setupObserver() {
-    // 先清理旧的观察器
     cleanupObserver();
 
-    // 支持 MobileDrawer 延迟加载
+    // Guard: only observe if there are collapsible containers in the page.
+    // Previously observed document.body with subtree:true which fired on every
+    // DOM change across the whole page (React hydration, Astro transitions, etc.)
+    // and caused forced reflow via repeated layout reads.
+    const containers = document.querySelectorAll('[data-home-info-container]');
+    if (containers.length === 0) return;
+
     collapseMutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length) {
-          setTimeout(initCollapsible, 100);
-        }
-      });
+      // Only re-init when nodes are actually added (not attribute/text changes)
+      const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
+      if (!hasAddedNodes) return;
+
+      // Defer to next frame to batch with any pending DOM work
+      requestAnimationFrame(initCollapsible);
     });
 
-    collapseMutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
+    // Observe only the specific containers that have collapsibles,
+    // not all of document.body — this prevents false-positive fires from
+    // React hydration or other islands updating elsewhere in the page.
+    containers.forEach((container) => {
+      collapseMutationObserver!.observe(container, {
+        childList: true,
+        subtree: true,
+      });
     });
   }
 

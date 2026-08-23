@@ -15,9 +15,11 @@ interface Props {
   baseUrl?: string; // 分页基础路径
   isHomePage?: boolean; // 是否是首页
   isSimple?: boolean; // 是否隐藏封面
+  /** When true, the first card gets eager loading / high fetchpriority. Default: true. */
+  markFirstAsLCP?: boolean;
 }
 
-const { posts, page, showPaginator = true, baseUrl, isHomePage = false, isSimple = false } = Astro.props;
+const { posts, page, showPaginator = true, baseUrl, isHomePage = false, isSimple = false, markFirstAsLCP = true } = Astro.props;
 const locale = getLocaleFromUrl(Astro.url.pathname);
 const covers = shuffle(defaultCoverList);
 
@@ -63,6 +65,7 @@ function getLeftClip(index: number): boolean {
             hideCover={isSimple}
             isSimple={isSimple}
             isUniformPosition={isUniformPosition}
+            isFirst={markFirstAsLCP && index === 0}
           />
         ))}
       </div>

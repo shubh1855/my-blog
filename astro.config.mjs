@@ -265,12 +265,16 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks(id) {
+            // Let Rollup handle internal modules (like \0vite/preload-helper) automatically
+            if (id.includes('\0')) return;
+
             if (id.includes('node_modules')) {
-              if (id.includes('mermaid')) return 'vendor-mermaid';
-              if (id.includes('@antv')) return 'vendor-antv';
-              if (id.includes('katex')) return 'vendor-katex';
-              if (id.includes('motion') || id.includes('@floating-ui')) return 'vendor-ui';
-              if (id.includes('react-dom') || id.includes('react')) return 'vendor-react';
+              if (id.includes('/@pagefind/') || id.includes('/pagefind/')) return 'vendor-pagefind';
+              if (id.includes('/mermaid/')) return 'vendor-mermaid';
+              if (id.includes('/@antv/')) return 'vendor-antv';
+              if (id.includes('/katex/')) return 'vendor-katex';
+              if (id.includes('/motion/') || id.includes('/@floating-ui/')) return 'vendor-ui';
+              if (id.includes('/react-dom/') || id.includes('/react/')) return 'vendor-react';
             }
           },
         },
