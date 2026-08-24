@@ -51,7 +51,7 @@ is egid == file group GID?   --> apply group bits
 neither?                     --> apply other bits
 ```
 
-This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c) line 521.
+This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c#521) line 521.
 
 If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`.
 
@@ -177,7 +177,7 @@ So, if a user is not part of the `docker` user group they will need sudo access 
 
 # Where does all this live?
 
-All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h) defines all this at line 115.
+All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h#115) defines all this at line 115.
 The structure of the folder is essentially like this:
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect { rx: 14px !important; ry: 14px !important; } g.classGroup rect { rx: 14px !important; ry: 14px !important; }"}}%%
@@ -275,7 +275,7 @@ But once you start using it to do things like host servers, accept files and han
 
 Running processes need different identities for different purposes. They might drop their privilege for some task then, they will need to regain their privilege back. So the model adapted itself for these changing needs.
 
-All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h). These along with the capability set handles all these nuances.
+All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h#115). These along with the capability set handles all these nuances.
 
 Permissions are the primitive in IAM. Capabilities are the primitive in Linux. Root is a bundle that gives you all of them at once.
 
