@@ -4,7 +4,7 @@
   --pf-text: #393939;
   --pf-text-secondary: #666;
   --pf-text-muted: #767676;
-  --pf-background: var(--gradient-bg-start);
+  --pf-background: transparent;
   --pf-border: #e5e5e5;
   --pf-border-focus: hsl(var(--primary));
   --pf-hover: hsl(var(--accent));
@@ -63,4 +63,12 @@
     --pf-input-font-size: 0.875rem;
     --pf-searchbox-dropdown-max-height: calc(80dvh - 11rem);
   }
+}
+
+.pagefind-ui__drawer,
+.pagefind-ui__results-area,
+.pagefind-ui__result,
+.pagefind-ui__message,
+.pagefind-ui__result-image {
+  background-color: transparent !important;
 }

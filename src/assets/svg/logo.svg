@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 75" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" fill="none">
   <defs>
     <filter id="shadow">
       <feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#0f0b1d" flood-opacity="0.8"/>
     </filter>
   </defs>
-  <text x="50%" y="62" text-anchor="middle" filter="url(#shadow)"
+  <text x="50%" y="75" text-anchor="middle" filter="url(#shadow)"
         style="font-family: 'Times New Roman', Times, serif; font-weight: bold; font-size: 90px; fill: #b858a8; letter-spacing: -2px;">
     Shubh
   </text>
