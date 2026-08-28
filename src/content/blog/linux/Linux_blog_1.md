@@ -18,7 +18,7 @@ tags:
 
 Every process in Linux has an identity. This identity determines what it can read, write and also what it can execute. The usual model is files have permissions, users have ownership, and if they match, access is granted.
 
-But the more I dug into how Linux actually enforces this, the more I realised the model was more layered than it first appears. The [article by Nathaniel Fernandes](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles) talked about how permissions are the primitive in IAM systems, not roles. Linux has the same problem, just one layer lower. Thanks to [Adhokshaj Mishra](https://www.linkedin.com/in/adhokshajmishra/) for further encouragement to dig into this.
+But the more I dug into how Linux actually enforces this, the more I realised the model was more layered than it first appears. The [article](https://docs.wehost.co.in/blog/roles-are-just-an-abstraction-rethinking-authorization-from-first-principles) by [Nathaniel Fernandes](https://www.linkedin.com/in/nathaniel-fernandes/) talked about how permissions are the primitive in IAM systems, not roles. Linux has the same problem, just one layer lower. Thanks to [Adhokshaj Mishra](https://www.linkedin.com/in/adhokshajmishra/) for further encouragement to dig into this.
 
 # The Traditional Model
 
@@ -53,7 +53,7 @@ neither?                     --> apply other bits
 
 This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c) line 521.
 
-If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`.
+If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`. [EACCES](https://man7.org/linux/man-pages/man2/access.2.html#ERRORS) stands for EACCES stands for Error: Access Denied. It is a standard POSIX error code.
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect, .node polygon { rx: 14; ry: 14; }"}}%%
@@ -67,21 +67,21 @@ flowchart TD
     B -- no --> D{"euid == file<br/>owner UID?"}
     D -- yes --> E["apply owner bits<br/>rwx------"]
     D -- no --> I{"egid or<br/>supplementary<br/>GID matches<br/>file group?"}
-    
+
     E --> F{"bit<br/>set?"}
     F -- yes --> G["ALLOWED"]:::allowed
     F -- no --> H["EACCES"]:::denied
-    
+
     I -- yes --> J["apply group bits<br/>---rwx---"]
     J --> K{"bit<br/>set?"}
     K -- yes --> L["ALLOWED"]:::allowed
     K -- no --> M["EACCES"]:::denied
-    
+
     I -- no --> N["apply other bits<br/>------rwx"]
     N --> O{"bit<br/>set?"}
     O -- yes --> Q["ALLOWED"]:::allowed
     O -- no --> R2["EACCES"]:::denied
-    
+
     G & L & Q --> Z["LSM hooks fire next<br/>generic_permission in<br/>fs/namei.c"]
 ```
 
@@ -101,19 +101,19 @@ Uid:  1000  1000  1000  1000
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect { rx: 14; ry: 14; }"}}%%
 flowchart TD
     P["PROCESS<br>task_struct"]
-    
+
     R["ruid: Real UID<br>who you actually are"]
     E["euid: Effective UID<br>kernel checks this for<br>access decisions"]
     S["suid: Saved set-user-ID<br>preserved for priv drop<br>and restore"]
     F["fsuid: Filesystem UID<br>used only for filesystem<br>checks"]
-    
+
     U["Uid: 1000 1000 1000 1000<br>real eff saved fs"]
-    
+
     P --> R
     P --> E
     P --> S
     P --> F
-    
+
     R --> U
     E --> U
     S --> U
@@ -158,7 +158,7 @@ Without the Saved UID, a process which drops its privilege will never get it bac
 
 ### Filesystem UID
 
-The filesystem UID is the 4th identity. This exists to solve a very specific issue. In the early 90s, NFS server implementations on Linux could not function properly.
+The `filesystem UID` is the 4th identity. This exists to solve a very specific issue. In the early 90s, NFS server implementations on Linux could not function properly.
 
 A server process needed to drop filesystem access for a particular client request without dropping its other network privileges. The way this worked was using `setuid()`, but this also affected a number of other things. So Linux introduced `fsuid` for the sole purpose of filesystem permission checks.
 
@@ -166,11 +166,15 @@ Most programs never touch `fsuid` directly. It automatically tracks the effectiv
 
 ### Supplementary Groups
 
-A process has a primary group (GID) and a list of supplementary groups. When a kernel checks GID it checks for the both of these.
+A process has a primary group (GID) and a list of supplementary groups. When a kernel checks GID it checks for the both of these. When an user creates a folder or file then Linux it a user user owner and group owner. The group owner is usually a primary owner. By default the group owner is always your **Primary Group**. Most Linux systems nowadays use **User Primary Group** When a user named `Suzaku` is created then a group names `Suzaku` is also created.
+
+`Supplementary Groups` act as way to share resources amongst a number of users. For example using docker commands require `sudo` permissions. To not use sudo repeatedly one can add themselves to the docker group using `sudo usermod -aG docker $USER`.
+
+The `Primary Group` is present at the `/etc/passwd` path and the `Supplementary Groups` are at `/etc/group`.
 
 ```bash
 id
-uid=1000(Lelouch) gid=1000(black_knights) groups=1000(zero),4(adm),27(sudo),1001(docker)
+uid=1000(Lelouch) gid=1000(Lelouch) groups=1000(zero),4(adm),27(sudo),1001(docker)
 ```
 
 So, if a user is not part of the `docker` user group they will need sudo access to run the commands. Whereas another user who is part of the docker group will not need sudo access since, they will be part of the supplementary group which provides access.
@@ -179,6 +183,7 @@ So, if a user is not part of the `docker` user group they will need sudo access 
 
 All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h) defines all this at line 115.
 The structure of the folder is essentially like this:
+
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#3d2b6b", "primaryTextColor": "#e0aaff", "primaryBorderColor": "#b535b5", "lineColor": "#9b5555", "background": "#141014", "mainBkg": "#3d2b6b", "actorBkg": "#3d2b6b", "actorBorder": "#b535b5", "actorTextColor": "#e0aaff", "actorLineColor": "#9b5555", "signalColor": "#9b5555", "signalTextColor": "#e0aaff", "labelBoxBkgColor": "#1a0f2e", "labelBoxBorderColor": "#b535b5", "labelTextColor": "#e0aaff", "loopTextColor": "#e0aaff", "noteBkgColor": "#3d2b6b", "noteTextColor": "#e0aaff", "noteBorderColor": "#b535b5", "edgeLabelBackground": "#141014"}, "themeCSS": "rect.actor { rx: 14; ry: 14; } rect.note { stroke-dasharray: 6,3; rx: 14; ry: 14; } .node rect { rx: 14px !important; ry: 14px !important; } g.classGroup rect { rx: 14px !important; ry: 14px !important; }"}}%%
 classDiagram
