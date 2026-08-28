@@ -792,3 +792,84 @@ html[data-reader-font="local"]:lang(ja) .prose :is(h1, h2, h3, h4, h5, h6) {
 html.reader-justify .prose {
   text-align: justify;
 }
+
+/* GitHub Alerts Starlight-style overrides */
+.markdown-alert {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  background-color: var(--alert-bg, rgba(255, 255, 255, 0.05));
+  color: var(--foreground, inherit);
+}
+.markdown-alert-title {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-top: 0 !important;
+  margin-bottom: 0.75rem !important;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.markdown-alert-title .octicon {
+  width: 1.25rem;
+  height: 1.25rem;
+  -webkit-mask: var(--oct-icon) no-repeat;
+  mask: var(--oct-icon) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+}
+.markdown-alert p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-alert-note {
+  --alert-bg: hsl(var(--primary) / 0.1);
+  border-color: hsl(var(--primary) / 0.3);
+}
+.markdown-alert-note .markdown-alert-title {
+  color: hsl(var(--primary));
+}
+
+.markdown-alert-tip {
+  --alert-bg: hsl(var(--success) / 0.1);
+  border-color: hsl(var(--success) / 0.3);
+}
+.markdown-alert-tip .markdown-alert-title {
+  color: hsl(var(--success));
+}
+
+.markdown-alert-important {
+  --alert-bg: hsl(var(--primary) / 0.15);
+  border-color: hsl(var(--primary) / 0.4);
+}
+.markdown-alert-important .markdown-alert-title {
+  color: hsl(var(--primary));
+}
+
+.markdown-alert-warning {
+  --alert-bg: hsl(var(--warning) / 0.1);
+  border-color: hsl(var(--warning) / 0.3);
+}
+.markdown-alert-warning .markdown-alert-title {
+  color: hsl(var(--warning));
+}
+
+.markdown-alert-caution {
+  --alert-bg: hsl(var(--destructive) / 0.1);
+  border-color: hsl(var(--destructive) / 0.3);
+}
+.markdown-alert-caution .markdown-alert-title {
+  color: hsl(var(--destructive));
+}
+
+/* Hide the default blockquote styling (the left border) when it's an alert */
+blockquote.markdown-alert {
+  border-left-width: 1px;
+  border-left-style: solid;
+  background-image: none;
+  box-shadow: none;
+}

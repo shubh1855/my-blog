@@ -15,6 +15,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import remarkDirective from 'remark-directive';
+import remarkGithubAlerts from 'remark-github-alerts';
 import remarkMath from 'remark-math';
 import Sonda from 'sonda/vite';
 import { loadEnv } from 'vite';
@@ -179,6 +180,8 @@ remarkPlugins.push([
   },
 ]);
 
+remarkPlugins.push(remarkGithubAlerts);
+
 // Rehype plugins — order matters
 const rehypePlugins = [
   rehypeSlug,
@@ -208,6 +211,7 @@ if (contentConfig.enableCodeMeta) shikiTransformers.push(shokaMetaTransformer())
 if (contentConfig.enhanceCodeBlock) shikiTransformers.push(collapsibleCodeTransformer());
 
 // https://astro.build/config
+
 export default defineConfig({
   site: yamlConfig.site.url,
   output: 'static',

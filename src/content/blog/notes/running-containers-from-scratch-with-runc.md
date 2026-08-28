@@ -1,5 +1,5 @@
 ---
-link: 'notes/running-containers-from-scratch-with-runc'
+link: "notes/running-containers-from-scratch-with-runc"
 title: "Running Containers From Scratch with runc"
 description: "A deep dive into how containers actually work by building one from scratch using runc — the low-level runtime behind Docker, containerd, and Podman."
 date: 2026-08-03
