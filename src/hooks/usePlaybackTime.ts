@@ -10,6 +10,7 @@ export interface LrcLine {
   time: number;
   text: string;
 }
+
 import { formatTime } from '@components/markdown/audio-player/utils';
 import type { PlaybackTimeStore } from '@lib/playback-time-store';
 import { type RefObject, useEffect, useRef, useSyncExternalStore } from 'react';

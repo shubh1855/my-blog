@@ -1,8 +1,9 @@
 import { friendsIntro } from '@constants/friends-config';
 import { useTranslation } from '@hooks/useTranslation';
-import { useClipboard } from 'foxact/use-clipboard';
 import { Icon } from '@iconify/react';
+import { useClipboard } from 'foxact/use-clipboard';
 import { useCallback, useState } from 'react';
+
 interface FormData {
   site: string;
   owner: string;
