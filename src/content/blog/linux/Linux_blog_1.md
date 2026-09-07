@@ -51,7 +51,7 @@ is egid == file group GID?   --> apply group bits
 neither?                     --> apply other bits
 ```
 
-This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c#521) line 521.
+This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c#L521) line 521.
 
 If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`.
 
