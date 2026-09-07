@@ -356,26 +356,11 @@ comment:
 | ----------------------------------------- | ---------- | --------------------------------------------------------------- | ---------------------------- |
 | **[余弦の博客](http://blog.cosine.ren/)** | **cosine** | [cosZone/astro-koharu](https://github.com/cosZone/astro-koharu) | 本主题                       |
 | [雪花的博客](https://xhblog.top/)         | XueHua-s   | [XueHua-s/astro-snow](https://github.com/XueHua-s/astro-snow)   | 精简了很多功能，增加了起始页 |
-| [Ksable's 小屋](https://blog.ksable.top/) | Ksable    | [God-2077/astro-blog](https://github.com/God-2077/astro-blog) | 修改 / 新增了部分功能 |
+| [Ksable's 小屋](https://blog.ksable.top/) | Ksable     | [God-2077/astro-blog](https://github.com/God-2077/astro-blog)   | 修改 / 新增了部分功能        |
 
 ## 🙏 鸣谢
 
 使用字体[寒蝉全圆体](https://chinese-font.netlify.app/zh-cn/fonts/hcqyt/ChillRoundFRegular)
-
-感谢以下项目对 astro-koharu 的开发提供的灵感及参考：
-
-- [mx-space](https://github.com/mx-space)
-- [Hexo 主题 Shoka](https://shoka.lostyu.me/computer-science/note/theme-shoka-doc/)
-- [waterwater.moe](https://github.com/lawvs/lawvs.github.io)
-- [yfi.moe](https://github.com/yy4382/yfi.moe)
-- [4ark.me](https://github.com/gd4Ark/gd4Ark.github.io)
-- [纸鹿摸鱼处](https://blog.zhilu.site/)
-
-...
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=cosZone/astro-koharu&type=date&legend=top-left)](https://www.star-history.com/#cosZone/astro-koharu&type=date&legend=top-left)
 
 ## License
 
