@@ -51,7 +51,7 @@ is egid == file group GID?   --> apply group bits
 neither?                     --> apply other bits
 ```
 
-This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c) line 521.
+This permission check happens inside the generic_permission() in [fs/namei.c](https://github.com/torvalds/linux/blob/master/fs/namei.c#L521) line 521.
 
 If the bits have the correct permissions then the kernel allows access to a file or resource. If they don't permit the action then, it returns `EACCES`. [EACCES](https://man7.org/linux/man-pages/man2/access.2.html#ERRORS) stands for EACCES stands for Error: Access Denied. It is a standard POSIX error code.
 
@@ -181,7 +181,7 @@ So, if a user is not part of the `docker` user group they will need sudo access 
 
 # Where does all this live?
 
-All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h) defines all this at line 115.
+All of these identities live together in one kernel structure. The [cred.h](https://github.com/torvalds/linux/blob/master/include/linux/cred.h#L115) defines all this at line 115.
 The structure of the folder is essentially like this:
 
 ```mermaid
@@ -280,7 +280,7 @@ But once you start using it to do things like host servers, accept files and han
 
 Running processes need different identities for different purposes. They might drop their privilege for some task then, they will need to regain their privilege back. So the model adapted itself for these changing needs.
 
-All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h). These along with the capability set handles all these nuances.
+All these can be easily tracked by checking the [cred struct](https://github.com/torvalds/linux/blob/master/include/linux/cred.h#L115). These along with the capability set handles all these nuances.
 
 Permissions are the primitive in IAM. Capabilities are the primitive in Linux. Root is a bundle that gives you all of them at once.
 
