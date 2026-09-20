@@ -92,6 +92,9 @@ export const MediaControls = memo(function MediaControls({
     onSetVolume(Number.parseFloat(e.target.value));
   };
 
+  const currentVolume = muted ? 0 : volume;
+  const volumePercent = Math.round(currentVolume * 100);
+
   return (
     <div className="audio-player-controls">
       <div className="audio-player-buttons">
@@ -137,9 +140,14 @@ export const MediaControls = memo(function MediaControls({
             min={0}
             max={1}
             step={0.05}
-            value={muted ? 0 : volume}
+            value={currentVolume}
             onChange={handleVolumeChange}
-            title={t('media.volume', { percent: String(Math.round(volume * 100)) })}
+            style={{ '--vol-percent': `${volumePercent}%` } as React.CSSProperties}
+            title={t('media.volume', { percent: String(volumePercent) })}
+            aria-label={t('media.volume', { percent: String(volumePercent) })}
+            aria-valuenow={volumePercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
           />
         </div>
       </div>
