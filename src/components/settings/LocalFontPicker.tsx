@@ -178,7 +178,10 @@ export default function LocalFontPicker({ open, currentFont, returnFocusRef, onO
             </div>
 
             {filteredFamilies.length > 0 ? (
-              <div ref={scrollRef} className="h-72 overflow-y-auto overscroll-contain rounded-lg border border-border">
+              <div
+                ref={scrollRef}
+                className="vertical-scrollbar h-72 overflow-y-auto overscroll-contain rounded-lg border border-border"
+              >
                 <div className="relative w-full" style={{ height: rowVirtualizer.getTotalSize() }}>
                   {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                     const family = filteredFamilies[virtualRow.index];

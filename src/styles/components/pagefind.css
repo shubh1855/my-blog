@@ -1,6 +1,6 @@
 /* Pagefind Component UI theme overrides */
 
-:root {
+:is(*, #\#):is(*, #\#):is(*, #\#) {
   --pf-text: #393939;
   --pf-text-secondary: #666;
   --pf-text-muted: #767676;
@@ -10,6 +10,8 @@
   --pf-hover: hsl(var(--accent));
   --pf-mark: hsl(var(--primary));
   --pf-outline-focus: hsl(var(--primary));
+  --pf-skeleton: hsl(var(--muted));
+  --pf-skeleton-shine: hsl(var(--muted-foreground) / 0.15);
   --pf-font: inherit;
   --pf-input-height: 2.5rem;
   --pf-input-font-size: 1rem;
@@ -18,20 +20,58 @@
   --pf-searchbox-dropdown-max-height: calc(80dvh - 13rem);
 }
 
-.dark {
+.dark :is(*, #\#):is(*, #\#):is(*, #\#),
+[data-theme="dark"] :is(*, #\#):is(*, #\#):is(*, #\#),
+[data-pf-theme="dark"] :is(*, #\#):is(*, #\#):is(*, #\#) {
   --pf-text: #e5e5e5;
   --pf-text-secondary: #b7b7b7;
   --pf-text-muted: #a0a0a0;
+  --pf-background: transparent;
   --pf-border: rgba(255, 255, 255, 0.15);
   --pf-border-focus: hsl(var(--primary));
   --pf-hover: rgba(255, 255, 255, 0.08);
   --pf-mark: hsl(var(--primary));
+  --pf-skeleton: hsl(var(--muted));
+  --pf-skeleton-shine: hsl(var(--accent) / 0.2);
 }
 
 #search-for-dialog,
 #search-for-dialog pagefind-searchbox {
   display: block;
   width: 100%;
+}
+
+/* Prevent white skeleton boxes, dropdown background flashes, and loading flicker while typing */
+:is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-loading {
+  display: none;
+}
+
+/* DO NOT use display:none on the placeholder, as Pagefind uses IntersectionObserver on it to load results.
+   Instead, delay its visibility to prevent flashing on fast results. */
+:is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-placeholder {
+  opacity: 0;
+  animation: pf-fade-in 0.2s ease-in forwards;
+  animation-delay: 0.15s;
+}
+
+@keyframes pf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-dropdown {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  max-height: none;
+}
+
+:is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-results {
+  overflow: visible;
 }
 
 .search-dialog:has(.pf-searchbox.open) .search-empty-hint {

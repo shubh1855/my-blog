@@ -259,7 +259,7 @@ export default function SettingsPanelContent() {
                   <AnimatePresence mode="wait" initial={false}>
                     <m.div
                       key={section}
-                      className="h-full overflow-y-auto overscroll-contain"
+                      className="vertical-scrollbar h-full overflow-y-auto overscroll-contain pr-1.5"
                       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
