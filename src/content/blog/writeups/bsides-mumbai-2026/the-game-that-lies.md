@@ -1,5 +1,5 @@
 ---
-link: 'writeups/bsides-mumbai-2026/the-game-that-lies'
+link: "writeups/bsides-mumbai-2026/the-game-that-lies"
 title: "The Game That Lies - BSides Mumbai CTF 2026"
 description: "Writeup for The Game That Lies from BSides Mumbai CTF 2026."
 date: 2026-10-01 14:47:00
@@ -15,11 +15,6 @@ tags:
 
 # BSides Mumbai CTF 2026 — The Game That Lies
 
-**Category:** Reverse Engineering
-**Flag:** `Bsides_Mumbai{st4t3_l1e5_wh3n_y0u_re4d_1t}`
-
----
-
 ## Challenge Description
 
 > The game logic seems to work fine, but the emulator screen is buggy and unreliable. See if you can cut through the lies and find the treasure hidden inside.
@@ -32,7 +27,7 @@ The core mechanic of this challenge relies on Game Boy architecture (specificall
 
 ## Step 1 — Reconnaissance & Static Analysis
 
-First, we analyzed the ROM file using standard tools like `file` and `strings`. 
+First, we analyzed the ROM file using standard tools like `file` and `strings`.
 
 ```bash
 file the_game_that_lies.gb
@@ -61,12 +56,12 @@ Right next to the string `SYSTEM READY` at offset `0x2A0` in the ROM, we found a
 
 By disassembling the joypad reading routine at `0x5F7` (which checks bits in the Game Boy's `0xFF00` hardware register), we mapped these bytes to button presses:
 
-* `01` = UP (Bit 2)
-* `02` = DOWN (Bit 3)
-* `03` = LEFT (Bit 1)
-* `04` = RIGHT (Bit 0)
-* `05` = A (Bit 4)
-* `06` = B (Bit 5)
+- `01` = UP (Bit 2)
+- `02` = DOWN (Bit 3)
+- `03` = LEFT (Bit 1)
+- `04` = RIGHT (Bit 0)
+- `05` = A (Bit 4)
+- `06` = B (Bit 5)
 
 This gave us a 6-step code: **UP, LEFT, RIGHT, DOWN, A, B**.
 
@@ -76,7 +71,7 @@ This gave us a 6-step code: **UP, LEFT, RIGHT, DOWN, A, B**.
 
 To test this code, we wrote a Python script using the `PyBoy` library. This allowed us to emulate the Game Boy headlessly, programmatically press the buttons, and read the Video RAM (VRAM) to see what the screen was trying to display without relying on buggy graphics rendering.
 
-**Why we did this:** The challenge stated the screen is "buggy and unreliable". In Game Boy architecture, text is typically rendered via a tilemap (indices mapping to font graphics). Even if the graphics are corrupted (XOR'd or blanked out), the *tilemap indices* usually still match standard ASCII. 
+**Why we did this:** The challenge stated the screen is "buggy and unreliable". In Game Boy architecture, text is typically rendered via a tilemap (indices mapping to font graphics). Even if the graphics are corrupted (XOR'd or blanked out), the _tilemap indices_ usually still match standard ASCII.
 
 ### PyBoy Script (The Lie)
 
@@ -117,11 +112,12 @@ We got **Rickrolled**. The string explicitly asked for an **8-STEP CODE**, but o
 
 To find the real 8-step code, we disassembled the ROM using `mgbdis` and traced the input buffering logic.
 We discovered:
-1. User input is buffered into Work RAM (WRAM) starting at address `0xC0B3`.
-2. A function at `0x696` runs heavily *on boot* before the user even presses a button.
-3. This function acts as a PRNG (Pseudo-Random Number Generator), seeded by the value at `0xC0B2` (which initializes to `0xF0`). It loops 8 times, generating 8 valid button presses, and pre-fills the input buffer at `0xC0B3` with the correct sequence. 
 
-**How we solved it:** Instead of manually reverse-engineering the PRNG math, we can just let the emulator boot up and dump the `0xC0B3` buffer *before* we press any buttons. This extracts the generated truth dynamically.
+1. User input is buffered into Work RAM (WRAM) starting at address `0xC0B3`.
+2. A function at `0x696` runs heavily _on boot_ before the user even presses a button.
+3. This function acts as a PRNG (Pseudo-Random Number Generator), seeded by the value at `0xC0B2` (which initializes to `0xF0`). It loops 8 times, generating 8 valid button presses, and pre-fills the input buffer at `0xC0B3` with the correct sequence.
+
+**How we solved it:** Instead of manually reverse-engineering the PRNG math, we can just let the emulator boot up and dump the `0xC0B3` buffer _before_ we press any buttons. This extracts the generated truth dynamically.
 
 ### PyBoy Script (Extracting the Truth)
 

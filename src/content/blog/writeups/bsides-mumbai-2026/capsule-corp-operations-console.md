@@ -14,12 +14,6 @@ tags:
 
 # BSides Mumbai CTF — Capsule Corp Operations Console
 
-**Category:** Web  
-**Difficulty:** Medium  
-**Flag:** `BSides_Mumbai{c4psul3_c0rp_3ng_0v3rr1d3_4es_cbc_pr1v_m1nus_tw0}`
-
----
-
 ## Challenge Description
 
 > Dr. Briefs has deployed a state-of-the-art operations console to safeguard Capsule
