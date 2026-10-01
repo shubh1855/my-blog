@@ -1,4 +1,4 @@
-@import "@fontsource/jetbrains-mono/index.css";
+@import "@fontsource/jetbrains-mono/400.css";
 @import "./reset.css";
 @import "tailwindcss";
 @import "./utils.css";
