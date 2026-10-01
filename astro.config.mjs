@@ -263,6 +263,8 @@ export default defineConfig({
   },
   vite: {
     build: {
+      // lightningcss gives better CSS compression than the default esbuild CSS minifier.
+      cssMinify: 'lightningcss',
       // Enable sourcemap for Sonda bundle analysis
       sourcemap: isAnalyze,
       chunkSizeWarningLimit: 3000,
@@ -284,6 +286,7 @@ export default defineConfig({
         },
       },
     },
+
     plugins: [...(isAnalyze ? [Sonda({ open: false })] : []), yaml(), conditionalSnowfall(), svgr(), tailwindcss()],
     resolve: {
       noExternal: ['react-tweet'],

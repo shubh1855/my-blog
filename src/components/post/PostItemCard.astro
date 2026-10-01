@@ -96,7 +96,7 @@ const pageStatsConfig = createArticleStatsConfig(href);
         )}
       >
         <picture>
-          <source media="(max-width: 768px)" srcset={finalCover.replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" />
+          <source media="(max-width: 768px)" srcset={finalCover.replace(/\.(png|jpg|jpeg|webp)$/i, '-mobile.webp')} type="image/webp" sizes="(max-width: 768px) calc(50vw - 2rem)" />
           <img
             src={finalCover.replace(/\.(png|jpg|jpeg)$/i, '.webp')}
             loading={isFirst ? 'eager' : 'lazy'}
@@ -104,10 +104,12 @@ const pageStatsConfig = createArticleStatsConfig(href);
             decoding="async"
             width="800"
             height="450"
+            sizes="(max-width: 768px) 100vw, 400px"
             alt="post cover"
-            class="h-full w-full cursor-pointer object-cover transition duration-500 group-hover:scale-110 group-hover:rotate-3"
+            class="h-full w-full cursor-pointer object-cover transition duration-500 group-hover:scale-110 group-hover:rotate-3 will-change-transform"
           />
         </picture>
+
       </a>
     )
   }

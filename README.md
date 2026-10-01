@@ -27,13 +27,36 @@ _A personal blog and portfolio focusing on cybersecurity CTF writeups, Linux int
 
 <!-- Drop your screenshots into public/img/screenshots/ and update the image paths below -->
 
-| Desktop Home View | Security and CTF Writeup View |
-| :---: | :---: |
+|                                                  Desktop Home View                                                  |                                                   Security and CTF Writeup View                                                   |
+| :-----------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------: |
 | ![Home View](./public/img/screenshots/home.webp) <br> _Homepage with featured categories and Code Geass aesthetics_ | ![Writeup View](./public/img/screenshots/writeup.webp) <br> _In-depth writeups with syntax highlighting, TOC, and callout blocks_ |
 
-| Persistent Background Music Player | Geass Toolbar and Reader Settings |
-| :---: | :---: |
+|                                                       Persistent Background Music Player                                                        |                                                       Geass Toolbar and Reader Settings                                                       |
+| :---------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------: |
 | ![BGM Player Preview](./public/img/screenshots/music-player.webp) <br> _Floating audio panel with multi-playlist tabs and vinyl disc animation_ | ![Floating Menu Preview](./public/img/screenshots/settings.webp) <br> _Quick navigation toolbar with reader customizations and theme toggles_ |
+
+---
+
+## Performance
+
+<div align="center">
+
+![Lighthouse Scores — 100 Performance · 100 Accessibility · 100 Best Practices · 100 SEO](./public/img/lighthouse-scores.webp)
+
+**Perfect 100 across all four Lighthouse categories.**
+
+</div>
+
+Site speed is treated as a first-class feature. Key optimizations that reach these scores:
+
+- **Font subsetting** — JetBrains Mono is imported as `400.css` (latin-only, weight 400) instead of the full `index.css` which registers 48+ `@font-face` rules across all subsets and weights. Eliminates dead CSS and matches exactly the file preloaded in `<head>`.
+- **Scoped Pagefind styles** — Search UI CSS ships only with `SearchPortal.astro` rather than the global stylesheet, so non-search pages pay zero cost for those styles.
+- **Image delivery** — Post card `<picture>` elements include proper `sizes` attributes so browsers select the correct responsive variant without waiting for layout. Hover-animated images carry `will-change: transform` to keep scale/rotate transitions on the compositor thread (GPU-only, no layout/paint).
+- **Modern build target + LightningCSS** — `cssMinify: 'lightningcss'` replaces esbuild's CSS minifier for better compression. Astro's default `es2022` target is already in effect, avoiding legacy polyfill output.
+- **Lazy islands** — Heavy components (search, settings, lightbox, code fullscreen, toaster) use `client:idle` or `client:visible` — they never block the critical path.
+- **LCP preloading** — The homepage computes the first post's cover URL at build time and emits two `<link rel="preload">` tags (mobile + desktop) in `<head>` before the browser parses any CSS.
+- **LQIP placeholders** — Build-time low-quality image placeholders prevent layout shifts during image load.
+- **Zero third-party fonts** — JetBrains Mono is fully self-hosted via npm; no Google Fonts requests.
 
 ---
 
