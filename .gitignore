@@ -2,6 +2,7 @@
 dist/
 .sonda/
 
+.agents
 # generated types
 .astro/
 
