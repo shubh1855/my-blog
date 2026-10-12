@@ -271,7 +271,9 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks(id) {
-            // Let Rollup handle internal modules (like \0vite/preload-helper) automatically
+            // Keep the shared preload helper out of feature chunks so static imports
+            // cannot pull a lazy feature (such as Mermaid) into every page.
+            if (id === '\0vite/preload-helper.js') return 'preload-helper';
             if (id.includes('\0')) return;
 
             if (id.includes('node_modules')) {

@@ -10,7 +10,6 @@ import geassSymbol from '@assets/svg/geass-symbol.svg?url';
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { preloadSettingsPanel } from '@components/settings/SettingsPanel';
 import { bgmConfig } from '@constants/site-config';
-import { useIsMounted } from '@hooks/useIsMounted';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { cn } from '@lib/utils';
@@ -53,8 +52,6 @@ function FloatingButton({
   dataSettingsToggle,
   onIntent,
 }: FloatingButtonProps) {
-  const isMounted = useIsMounted();
-
   return (
     <button
       type="button"
@@ -63,15 +60,21 @@ function FloatingButton({
       onPointerDown={onIntent}
       onFocus={onIntent}
       className={cn(
-        'rounded-full bg-background/80 p-2 opacity-80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-background hover:opacity-100',
+        'group/floating-button relative rounded-full bg-background/80 p-2 opacity-80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-background hover:opacity-100',
         className,
       )}
       aria-label={ariaLabel}
-      title={isMounted ? title : undefined}
       data-bgm-toggle={dataBgmToggle || undefined}
       data-settings-toggle={dataSettingsToggle || undefined}
     >
       {children}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-[calc(100%+10px)] -translate-y-1/2 whitespace-nowrap rounded bg-[#333] px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover/floating-button:opacity-100 group-focus-visible/floating-button:opacity-100"
+      >
+        {title}
+        <span className="absolute top-1/2 left-full -translate-y-1/2 border-y-[6px] border-y-transparent border-l-[#333] border-l-[6px]" />
+      </span>
     </button>
   );
 }
