@@ -25,26 +25,26 @@ const stats = await getSiteStats();
 
     <!-- Site Stats -->
     <div class="text-muted-foreground flex flex-wrap items-center justify-center gap-6 text-sm md:gap-4">
-      <button class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.totalWordsTitle')}>
+      <span class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.totalWordsTitle')}>
         <Icon name="ri:file-text-line" class="h-4 w-4" />
         <span class="font-medium">{stats.formattedWords}</span>
         <span class="text-xs">{t(locale, 'footer.wordUnit')}</span>
-      </button>
+      </span>
 
       <div class="bg-muted-foreground/30 h-4 w-px"></div>
 
-      <button class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.readingTimeTitle')}>
+      <span class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.readingTimeTitle')}>
         <Icon name="ri:time-line" class="h-4 w-4" />
         <span class="font-medium">{stats.formattedTime}</span>
-      </button>
+      </span>
 
       <div class="bg-muted-foreground/30 h-4 w-px"></div>
 
-      <button class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.postCountTitle')}>
+      <span class="flex items-center gap-2 opacity-75 transition-opacity duration-300 hover:opacity-100" title={t(locale, 'footer.postCountTitle')}>
         <Icon name="ri:article-line" class="h-4 w-4" />
         <span class="font-medium">{stats.postCount}</span>
         <span class="text-xs">{t(locale, 'footer.postUnit')}</span>
-      </button>
+      </span>
 
       {umamiSiteStatsConfig && (
         <>
