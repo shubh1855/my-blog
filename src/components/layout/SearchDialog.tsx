@@ -12,9 +12,10 @@ import { useEscapeKey, useKeyboardShortcut } from '@hooks/useKeyboardShortcut';
 import { useTranslation } from '@hooks/useTranslation';
 import { cn } from '@lib/utils';
 import { useStore } from '@nanostores/react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { $isSearchOpen, closeModal, openModal } from '@store/modal';
 import { AnimatePresence, m } from 'motion/react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 // Icons
 function SearchIcon({ className }: { className?: string }) {
@@ -38,12 +39,26 @@ function CloseIcon({ className }: { className?: string }) {
 export default function SearchDialog() {
   const { t } = useTranslation();
   const isOpen = useStore($isSearchOpen);
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  // The trigger lives in another Astro island; use a DOM event across islands.
+  useEffect(() => {
+    const rememberOpener = (event: Event) => {
+      openerRef.current = (event as CustomEvent<HTMLElement>).detail;
+    };
+    window.addEventListener('search-dialog-trigger', rememberOpener);
+    return () => window.removeEventListener('search-dialog-trigger', rememberOpener);
+  }, []);
 
   // Cmd/Ctrl + K to open
   useKeyboardShortcut({
     key: 'k',
     modifiers: ['meta'],
-    handler: () => openModal('search'),
+    handler: () => {
+      if (isOpen) return;
+      openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      openModal('search');
+    },
   });
 
   // ESC to close
@@ -100,71 +115,84 @@ export default function SearchDialog() {
                 />
 
                 {/* Dialog */}
-                <m.div
-                  className="fixed inset-0 z-50 grid place-items-center px-4"
-                  onClick={handleBackgroundClick}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                <DialogPrimitive.Content
+                  asChild
+                  aria-describedby={undefined}
+                  onCloseAutoFocus={(event) => {
+                    event.preventDefault();
+                    const opener = openerRef.current;
+                    openerRef.current = null;
+                    if (opener?.isConnected) opener.focus();
+                  }}
                 >
                   <m.div
-                    className="w-full max-w-3xl overflow-auto rounded-xl bg-gradient-start text-foreground shadow-box"
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className="fixed inset-0 z-50 grid place-items-center px-4"
+                    onClick={handleBackgroundClick}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="relative p-6 md:p-3">
-                      <div className="search-dialog">
-                        {/* Header */}
-                        <div className="relative mb-4 flex items-center justify-between">
-                          <h2 className="flex items-center gap-2 font-semibold text-lg md:text-base">
-                            <SearchIcon className="size-5 md:size-4" />
-                            {t('search.dialogTitle')}
-                          </h2>
-                          <button
-                            type="button"
-                            onClick={closeModal}
-                            className="flex size-8 items-center justify-center rounded-full bg-black/5 transition-colors duration-300 hover:bg-black/10 md:size-7 dark:bg-white/10 dark:hover:bg-white/20"
-                            aria-label={t('search.dialogClose')}
+                    <m.div
+                      className="w-full max-w-3xl overflow-auto rounded-xl bg-gradient-start text-foreground shadow-box"
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="relative p-6 md:p-3">
+                        <div className="search-dialog">
+                          {/* Header */}
+                          <div className="relative mb-4 flex items-center justify-between">
+                            <DialogPrimitive.Title asChild>
+                              <h2 className="flex items-center gap-2 font-semibold text-lg md:text-base">
+                                <SearchIcon className="size-5 md:size-4" />
+                                {t('search.dialogTitle')}
+                              </h2>
+                            </DialogPrimitive.Title>
+                            <button
+                              type="button"
+                              onClick={closeModal}
+                              className="flex size-8 items-center justify-center rounded-full bg-black/5 transition-colors duration-300 hover:bg-black/10 md:size-7 dark:bg-white/10 dark:hover:bg-white/20"
+                              aria-label={t('search.dialogClose')}
+                            >
+                              <CloseIcon className="size-5 md:size-4" />
+                            </button>
+                          </div>
+
+                          {/* Empty hint */}
+                          <div
+                            id="search-empty-hint"
+                            className="search-empty-hint absolute inset-x-0 top-32 text-center text-sm opacity-60 md:top-28"
                           >
-                            <CloseIcon className="size-5 md:size-4" />
-                          </button>
+                            <p>{t('search.dialogHint')}</p>
+                            <p className="mt-1 text-xs">
+                              <kbd className="kbd">ESC</kbd> {t('search.dialogClose')}
+                            </p>
+                          </div>
+
+                          {/* Search Content Area */}
+                          <div className="vertical-scrollbar scroll-feather-mask -mx-6 h-[calc(80dvh-140px)] overflow-auto scroll-smooth px-6 pb-8 after:bottom-10 md:-mx-3 md:h-[calc(80dvh-120px)] md:px-3">
+                            <div id="search-dialog-container" />
+                          </div>
                         </div>
 
-                        {/* Empty hint */}
-                        <div
-                          id="search-empty-hint"
-                          className="search-empty-hint absolute inset-x-0 top-32 text-center text-sm opacity-60 md:top-28"
-                        >
-                          <p>{t('search.dialogHint')}</p>
-                          <p className="mt-1 text-xs">
+                        {/* Keyboard hints */}
+                        <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-4 bg-gradient-start px-4 pt-1 pb-4 text-black/50 text-xs dark:border-white/10 dark:text-white/50">
+                          <span>
+                            <kbd className="kbd">↑↓</kbd> {t('search.dialogSelect')}
+                          </span>
+                          <span>
+                            <kbd className="kbd">Enter</kbd> {t('search.dialogOpen')}
+                          </span>
+                          <span>
                             <kbd className="kbd">ESC</kbd> {t('search.dialogClose')}
-                          </p>
-                        </div>
-
-                        {/* Search Content Area */}
-                        <div className="vertical-scrollbar scroll-feather-mask -mx-6 h-[calc(80dvh-140px)] overflow-auto scroll-smooth px-6 pb-8 after:bottom-10 md:-mx-3 md:h-[calc(80dvh-120px)] md:px-3">
-                          <div id="search-dialog-container" />
+                          </span>
                         </div>
                       </div>
-
-                      {/* Keyboard hints */}
-                      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-4 bg-gradient-start px-4 pt-1 pb-4 text-black/50 text-xs dark:border-white/10 dark:text-white/50">
-                        <span>
-                          <kbd className="kbd">↑↓</kbd> {t('search.dialogSelect')}
-                        </span>
-                        <span>
-                          <kbd className="kbd">Enter</kbd> {t('search.dialogOpen')}
-                        </span>
-                        <span>
-                          <kbd className="kbd">ESC</kbd> {t('search.dialogClose')}
-                        </span>
-                      </div>
-                    </div>
+                    </m.div>
                   </m.div>
-                </m.div>
+                </DialogPrimitive.Content>
               </>
             )}
           </AnimatePresence>
@@ -192,7 +220,10 @@ export function SearchTrigger({ className }: { className?: string }) {
   return (
     <button
       type="button"
-      onClick={() => openModal('search')}
+      onClick={(event) => {
+        window.dispatchEvent(new CustomEvent('search-dialog-trigger', { detail: event.currentTarget }));
+        openModal('search');
+      }}
       className={cn('cursor-pointer transition duration-300 hover:scale-125', className)}
       aria-label={t('common.search')}
       title={title}
