@@ -126,7 +126,7 @@ export function NumberField({ label, value, step, unit, emptyValue, onApply }: N
             invalid && 'border-destructive text-destructive focus-visible:ring-destructive',
           )}
           {...register('value', {
-            setValueAs: (rawValue) => (rawValue === '' ? null : Number(rawValue)),
+            setValueAs: (rawValue) => (rawValue === '' || rawValue === null ? null : Number(rawValue)),
           })}
         />
         {unit && inputValue !== null && (
