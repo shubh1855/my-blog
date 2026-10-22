@@ -61,7 +61,9 @@ function Popover({
     delay: { open: 0, close: animation.duration.fast },
   });
   const click = useClick(context, {
-    enabled: trigger === 'click',
+    // Hover-triggered popovers also need a press path for touch and keyboard.
+    // stickIfOpen keeps the first press from closing a popover just opened by hover.
+    stickIfOpen: true,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

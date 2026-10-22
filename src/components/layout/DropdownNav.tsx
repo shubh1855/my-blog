@@ -35,7 +35,7 @@ const DropdownNavComponent = ({ item, currentPath, className, locale = defaultLo
                   key={child.path}
                   href={childUrl}
                   className={cn(
-                    'group px-4 py-2 text-base outline-hidden transition-colors duration-300 hover:bg-gradient-shoka-button',
+                    'group px-4 py-2 text-base outline-hidden transition-colors duration-300 hover:bg-gradient-shoka-button focus-visible:bg-gradient-shoka-button focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[-2px]',
                     {
                       'rounded-ss-2xl': index === 0,
                       'rounded-ee-2xl': index === children.length - 1,
@@ -64,6 +64,7 @@ const DropdownNavComponent = ({ item, currentPath, className, locale = defaultLo
           'inline-flex h-10 items-center px-4 py-2 text-base tracking-wider',
           'relative after:absolute after:bottom-1 after:left-1/2 after:h-0.5 after:w-0',
           'after:-translate-x-1/2 after:bg-white after:transition-all after:duration-300 after:content-[""]',
+          'focus-visible:after:w-full',
           className,
         )}
         aria-expanded={isOpen}
