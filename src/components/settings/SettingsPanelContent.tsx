@@ -41,7 +41,7 @@ import {
 } from '@store/settings';
 import { READER_CUSTOM_MEASURE } from '@store/settings-constants';
 import { AnimatePresence, m, useReducedMotion } from 'motion/react';
-import { lazy, type MouseEvent, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, type MouseEvent, Suspense, useEffect, useId, useRef, useState } from 'react';
 import { NumberField } from './NumberField';
 import { isSettingVisible, SETTINGS_REGISTRY, type SettingItem, type SettingSection } from './registry';
 
@@ -56,6 +56,7 @@ const LocalFontPicker = lazy(loadLocalFontPicker);
 
 export default function SettingsPanelContent() {
   const { t } = useTranslation();
+  const titleId = useId();
   const open = useStore($isSettingsOpen);
   const shouldReduceMotion = useReducedMotion();
 
@@ -207,6 +208,7 @@ export default function SettingsPanelContent() {
             <m.div
               ref={refs.setFloating}
               {...getFloatingProps()}
+              aria-labelledby={titleId}
               className="fixed right-16 bottom-20 z-40 w-[320px] max-w-[calc(100vw-5rem)]"
               initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -216,7 +218,9 @@ export default function SettingsPanelContent() {
               <div className="flex h-[calc(100dvh-6rem)] max-h-96 flex-col overflow-hidden rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
                 {/* Header */}
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="font-semibold text-sm">{t('settings.title')}</h2>
+                  <h2 id={titleId} className="font-semibold text-sm">
+                    {t('settings.title')}
+                  </h2>
                   <button
                     type="button"
                     className="relative rounded-full p-1 text-muted-foreground transition-[background-color,color,transform] after:absolute after:-inset-2 after:rounded-full after:content-[''] hover:bg-accent hover:text-foreground active:scale-[0.96]"
@@ -236,6 +240,7 @@ export default function SettingsPanelContent() {
                         key={key}
                         type="button"
                         onClick={() => setSection(key)}
+                        aria-pressed={active}
                         className={cn(
                           'relative flex-1 rounded-md px-3 py-1 font-medium text-xs transition-colors',
                           active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
