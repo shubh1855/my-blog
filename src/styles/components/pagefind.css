@@ -41,11 +41,6 @@
   width: 100%;
 }
 
-/* Prevent white skeleton boxes, dropdown background flashes, and loading flicker while typing */
-:is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-loading {
-  display: none;
-}
-
 /* DO NOT use display:none on the placeholder, as Pagefind uses IntersectionObserver on it to load results.
    Instead, delay its visibility to prevent flashing on fast results. */
 :is(*, #\#):is(*, #\#):is(*, #\#):is(*, #\#) .pf-searchbox-placeholder {
