@@ -22,13 +22,16 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
   id="mobile-drawer"
   class="bg-gradient-start dark:bg-[#0f0c1e] tablet:flex fixed inset-y-0 left-0 z-50 hidden h-dvh w-[70vw] min-w-64 max-w-sm -translate-x-full transform px-4 pt-3 pb-6 shadow-lg backdrop-blur-sm transition-transform duration-300 md:px-0"
   role="dialog"
+  tabindex="-1"
   aria-label={t(locale, 'drawer.navMenu')}
   aria-modal="true"
+  aria-hidden="true"
+  inert
 >
   <div class="flex h-full w-full flex-col overflow-auto">
     <div class="flex items-center">
-      <button id="close-drawer" aria-label={t(locale, 'drawer.close')} class="invisible">
-        <Icon name="ri:close-line" class="h-6 w-6" />
+      <button id="close-drawer" type="button" aria-label={t(locale, 'drawer.close')} class="flex size-10 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2">
+        <Icon name="ri:close-line" class="size-6" aria-hidden="true" />
       </button>
       {localeEntries.length > 1 && (
         <details class="language-switcher group relative ml-auto mr-4">
@@ -89,6 +92,10 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
   class DrawerController {
     private elements: DrawerElements;
     private unsubscribe: (() => void) | null = null;
+    private opener: HTMLElement | null = null;
+    private inertedSiblings: Array<{ element: HTMLElement; wasInert: boolean }> = [];
+    private previousBodyOverflow = '';
+    private readonly mediaQuery = window.matchMedia('(min-width: 993px)');
 
     constructor() {
       this.elements = this.initElements();
@@ -120,6 +127,8 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
 
     private bindEvents(): void {
       document.addEventListener('keydown', this.handleKeyDown);
+      this.elements.drawer?.addEventListener('keydown', this.handleTrapFocus);
+      this.mediaQuery.addEventListener('change', this.handleResponsiveChange);
       this.elements.closeBtn?.addEventListener('click', this.handleClose);
       this.elements.overlay?.addEventListener('click', this.handleClose);
       this.elements.drawer?.addEventListener('click', this.handleDrawerClick);
@@ -144,6 +153,48 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
       }
     };
 
+    private handleTrapFocus = (e: KeyboardEvent): void => {
+      if (e.key !== 'Tab' || !$isDrawerOpen.get() || !this.elements.drawer) return;
+      const focusable = this.getFocusableElements();
+      if (!focusable.length) {
+        e.preventDefault();
+        this.elements.drawer.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !this.elements.drawer.contains(document.activeElement))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !this.elements.drawer.contains(document.activeElement))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    private getFocusableElements(): HTMLElement[] {
+      return Array.from(this.elements.drawer?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex], [contenteditable="true"]',
+      ) ?? []).filter((element) => {
+        const style = window.getComputedStyle(element);
+        return (
+          element.tabIndex >= 0 &&
+          element.getClientRects().length > 0 &&
+          style.visibility !== 'hidden' &&
+          style.display !== 'none' &&
+          !element.closest('[inert]') &&
+          element.getAttribute('aria-hidden') !== 'true'
+        );
+      });
+    }
+
+    private handleResponsiveChange = (event: MediaQueryListEvent): void => {
+      if (event.matches && $isDrawerOpen.get()) {
+        this.opener = null;
+        closeDrawer();
+      }
+    };
+
     private handleClose = (): void => {
       closeDrawer();
     };
@@ -159,6 +210,31 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
       const { drawer, overlay, closeBtn } = this.elements;
       if (!drawer || !overlay) return;
 
+      if (!$isDrawerOpen.get()) return;
+      if (this.mediaQuery.matches) {
+        closeDrawer();
+        return;
+      }
+      this.opener = document.activeElement instanceof HTMLElement && document.activeElement.matches('[aria-controls="mobile-drawer"]')
+        ? document.activeElement
+        : document.querySelector<HTMLElement>('[aria-controls="mobile-drawer"]');
+      this.previousBodyOverflow = document.body.style.overflow;
+      this.inertedSiblings = [];
+      let branch: HTMLElement = drawer;
+      while (branch.parentElement) {
+        const parent = branch.parentElement;
+        for (const child of Array.from(parent.children)) {
+          if (!(child instanceof HTMLElement) || child === branch || child.contains(overlay)) continue;
+          this.inertedSiblings.push({ element: child, wasInert: child.inert });
+        }
+        if (parent === document.body) break;
+        branch = parent;
+      }
+      this.inertedSiblings.forEach(({ element }) => { element.inert = true; });
+      drawer.inert = false;
+      drawer.removeAttribute('aria-hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+
       drawer.classList.remove(DRAWER_CLASSES.translateX);
       overlay.classList.remove(DRAWER_CLASSES.hidden);
       document.body.style.overflow = 'hidden';
@@ -169,14 +245,39 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
       const { drawer, overlay } = this.elements;
       if (!drawer || !overlay) return;
 
+      const wasOpen = !drawer.inert || !drawer.hasAttribute('aria-hidden');
       drawer.classList.add(DRAWER_CLASSES.translateX);
       overlay.classList.add(DRAWER_CLASSES.hidden);
       drawer.querySelector('details.language-switcher')?.removeAttribute('open');
-      document.body.style.overflow = '';
+      if (wasOpen) {
+        document.body.style.overflow = this.previousBodyOverflow;
+        this.previousBodyOverflow = '';
+      }
+      this.inertedSiblings.forEach(({ element, wasInert }) => { element.inert = wasInert; });
+      this.inertedSiblings = [];
+      const opener = this.opener;
+      this.opener = null;
+      if (opener?.isConnected && !opener.inert) opener.focus();
+      drawer.inert = true;
+      drawer.setAttribute('aria-hidden', 'true');
     }
 
     public destroy(): void {
+      const { drawer } = this.elements;
+      if (drawer && $isDrawerOpen.get()) {
+        this.inertedSiblings.forEach(({ element, wasInert }) => { element.inert = wasInert; });
+        this.inertedSiblings = [];
+        document.body.style.overflow = this.previousBodyOverflow;
+        this.previousBodyOverflow = '';
+        drawer.inert = true;
+        drawer.setAttribute('aria-hidden', 'true');
+        drawer.classList.add(DRAWER_CLASSES.translateX);
+        this.elements.overlay?.classList.add(DRAWER_CLASSES.hidden);
+        this.opener = null;
+      }
       document.removeEventListener('keydown', this.handleKeyDown);
+      this.elements.drawer?.removeEventListener('keydown', this.handleTrapFocus);
+      this.mediaQuery.removeEventListener('change', this.handleResponsiveChange);
       this.elements.closeBtn?.removeEventListener('click', this.handleClose);
       this.elements.overlay?.removeEventListener('click', this.handleClose);
       this.elements.drawer?.removeEventListener('click', this.handleDrawerClick);

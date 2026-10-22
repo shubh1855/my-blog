@@ -13,6 +13,7 @@
 
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { animation } from '@constants/design-tokens';
+import { useTranslation } from '@hooks/useTranslation';
 import { cn } from '@lib/utils';
 import { useStore } from '@nanostores/react';
 import { $isDrawerOpen, toggleDrawer } from '@store/modal';
@@ -67,6 +68,8 @@ interface MenuIconProps {
 
 const MenuIcon = ({ className, id }: MenuIconProps) => {
   const isOpen = useStore($isDrawerOpen);
+  const { t } = useTranslation();
+  const label = t(isOpen ? 'drawer.close' : 'drawer.openMenu');
 
   return (
     <LazyMotionProvider>
@@ -74,8 +77,9 @@ const MenuIcon = ({ className, id }: MenuIconProps) => {
         <button
           className="size-10 flex-center cursor-pointer select-none rounded-full bg-white/20 text-shoka"
           onClick={toggleDrawer}
-          aria-label={isOpen ? '关闭菜单' : '打开菜单'}
+          aria-label={label}
           aria-expanded={isOpen}
+          aria-controls="mobile-drawer"
           type="button"
           style={{
             viewTransitionName: 'menu-icon',
@@ -90,8 +94,7 @@ const MenuIcon = ({ className, id }: MenuIconProps) => {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            role="img"
-            aria-label={isOpen ? '关闭菜单' : '打开菜单'}
+            aria-hidden="true"
           >
             <m.g
               variants={lineVariants}
