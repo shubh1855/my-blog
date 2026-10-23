@@ -1,7 +1,7 @@
 ---
 // 导入所需的库和类型
 import { Badge } from '@components/ui/badge';
-import { Button } from '@components/ui/button';
+import { Button, buttonVariants } from '@components/ui/button';
 import { ScrollableRow } from '@components/ui/ScrollableRow';
 import { Routes } from '@constants/router';
 import { createArticleStatsConfig, defaultCoverList } from '@constants/site-config';
@@ -85,7 +85,7 @@ const pageStatsConfig = createArticleStatsConfig(href);
   {
     !hideCover && (
       <a
-        aria-label="post-link"
+        aria-label={title}
         href={href}
         style={lqipProps.style}
         class={cn(
@@ -172,7 +172,7 @@ const pageStatsConfig = createArticleStatsConfig(href);
     </ScrollableRow>
     <div class={cn('mt-1 flex flex-col space-y-1.5 p-0', getStaggerPadding(1), 'md:pl-0 md:pr-0')}>
       <div class="flex items-center gap-2">
-        <a href={href} aria-label="post-link" class="min-w-0 flex-1"
+        <a href={href} class="min-w-0 flex-1"
           ><h2 class="text-primary hover:text-blue line-clamp-1 truncate text-xl font-bold transition-colors duration-300">
             {title}
           </h2>
@@ -234,22 +234,20 @@ const pageStatsConfig = createArticleStatsConfig(href);
     }
     <a
       href={href}
-      aria-label="more info"
-      class={cn('absolute -bottom-1', hideCover ? '-right-1' : leftClip ? '-right-1' : '-left-1', 'md:left-auto md:-right-1')}
-    >
-      <Button
-        className={cn(
-          'bg-gradient-shoka-button rounded-2xl transition-all hover:translate-y-1 hover:scale-105 md:h-7 md:px-2 md:py-1 md:text-xs',
+      aria-label={`${t(locale, 'post.readMore')}: ${title}`}
+      class={cn(buttonVariants({
+        className: cn(
+          'absolute -bottom-1 bg-gradient-shoka-button rounded-2xl transition-all hover:translate-y-1 hover:scale-105 md:h-7 md:px-2 md:py-1 md:text-xs',
           hideCover
-            ? 'rounded-se-none rounded-es-none hover:translate-x-1'
+            ? '-right-1 rounded-se-none rounded-es-none hover:translate-x-1'
             : leftClip
-              ? 'rounded-se-none rounded-es-none hover:translate-x-1'
-              : 'rounded-ss-none rounded-ee-none hover:-translate-x-1',
-          'md:rounded-ss-2xl md:rounded-se-none md:rounded-ee-2xl md:rounded-es-none md:hover:translate-x-1',
-        )}
-      >
-        more...
-      </Button>
+              ? '-right-1 rounded-se-none rounded-es-none hover:translate-x-1'
+              : '-left-1 rounded-ss-none rounded-ee-none hover:-translate-x-1',
+          'md:left-auto md:-right-1 md:rounded-ss-2xl md:rounded-se-none md:rounded-ee-2xl md:rounded-es-none md:hover:translate-x-1',
+        ),
+      }))}
+    >
+      more...
     </a>
   </div>
 </div>
