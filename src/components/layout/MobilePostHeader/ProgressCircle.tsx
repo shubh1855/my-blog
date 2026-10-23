@@ -5,9 +5,11 @@
  * Uses Motion's useScroll for tracking and useSpring for smooth animation.
  */
 
+import { useTranslation } from '@hooks/useTranslation';
 import { useStore } from '@nanostores/react';
 import { masterMotionEnabled, scrollProgressEnabled } from '@store/settings';
-import { m, useReducedMotion, useScroll, useSpring } from 'motion/react';
+import { m, useMotionValueEvent, useReducedMotion, useScroll, useSpring } from 'motion/react';
+import { useEffect, useState } from 'react';
 
 interface ProgressCircleProps {
   /** Circle size in pixels (default: 28) */
@@ -19,10 +21,19 @@ interface ProgressCircleProps {
 }
 
 export function ProgressCircle({ size = 28, strokeWidth = 2, className }: ProgressCircleProps) {
+  const { t } = useTranslation();
+  const [percentage, setPercentage] = useState(0);
   const shouldReduceMotion = useReducedMotion();
   const enabled = useStore(scrollProgressEnabled);
   const masterMotion = useStore(masterMotionEnabled);
   const { scrollYProgress } = useScroll();
+  useEffect(() => {
+    const distance = document.documentElement.scrollHeight - window.innerHeight;
+    setPercentage(distance > 0 ? Math.max(0, Math.min(100, Math.round((window.scrollY / distance) * 100))) : 0);
+  }, []);
+  useMotionValueEvent(scrollYProgress, 'change', (value) => {
+    setPercentage(Math.max(0, Math.min(100, Math.round(value * 100))));
+  });
 
   const springProgress = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -42,8 +53,11 @@ export function ProgressCircle({ size = 28, strokeWidth = 2, className }: Progre
       width={size}
       height={size}
       className={className}
-      aria-label="阅读进度"
+      aria-label={t('post.readingProgress')}
       role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={percentage}
       style={{ transform: 'rotate(-90deg)' }}
     >
       {/* Background circle (track) */}

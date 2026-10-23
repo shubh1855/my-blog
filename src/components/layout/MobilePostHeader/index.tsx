@@ -80,26 +80,25 @@ export function MobilePostHeader({
           {showHeadingMode ? (
             <m.div
               key="heading-mode"
-              className="flex items-center"
+              className="relative flex items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={shouldReduceMotion ? { duration: 0 } : animation.spring.gentle}
             >
               <TocProvider value={toc}>
+                <div className="pointer-events-none absolute top-1/2 left-1.5 z-10 -translate-y-1/2">
+                  <ProgressCircle size={32} strokeWidth={2.5} />
+                </div>
                 <MobileTOCDropdown
                   headings={headings}
                   enableNumbering={enableNumbering}
                   trigger={
                     <button
                       type="button"
-                      className="flex w-[calc(100vw-12rem)] items-center gap-2.5 rounded-full bg-foreground/10 py-1 pr-3 pl-1.5 backdrop-blur-sm transition-colors hover:bg-foreground/20"
+                      className="flex min-h-10 w-[calc(100vw-12rem)] items-center gap-2.5 rounded-full bg-foreground/10 py-1 pr-3 pl-12 backdrop-blur-sm transition-colors hover:bg-foreground/20"
                       aria-label={t('toc.expand')}
                     >
-                      {/* Progress circle - fixed size container */}
-                      <div className="relative shrink-0">
-                        <ProgressCircle size={32} strokeWidth={2.5} />
-                      </div>
                       <div className="overflow-hidden">
                         <HeadingTitle heading={currentHeading} />
                       </div>
