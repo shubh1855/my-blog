@@ -16,13 +16,6 @@
         "files": ["src/components/post/CategoryCards.astro"],
         "createdAt": "2026-10-23T05:18:24.734Z",
         "reason": "User confirmed preservation of existing colors and overall design in the audit/fix brief. This pre-existing purple category badge belongs to that pinned palette; no palette change was made by these fixes."
-      },
-      {
-        "rule": "side-tab",
-        "value": "*",
-        "files": ["src/components/layout/TableOfContents/HeadingTreeItem.tsx"],
-        "createdAt": "2026-10-23T05:53:37.240Z",
-        "reason": "Agent review: existing narrow TOC border identifies the active heading and hover target; it is a navigation-state marker, not a decorative card accent. Audit ae3854b explicitly retains it, and the user requested preservation of the design."
       }
     ]
   }
