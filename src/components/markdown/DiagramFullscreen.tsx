@@ -21,7 +21,7 @@ export default function DiagramFullscreen() {
   const data = useStore($diagramFullscreenData);
   const { t } = useTranslation();
   const isOpen = data !== null;
-  const { containerRef, state, reset, zoomLevel } = useZoomPan(isOpen);
+  const { containerRef, state, reset, zoomTo, panBy, zoomLevel } = useZoomPan(isOpen);
 
   // Reset zoom when opening
   useEffect(() => {
@@ -32,11 +32,56 @@ export default function DiagramFullscreen() {
 
   return (
     <ModalLayer open onClose={closeModal} ariaLabel={`${data.diagramType} ${t('diagram.fullscreen')}`}>
-      <DiagramToolbar data={data} zoomLevel={zoomLevel} onReset={reset} />
+      <DiagramToolbar
+        data={data}
+        zoomLevel={zoomLevel}
+        onReset={reset}
+        onZoomIn={() => zoomTo(state.scale * 1.1)}
+        onZoomOut={() => zoomTo(state.scale / 1.1)}
+        scale={state.scale}
+      />
       <div
         ref={containerRef}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users focus the graphic to zoom and pan it with the documented controls.
+        tabIndex={0}
+        role="img"
+        aria-label={`${data.diagramType} ${t('diagram.fullscreen')}`}
+        onKeyDown={(event) => {
+          if (event.altKey || event.ctrlKey || event.metaKey || (event.shiftKey && event.key !== '+')) return;
+          switch (event.key) {
+            case 'ArrowLeft':
+              event.preventDefault();
+              panBy(-48, 0);
+              break;
+            case 'ArrowRight':
+              event.preventDefault();
+              panBy(48, 0);
+              break;
+            case 'ArrowUp':
+              event.preventDefault();
+              panBy(0, -48);
+              break;
+            case 'ArrowDown':
+              event.preventDefault();
+              panBy(0, 48);
+              break;
+            case '+':
+            case '=':
+              event.preventDefault();
+              zoomTo(state.scale * 1.1);
+              break;
+            case '-':
+              event.preventDefault();
+              zoomTo(state.scale / 1.1);
+              break;
+            case '0':
+              event.preventDefault();
+              reset();
+              break;
+          }
+        }}
         className={cn(
-          'flex flex-1 cursor-grab items-center justify-center overflow-hidden active:cursor-grabbing',
+          'flex flex-1 cursor-grab items-center justify-center overflow-hidden focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-[-2px] active:cursor-grabbing',
           data.diagramType === 'infographic' && 'infographic-container',
         )}
       >
@@ -58,12 +103,46 @@ export default function DiagramFullscreen() {
   );
 }
 
-function DiagramToolbar({ data, zoomLevel, onReset }: { data: DiagramFullscreenData; zoomLevel: string; onReset: () => void }) {
+function DiagramToolbar({
+  data,
+  zoomLevel,
+  onReset,
+  onZoomIn,
+  onZoomOut,
+  scale,
+}: {
+  data: DiagramFullscreenData;
+  zoomLevel: string;
+  onReset: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  scale: number;
+}) {
   const { t } = useTranslation();
   return (
     <MacToolbar language={data.diagramType} className="tablet:items-stretch tablet:px-2" onClose={closeModal}>
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         <span className="mr-2 tablet:ml-auto text-muted-foreground text-sm">{zoomLevel}</span>
+        <button
+          type="button"
+          onClick={onZoomIn}
+          disabled={scale >= 4.9}
+          className="flex items-center gap-2 rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-40"
+          title={t('image.zoomIn')}
+          aria-label={t('image.zoomIn')}
+        >
+          <Icon icon="ri:zoom-in-line" className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onZoomOut}
+          disabled={scale <= 0.55}
+          className="flex items-center gap-2 rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-40"
+          title={t('image.zoomOut')}
+          aria-label={t('image.zoomOut')}
+        >
+          <Icon icon="ri:zoom-out-line" className="size-4" />
+        </button>
         <button
           type="button"
           onClick={onReset}

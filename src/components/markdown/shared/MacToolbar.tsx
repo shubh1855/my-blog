@@ -35,7 +35,7 @@ export function MacToolbar({ language, title, url, linkText, className, children
           <span className="font-medium font-mono text-muted-foreground text-xs uppercase tracking-wider">{language}</span>
         </div>
         {(children || onClose) && (
-          <div className="ml-auto flex items-center gap-1 py-1">
+          <div className="ml-auto flex flex-wrap items-center gap-1 py-1">
             {children}
             {onClose && (
               <button

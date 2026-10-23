@@ -26,6 +26,7 @@ export interface UseZoomPanReturn {
   containerRef: (node: HTMLDivElement | null) => void;
   state: ZoomPanState;
   reset: () => void;
+  panBy: (deltaX: number, deltaY: number) => void;
   zoomTo: (targetScale: number, centerX?: number, centerY?: number) => void;
   zoomLevel: string;
 }
@@ -81,6 +82,18 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
     }
     setState(INITIAL_STATE);
   }, []);
+
+  const panBy = useCallback(
+    (deltaX: number, deltaY: number) => {
+      transformRef.current = {
+        ...transformRef.current,
+        translateX: transformRef.current.translateX + deltaX,
+        translateY: transformRef.current.translateY + deltaY,
+      };
+      flushState();
+    },
+    [flushState],
+  );
 
   const zoomTo = useCallback(
     (targetScale: number, centerX?: number, centerY?: number) => {
@@ -214,6 +227,7 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
     containerRef,
     state,
     reset,
+    panBy,
     zoomTo,
     zoomLevel: `${Math.round(state.scale * 100)}%`,
   };
