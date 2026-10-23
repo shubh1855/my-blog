@@ -6,6 +6,14 @@
  */
 
 export const uiStrings = {
+  'common.copyTextFailed': '复制失败。请选中并复制下方文本。',
+  'common.copyManually': '手动复制的文本',
+  'post.readingProgress': '阅读进度',
+  'image.loading': '正在加载图片…',
+  'image.loadFailed': '无法加载此图片。',
+  'image.retry': '重试',
+  'image.openOriginal': '打开原图',
+  'image.viewer': '图片查看器',
   // ── Navigation ──────────────────────────────────────────────
   'nav.home': '首页',
   'nav.posts': '文章',

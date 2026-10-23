@@ -7,6 +7,14 @@
 import type { UIStrings } from '../types';
 
 export const uiStrings: UIStrings = {
+  'common.copyTextFailed': 'Copy failed. Select and copy the text below.',
+  'common.copyManually': 'Text to copy manually',
+  'post.readingProgress': 'Reading progress',
+  'image.loading': 'Loading image…',
+  'image.loadFailed': 'This image could not be loaded.',
+  'image.retry': 'Retry',
+  'image.openOriginal': 'Open original image',
+  'image.viewer': 'Image viewer',
   // ── Navigation ──────────────────────────────────────────────
   'nav.home': 'Home',
   'nav.posts': 'Posts',

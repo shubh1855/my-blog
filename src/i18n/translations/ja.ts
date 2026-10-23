@@ -7,6 +7,14 @@
 import type { UIStrings } from '../types';
 
 export const uiStrings: UIStrings = {
+  'common.copyTextFailed': 'コピーできませんでした。下のテキストを選択してコピーしてください。',
+  'common.copyManually': '手動でコピーするテキスト',
+  'post.readingProgress': '読書の進捗',
+  'image.loading': '画像を読み込み中…',
+  'image.loadFailed': '画像を読み込めませんでした。',
+  'image.retry': '再試行',
+  'image.openOriginal': '元の画像を開く',
+  'image.viewer': '画像ビューアー',
   // ── ナビゲーション ──────────────────────────────────────────────
   'nav.home': 'ホーム',
   'nav.posts': '投稿',
