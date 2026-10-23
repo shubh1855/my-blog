@@ -802,13 +802,13 @@ html.reader-justify .prose {
   background-color: var(--alert-bg, rgba(255, 255, 255, 0.05));
   color: var(--foreground, inherit);
 }
-.markdown-alert-title {
-  display: flex !important;
+.prose .markdown-alert .markdown-alert-title {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  margin-top: 0 !important;
-  margin-bottom: 0.75rem !important;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;

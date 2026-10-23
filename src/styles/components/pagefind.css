@@ -100,10 +100,13 @@
   }
 }
 
-.pagefind-ui__drawer,
-.pagefind-ui__results-area,
-.pagefind-ui__result,
-.pagefind-ui__message,
-.pagefind-ui__result-image {
-  background-color: transparent !important;
+#search-for-dialog
+  :is(
+    .pagefind-ui__drawer,
+    .pagefind-ui__results-area,
+    .pagefind-ui__result,
+    .pagefind-ui__message,
+    .pagefind-ui__result-image
+  ) {
+  background-color: transparent;
 }
