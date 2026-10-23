@@ -23,9 +23,22 @@ export function useHeadingClickHandler({ revealTo }: UseHeadingClickHandlerOptio
       const element = document.getElementById(id);
       if (!element) return;
 
-      // Pin the active heading until the smooth scroll settles
+      const hash = `#${encodeURIComponent(id)}`;
+      if (window.location.hash !== hash) {
+        window.history.pushState(window.history.state, '', hash);
+      }
+
+      // Pin the active heading until the programmatic scroll settles
       lockHeadingTo(id);
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const hadTabIndex = element.hasAttribute('tabindex');
+      if (!hadTabIndex) {
+        element.setAttribute('tabindex', '-1');
+        element.addEventListener('blur', () => element.removeAttribute('tabindex'), { once: true });
+      }
+      element.focus({ preventScroll: true });
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      element.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' });
       revealTo(id);
     },
     [revealTo],

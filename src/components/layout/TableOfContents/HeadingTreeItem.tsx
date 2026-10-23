@@ -30,8 +30,9 @@ export function HeadingTreeItem({ heading, depth = 0, children }: HeadingTreeIte
   return (
     <div className="heading-tree-item relative">
       <a
-        href={`#${heading.id}`}
+        href={`#${encodeURIComponent(heading.id)}`}
         onClick={(e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault();
           onHeadingClick(heading.id);
         }}
