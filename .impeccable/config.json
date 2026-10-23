@@ -1,0 +1,22 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": ["src/components/post/CategoryCards.astro"],
+        "createdAt": "2026-10-23T05:18:24.713Z",
+        "reason": "Agent review: existing border triangle constructs the category ribbon geometry, not an added card accent; documented in audit ae3854b. Preserve the established design as requested."
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "*",
+        "files": ["src/components/post/CategoryCards.astro"],
+        "createdAt": "2026-10-23T05:18:24.734Z",
+        "reason": "User confirmed preservation of existing colors and overall design in the audit/fix brief. This pre-existing purple category badge belongs to that pinned palette; no palette change was made by these fixes."
+      }
+    ]
+  }
+}
