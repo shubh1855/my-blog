@@ -1,8 +1,9 @@
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { microDampingPreset } from '@constants/anim/spring';
 import type { FriendLink } from '@constants/friends-config';
+import { usePrefersReducedMotion } from '@hooks/useMediaQuery';
 import { m, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { type MouseEvent, useRef } from 'react';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
 import { normalizeHexColor } from '@/lib/utils';
 
 interface FriendCardProps {
@@ -30,6 +31,9 @@ const DEFAULT_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
 
 export default function FriendCard({ friend, index }: FriendCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
+  const avatarRef = useRef<HTMLImageElement>(null);
+  const reduceMotion = usePrefersReducedMotion();
+  const [failedAvatar, setFailedAvatar] = useState<string | null>(null);
 
   // Motion values for magnetic hover
   const x = useMotionValue(0);
@@ -50,7 +54,7 @@ export default function FriendCard({ friend, index }: FriendCardProps) {
   )`;
 
   const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!cardRef.current) return;
+    if (reduceMotion || !cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -70,6 +74,10 @@ export default function FriendCard({ friend, index }: FriendCardProps) {
 
   const cardColor = normalizeHexColor(friend.color || DEFAULT_COLOR);
   const avatarImage = friend.image || DEFAULT_AVATAR;
+  useEffect(() => {
+    const avatar = avatarRef.current;
+    if (avatar?.complete && avatar.naturalWidth === 0) setFailedAvatar(avatarImage);
+  }, [avatarImage]);
 
   return (
     <LazyMotionProvider>
@@ -91,8 +99,8 @@ export default function FriendCard({ friend, index }: FriendCardProps) {
           className="relative h-full w-full rounded-2xl bg-white p-3 shadow-xl ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10"
           style={{
             transformStyle: 'preserve-3d',
-            rotateX,
-            rotateY,
+            rotateX: reduceMotion ? 0 : rotateX,
+            rotateY: reduceMotion ? 0 : rotateY,
           }}
         >
           {/* Inner Card Container */}
@@ -107,10 +115,16 @@ export default function FriendCard({ friend, index }: FriendCardProps) {
             <div className="absolute top-8 left-1/2 -translate-x-1/2">
               <div className="relative h-14 w-14 overflow-hidden rounded-full border-4 border-white bg-white shadow-lg dark:border-gray-800 dark:bg-gray-800">
                 <img
-                  src={avatarImage}
+                  ref={avatarRef}
+                  src={failedAvatar === avatarImage ? DEFAULT_AVATAR : avatarImage}
                   alt={friend.owner}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className={
+                    reduceMotion
+                      ? 'h-full w-full object-cover'
+                      : 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
+                  }
                   loading="lazy"
+                  onError={() => setFailedAvatar(avatarImage)}
                 />
               </div>
             </div>
