@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { cn } from '@lib/utils';
-import { useEffect, useEffectEvent, useRef } from 'react';
+import { useEffect, useEffectEvent, useId, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -40,6 +40,7 @@ function round(value: number): number {
 
 export function NumberField({ label, value, step, unit, emptyValue, onApply }: NumberFieldProps) {
   const { t } = useTranslation();
+  const errorId = useId();
   const allowsEmpty = emptyValue !== undefined;
   const {
     register,
@@ -104,45 +105,51 @@ export function NumberField({ label, value, step, unit, emptyValue, onApply }: N
   const invalid = Boolean(errors.value) || (inputValue === null && !allowsEmpty);
 
   return (
-    <div className="flex items-center gap-1" title={invalid ? t('settings.invalidNumber') : undefined}>
-      <button
-        type="button"
-        className="size-7 flex-center rounded-md text-muted-foreground transition-[background-color,color,transform] hover:bg-accent hover:text-foreground active:scale-[0.96]"
-        onClick={() => stepBy(-1)}
-        aria-label={`${label} -${step}`}
-      >
-        <Icon icon="ri:subtract-line" className="h-4 w-4" />
-      </button>
-      <div className="relative">
-        <input
-          type="number"
-          step={step}
-          placeholder={emptyValue?.label}
-          aria-label={label}
-          aria-invalid={invalid || undefined}
-          className={cn(
-            'w-20 rounded-md border border-input bg-background px-2 py-1 text-center text-sm tabular-nums outline-hidden transition-colors',
-            'focus-visible:ring-2 focus-visible:ring-ring',
-            invalid && 'border-destructive text-destructive focus-visible:ring-destructive',
+    <div className="flex flex-col items-start" title={invalid ? t('settings.invalidNumber') : undefined}>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          className="size-7 flex-center rounded-md text-muted-foreground transition-[background-color,color,transform] hover:bg-accent hover:text-foreground active:scale-[0.96]"
+          onClick={() => stepBy(-1)}
+          aria-label={`${label} -${step}`}
+        >
+          <Icon icon="ri:subtract-line" className="h-4 w-4" />
+        </button>
+        <div className="relative">
+          <input
+            type="number"
+            step={step}
+            placeholder={emptyValue?.label}
+            aria-label={label}
+            aria-invalid={invalid || undefined}
+            aria-describedby={invalid ? errorId : undefined}
+            className={cn(
+              'w-20 rounded-md border border-input bg-background px-2 py-1 text-center text-sm tabular-nums outline-hidden transition-colors',
+              'focus-visible:ring-2 focus-visible:ring-ring',
+              invalid && 'border-destructive text-destructive focus-visible:ring-destructive',
+            )}
+            {...register('value', {
+              setValueAs: (rawValue) => (rawValue === '' || rawValue === null ? null : Number(rawValue)),
+            })}
+          />
+          {unit && inputValue !== null && (
+            <span className="pointer-events-none absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground text-xs">
+              {unit}
+            </span>
           )}
-          {...register('value', {
-            setValueAs: (rawValue) => (rawValue === '' || rawValue === null ? null : Number(rawValue)),
-          })}
-        />
-        {unit && inputValue !== null && (
-          <span className="pointer-events-none absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground text-xs">
-            {unit}
-          </span>
-        )}
+        </div>
+        <button
+          type="button"
+          className="size-7 flex-center rounded-md text-muted-foreground transition-[background-color,color,transform] hover:bg-accent hover:text-foreground active:scale-[0.96]"
+          onClick={() => stepBy(1)}
+          aria-label={`${label} +${step}`}
+        >
+          <Icon icon="ri:add-line" className="h-4 w-4" />
+        </button>
       </div>
-      <button
-        type="button"
-        className="size-7 flex-center rounded-md text-muted-foreground transition-[background-color,color,transform] hover:bg-accent hover:text-foreground active:scale-[0.96]"
-        onClick={() => stepBy(1)}
-        aria-label={`${label} +${step}`}
-      >
-        <Icon icon="ri:add-line" className="h-4 w-4" />
-      </button>
+      <span id={errorId} aria-live="polite" aria-atomic="true" className="pl-8 text-destructive text-xs">
+        {invalid ? t('settings.invalidNumber') : ''}
+      </span>
     </div>
   );
 }
