@@ -38,9 +38,13 @@ export const VideoPlaylist = memo(function VideoPlaylist({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>, index: number) => {
     if (index === currentIndex) {
+      // Keyboard activation synthesizes a click at clientX=0; it must not seek.
+      if (e.detail === 0) return;
       const rect = e.currentTarget.getBoundingClientRect();
+      const duration = timeStore.getDuration();
+      if (!Number.isFinite(duration) || duration <= 0 || rect.width <= 0) return;
       const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      onSeek(ratio * timeStore.getDuration());
+      onSeek(Math.max(0, Math.min(duration, ratio * duration)));
     } else {
       onTrackSelect(index);
     }

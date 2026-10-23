@@ -56,10 +56,14 @@ export const PlayerPlaylist = memo(function PlayerPlaylist({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>, globalIdx: number) => {
     if (globalIdx === currentIndex) {
+      // Keyboard activation synthesizes a click at clientX=0; it must not seek.
+      if (e.detail === 0) return;
       // Click on current track → seek by position percentage
       const rect = e.currentTarget.getBoundingClientRect();
+      const duration = timeStore.getDuration();
+      if (!Number.isFinite(duration) || duration <= 0 || rect.width <= 0) return;
       const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      onSeek(ratio * timeStore.getDuration());
+      onSeek(Math.max(0, Math.min(duration, ratio * duration)));
     } else {
       onTrackSelect(globalIdx);
     }

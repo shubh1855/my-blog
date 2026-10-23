@@ -79,8 +79,10 @@ export const MediaControls = memo(function MediaControls({
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const duration = timeStore.getDuration();
+    if (!Number.isFinite(duration) || duration <= 0 || rect.width <= 0) return;
     const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    onSeek(ratio * timeStore.getDuration());
+    onSeek(Math.max(0, Math.min(duration, ratio * duration)));
   };
 
   const cycleMode = () => {
@@ -163,10 +165,16 @@ export const MediaControls = memo(function MediaControls({
         aria-label={t('media.progress')}
         onClick={handleProgressClick}
         onKeyDown={(e) => {
-          const ct = timeStore.getCurrentTime();
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'Home' && e.key !== 'End') return;
+          e.preventDefault();
           const dur = timeStore.getDuration();
-          if (e.key === 'ArrowRight') onSeek(Math.min(dur, ct + 5));
-          else if (e.key === 'ArrowLeft') onSeek(Math.max(0, ct - 5));
+          if (!Number.isFinite(dur) || dur <= 0) return;
+          const currentTime = timeStore.getCurrentTime();
+          const current = Number.isFinite(currentTime) ? Math.max(0, Math.min(dur, currentTime)) : 0;
+          if (e.key === 'ArrowRight') onSeek(Math.min(dur, current + 5));
+          else if (e.key === 'ArrowLeft') onSeek(Math.max(0, current - 5));
+          else if (e.key === 'Home') onSeek(0);
+          else onSeek(dur);
         }}
       >
         <div ref={progressBarRef} className="audio-player-progress-bar" style={{ width: '0%' }} />
