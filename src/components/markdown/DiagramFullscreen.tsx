@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 
 export default function DiagramFullscreen() {
   const data = useStore($diagramFullscreenData);
+  const { t } = useTranslation();
   const isOpen = data !== null;
   const { containerRef, state, reset, zoomLevel } = useZoomPan(isOpen);
 
@@ -30,7 +31,7 @@ export default function DiagramFullscreen() {
   if (!data) return null;
 
   return (
-    <ModalLayer open onClose={closeModal}>
+    <ModalLayer open onClose={closeModal} ariaLabel={`${data.diagramType} ${t('diagram.fullscreen')}`}>
       <DiagramToolbar data={data} zoomLevel={zoomLevel} onReset={reset} />
       <div
         ref={containerRef}

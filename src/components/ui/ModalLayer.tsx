@@ -27,6 +27,8 @@ export interface ModalLayerProps {
   /** Extra classes for the floating element (the card in `panel`, the viewport layer in `fill`). */
   className?: string;
   backdropClassName?: string;
+  /** Accessible name for the dialog. */
+  ariaLabel?: string;
   /** Forwarded to Floating UI's `useDismiss`; return `false` to keep the modal open for that press. */
   outsidePress?: (event: MouseEvent) => boolean;
   children: ReactNode;
@@ -38,6 +40,7 @@ export function ModalLayer({
   variant = 'panel',
   className,
   backdropClassName,
+  ariaLabel,
   outsidePress,
   children,
 }: ModalLayerProps) {
@@ -82,6 +85,8 @@ export function ModalLayer({
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
                       {...getFloatingProps()}
+                      role="dialog"
+                      aria-label={ariaLabel}
                     >
                       {children}
                     </m.div>
@@ -91,6 +96,8 @@ export function ModalLayer({
                     ref={refs.setFloating}
                     className={cn('fixed inset-0 flex items-center justify-center', className)}
                     {...getFloatingProps()}
+                    role="dialog"
+                    aria-label={ariaLabel}
                   >
                     {children}
                   </div>
