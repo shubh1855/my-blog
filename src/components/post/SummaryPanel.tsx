@@ -1,16 +1,15 @@
 /**
  * Summary Panel Component
  *
- * 显示文章摘要面板，支持打字机动画展示
+ * 显示文章摘要面板，展开后立即显示完整文本
  * 可展示手写描述、AI 生成摘要或自动提取的内容
  * 支持 prefers-reduced-motion 可访问性
  */
 
 import { ErrorBoundary, InlineErrorFallback } from '@components/common';
-import { usePrefersReducedMotion } from '@hooks/index';
 import { useTranslation } from '@hooks/useTranslation';
 import { cn } from '@lib/utils';
-import { memo, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, type ReactNode, type RefObject, useCallback, useRef, useState } from 'react';
 import { RiBook2Fill } from 'react-icons/ri';
 import type { TranslationKey } from '@/i18n/types';
 import { MingcuteAiFillSvg } from '../svg/MingcuteAiFillSvg.tsx';
@@ -18,17 +17,7 @@ import { MingcuteAiFillSvg } from '../svg/MingcuteAiFillSvg.tsx';
 export type SummarySource = 'description' | 'ai' | 'auto';
 
 const SummaryPanelContent = memo(
-  ({
-    isExpanded,
-    summary,
-    isTyping,
-    textRef,
-  }: {
-    isExpanded: boolean;
-    summary: string;
-    isTyping: boolean;
-    textRef: RefObject<HTMLSpanElement | null>;
-  }) => {
+  ({ isExpanded, summary, textRef }: { isExpanded: boolean; summary: string; textRef: RefObject<HTMLSpanElement | null> }) => {
     return (
       <div
         id="summary-panel-content"
@@ -44,8 +33,7 @@ const SummaryPanelContent = memo(
 
             {/* 视觉展示 - 通过 ref 直接更新 DOM，避免频繁重渲染 */}
             <p aria-hidden="true">
-              <span ref={textRef} />
-              {isTyping && <span className="typewriter-cursor" />}
+              <span ref={textRef}>{summary}</span>
             </p>
           </div>
         </div>
@@ -59,7 +47,7 @@ export interface SummaryPanelProps {
   summary: string;
   /** 摘要来源类型 */
   source?: SummarySource;
-  /** 打字机每个字符的间隔时间（毫秒），默认 25 */
+  /** @deprecated Summaries now display immediately. Kept for caller compatibility. */
   typingSpeed?: number;
   /** 自定义类名 */
   className?: string;
@@ -87,12 +75,8 @@ const SOURCE_LABEL_KEYS: Record<SummarySource, TranslationKey> = {
   auto: 'summary.auto',
 };
 
-function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: SummaryPanelProps) {
+function SummaryPanel({ summary, source = 'ai', className }: SummaryPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const hasAnimatedRef = useRef(false);
-  const animationRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(0);
   const textRef = useRef<HTMLSpanElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -100,71 +84,17 @@ function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: S
   const icon = SOURCE_ICONS[source];
   const label = t(SOURCE_LABEL_KEYS[source]);
 
-  // 检测用户是否偏好减少动画 (响应式，用户切换系统偏好后会自动更新)
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  // 清理动画
-  const clearAnimation = useCallback(() => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-  }, []);
-
-  // 使用 requestAnimationFrame 的打字机效果 - 直接操作 DOM
-  const startTyping = useCallback(() => {
-    if (!textRef.current) return;
-
-    // 如果用户偏好减少动画，或已经播放过动画，直接显示全部
-    if (prefersReducedMotion || hasAnimatedRef.current) {
-      textRef.current.textContent = summary;
-      setIsTyping(false);
-      hasAnimatedRef.current = true;
-      return;
-    }
-
-    setIsTyping(true);
-    textRef.current.textContent = '';
-    startTimeRef.current = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTimeRef.current;
-      const charIndex = Math.floor(elapsed / typingSpeed);
-
-      if (charIndex < summary.length && textRef.current) {
-        textRef.current.textContent = summary.slice(0, charIndex + 1);
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        if (textRef.current) {
-          textRef.current.textContent = summary;
-        }
-        setIsTyping(false);
-        hasAnimatedRef.current = true;
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-  }, [summary, typingSpeed, prefersReducedMotion]);
-
   // 展开/收起
   const handleToggle = useCallback(() => {
     if (isExpanded) {
       if (textRef.current?.closest('#summary-panel-content')?.contains(document.activeElement)) {
         triggerRef.current?.focus();
       }
-      clearAnimation();
       setIsExpanded(false);
-      setIsTyping(false);
     } else {
       setIsExpanded(true);
-      startTyping();
     }
-  }, [isExpanded, clearAnimation, startTyping]);
-
-  // 组件卸载时清理
-  useEffect(() => {
-    return () => clearAnimation();
-  }, [clearAnimation]);
+  }, [isExpanded]);
 
   return (
     <ErrorBoundary FallbackComponent={InlineErrorFallback}>
@@ -199,7 +129,7 @@ function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: S
             <path d="M12 16L6 10H18L12 16Z" />
           </svg>
         </button>
-        <SummaryPanelContent isExpanded={isExpanded} summary={summary} isTyping={isTyping} textRef={textRef} />
+        <SummaryPanelContent isExpanded={isExpanded} summary={summary} textRef={textRef} />
       </div>
     </ErrorBoundary>
   );
