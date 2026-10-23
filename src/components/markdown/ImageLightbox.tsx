@@ -16,12 +16,33 @@ import { $imageLightboxData, closeModal, type ImageLightboxData, navigateImage, 
 import { m } from 'motion/react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+type ImageStatus = { requestKey: string; phase: 'loading' | 'loaded' | 'error' };
+
+function isSafeImageSourceLink(src: string): boolean {
+  if (
+    !src ||
+    src !== src.trim() ||
+    Array.from(src).some((char) => char.charCodeAt(0) < 32 || char === '\\') ||
+    src.startsWith('//')
+  )
+    return false;
+  if (/^https?:\/\//i.test(src)) return true;
+  if (/^[a-z][a-z\d+.-]*:/i.test(src)) return false;
+  return true;
+}
+
 export default function ImageLightbox() {
   const { t } = useTranslation();
   const data = useStore($imageLightboxData);
   const isOpen = data !== null;
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [imageStatus, setImageStatus] = useState<ImageStatus | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const statusPanelRef = useRef<HTMLDivElement>(null);
   const [rotation, setRotation] = useState(0);
+  const requestKey = data ? `${data.src}\u0000${retryCount}` : '';
+  const activeRequestRef = useRef(requestKey);
+  const currentImageStatus = imageStatus?.requestKey === requestKey ? imageStatus.phase : 'loading';
 
   const { containerRef, state, reset, zoomTo, zoomLevel } = useZoomPan(isOpen);
 
@@ -46,7 +67,7 @@ export default function ImageLightbox() {
       if (!navigateImage(dir)) return;
       reset();
       setRotation(0);
-      setImageLoaded(false);
+      setRetryCount(0);
     },
     [reset],
   );
@@ -80,7 +101,7 @@ export default function ImageLightbox() {
     if (scaleRef.current > 1.05) return false;
     // Don't close when clicking interactive elements or the image itself
     const target = event.target as HTMLElement;
-    if (target.closest('button, img, [role="img"]')) return false;
+    if (target.closest('button, a, img, [data-image-status]')) return false;
     return true;
   }, []);
 
@@ -99,9 +120,45 @@ export default function ImageLightbox() {
     if (isOpen) {
       reset();
       setRotation(0);
-      setImageLoaded(false);
+      setRetryCount(0);
     }
   }, [isOpen, reset]);
+
+  // Reset load state for each source/retry and account for images already in cache.
+  useLayoutEffect(() => {
+    if (!data) return;
+    const key = `${data.src}\u0000${retryCount}`;
+    activeRequestRef.current = key;
+    setImageStatus({ requestKey: key, phase: 'loading' });
+    const image = imageRef.current;
+    if (image?.complete && image.currentSrc && activeRequestRef.current === key) {
+      setImageStatus({ requestKey: key, phase: image.naturalWidth > 0 ? 'loaded' : 'error' });
+    }
+  }, [data, retryCount]);
+
+  useEffect(() => {
+    const panel = statusPanelRef.current;
+    if (!panel || currentImageStatus === 'loaded') return;
+    const stopPan = (event: Event) => event.stopPropagation();
+    panel.addEventListener('mousedown', stopPan, true);
+    panel.addEventListener('touchstart', stopPan, true);
+    panel.addEventListener('wheel', stopPan, true);
+    panel.addEventListener('dblclick', stopPan, true);
+    return () => {
+      panel.removeEventListener('mousedown', stopPan, true);
+      panel.removeEventListener('touchstart', stopPan, true);
+      panel.removeEventListener('wheel', stopPan, true);
+      panel.removeEventListener('dblclick', stopPan, true);
+    };
+  }, [currentImageStatus]);
+
+  const markImageLoaded = useCallback((key: string) => {
+    if (activeRequestRef.current === key) setImageStatus({ requestKey: key, phase: 'loaded' });
+  }, []);
+
+  const markImageFailed = useCallback((key: string) => {
+    if (activeRequestRef.current === key) setImageStatus({ requestKey: key, phase: 'error' });
+  }, []);
 
   // useZoomPan only intercepts wheel on the zoom viewport; this also covers the overlaid
   // toolbar/nav so a wheel (or ctrl+wheel zoom) there can't move the page behind the lightbox.
@@ -125,7 +182,14 @@ export default function ImageLightbox() {
   if (!data) return null;
 
   return (
-    <ModalLayer open onClose={closeModal} variant="fill" backdropClassName="bg-black/90" outsidePress={outsidePress}>
+    <ModalLayer
+      open
+      onClose={closeModal}
+      variant="fill"
+      ariaLabel={t('image.viewer')}
+      backdropClassName="bg-black/90"
+      outsidePress={outsidePress}
+    >
       {/* Toolbar: vertical right on desktop, horizontal top on tablet */}
       <m.div
         className="absolute tablet:top-4 top-1/2 right-4 tablet:right-auto tablet:left-1/2 z-10 flex tablet:-translate-x-1/2 -translate-y-1/2 tablet:translate-y-0 tablet:flex-row flex-col items-center gap-1 rounded-2xl bg-black/50 p-1.5 backdrop-blur-sm"
@@ -156,24 +220,22 @@ export default function ImageLightbox() {
       </m.div>
 
       {/* Image viewport with zoom/pan */}
-      <div
-        ref={containerRef}
-        role="img"
-        className="flex h-full w-full touch-none select-none items-center justify-center p-4"
-        onDoubleClick={handleDoubleClick}
-      >
+      <div ref={containerRef} className="flex h-full w-full touch-none select-none items-center justify-center p-4">
         <m.div
-          className="flex items-center justify-center"
+          className="relative flex items-center justify-center"
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
           <m.img
+            key={requestKey}
+            ref={imageRef}
+            onDoubleClick={handleDoubleClick}
             src={data.src}
             alt={data.alt}
             className="max-h-[80vh] max-w-[90vw] origin-center rounded-lg object-contain shadow-2xl will-change-transform"
-            animate={{ scale: state.scale, rotate: rotation, opacity: imageLoaded ? 1 : 0 }}
+            animate={{ scale: state.scale, rotate: rotation, opacity: currentImageStatus === 'loaded' ? 1 : 0 }}
             transition={{
               scale: { type: 'tween', duration: 0.15, ease: 'easeOut' },
               rotate: { type: 'spring', stiffness: 300, damping: 25 },
@@ -184,9 +246,46 @@ export default function ImageLightbox() {
               y: state.translateY,
               cursor: state.scale > 1.05 ? 'grab' : 'zoom-in',
             }}
-            onLoad={() => setImageLoaded(true)}
+            onLoad={() => markImageLoaded(requestKey)}
+            onError={() => markImageFailed(requestKey)}
             draggable={false}
           />
+          {currentImageStatus !== 'loaded' && (
+            <div
+              ref={statusPanelRef}
+              data-image-status
+              className="absolute top-1/2 left-1/2 flex w-72 max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+            >
+              {currentImageStatus === 'loading' ? (
+                <output className="rounded-full bg-black/50 px-4 py-2 text-sm text-white/80 backdrop-blur-sm">
+                  {t('image.loading')}
+                </output>
+              ) : (
+                <div className="flex max-w-sm flex-col items-center gap-3 rounded-xl bg-black/70 p-5 text-center text-white/85 backdrop-blur-sm">
+                  <p role="alert" className="text-sm">
+                    {t('image.loadFailed')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setRetryCount((count) => count + 1)}
+                    className="rounded-full bg-white/15 px-4 py-2 text-sm transition-colors hover:bg-white/25"
+                  >
+                    {t('image.retry')}
+                  </button>
+                  {isSafeImageSourceLink(data.src) && (
+                    <a
+                      href={data.src}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-white/70 underline underline-offset-4 hover:text-white"
+                    >
+                      {t('image.openOriginal')}
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </m.div>
       </div>
 
