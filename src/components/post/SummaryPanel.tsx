@@ -34,6 +34,8 @@ const SummaryPanelContent = memo(
         id="summary-panel-content"
         className="grid transition-[grid-template-rows] duration-300 ease-out"
         style={{ gridTemplateRows: isExpanded ? '1fr' : '0fr' }}
+        inert={!isExpanded}
+        aria-hidden={!isExpanded}
       >
         <div className="overflow-hidden">
           <div className="rounded-b-lg bg-foreground/5 px-4 py-4 text-muted-foreground text-sm leading-relaxed">
@@ -92,6 +94,7 @@ function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: S
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const textRef = useRef<HTMLSpanElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const { t } = useTranslation();
   const icon = SOURCE_ICONS[source];
@@ -146,6 +149,9 @@ function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: S
   // 展开/收起
   const handleToggle = useCallback(() => {
     if (isExpanded) {
+      if (textRef.current?.closest('#summary-panel-content')?.contains(document.activeElement)) {
+        triggerRef.current?.focus();
+      }
       clearAnimation();
       setIsExpanded(false);
       setIsTyping(false);
@@ -165,6 +171,7 @@ function SummaryPanel({ summary, source = 'ai', typingSpeed = 25, className }: S
       <div className={cn('overflow-hidden rounded-lg', className)}>
         {/* 触发按钮 */}
         <button
+          ref={triggerRef}
           type="button"
           onClick={handleToggle}
           className={cn(
