@@ -31,7 +31,7 @@ const { className, direction = 'horizontal', duration = 600, delay = 100, disabl
     <div class="flip-card-front">
       <slot name="front" />
     </div>
-    <div class="flip-card-back">
+    <div class="flip-card-back" inert aria-hidden="true">
       <slot name="back" />
     </div>
   </div>
@@ -58,13 +58,13 @@ const { className, direction = 'horizontal', duration = 600, delay = 100, disabl
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 600ms;
+    transition: transform calc(var(--duration) * 1ms);
     transform-style: preserve-3d;
     will-change: transform;
     pointer-events: none;
   }
 
-  .flip-card:not(.flip-card-disabled):hover .flip-card-inner {
+  .flip-card:not(.flip-card-disabled)[data-revealed] .flip-card-inner {
     transform: rotateY(-180deg);
     transition-delay: calc(var(--delay) * 1ms);
   }
@@ -108,4 +108,63 @@ const { className, direction = 'horizontal', duration = 600, delay = 100, disabl
   .flip-card:not(.flip-card-disabled):hover .flip-card-back {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flip-card-inner,
+    .flip-card-front,
+    .flip-card-back {
+      transition: none;
+    }
+    .flip-card[data-revealed] .flip-card-inner {
+      transition-delay: 0ms;
+    }
+  }
 </style>
+
+<script>
+  function initFlipCards() {
+    document.querySelectorAll<HTMLElement>('.flip-card:not(.flip-card-disabled)').forEach((card) => {
+      if (card.dataset.initialized) return;
+      const front = card.querySelector<HTMLElement>('.flip-card-front');
+      const back = card.querySelector<HTMLElement>('.flip-card-back');
+      if (!front || !back) return;
+      card.dataset.initialized = 'true';
+      let hovered = false;
+
+      const update = () => {
+        // Never turn a focused link onto an invisible face.
+        const frontFocused = front.contains(document.activeElement);
+        const revealed = !frontFocused && (hovered || back.contains(document.activeElement));
+        card.toggleAttribute('data-revealed', revealed);
+        front.inert = revealed;
+        front.setAttribute('aria-hidden', String(revealed));
+        back.inert = !revealed;
+        back.setAttribute('aria-hidden', String(!revealed));
+      };
+
+      card.addEventListener('pointerenter', (event) => {
+        if (event.pointerType !== 'mouse') return;
+        hovered = true;
+        update();
+      });
+      card.addEventListener('pointerleave', () => {
+        hovered = false;
+        update();
+      });
+      card.addEventListener('focusin', update);
+      card.addEventListener('focusout', () => queueMicrotask(update));
+      card.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !card.hasAttribute('data-revealed')) return;
+        event.preventDefault();
+        hovered = false;
+        front.inert = false;
+        front.setAttribute('aria-hidden', 'false');
+        front.querySelector<HTMLElement>('a[href]')?.focus();
+        update();
+      });
+    });
+  }
+
+  initFlipCards();
+  document.addEventListener('astro:page-load', initFlipCards);
+</script>

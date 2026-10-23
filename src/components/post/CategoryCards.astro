@@ -1,6 +1,6 @@
 ---
 import { Badge } from '@components/ui/badge';
-import { Button } from '@components/ui/button';
+import { buttonVariants } from '@components/ui/button';
 import { categoryMap } from '@constants/category';
 import { Routes } from '@constants/router';
 import { siteConfig } from '@constants/site-config';
@@ -63,7 +63,7 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
       const displayName = translateCategoryName(category?.label ?? categoryInfo?.name ?? '', locale);
       return (
         <FlippedCard>
-          <div slot="front" class="flex-center relative h-full rounded-md px-2 py-4">
+          <a slot="front" href={categoryLink} aria-label={t(locale, 'category.postsInCategory', { name: displayName })} class="flex-center relative h-full rounded-md px-2 py-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
             <img
               style={getLqipStyle(category.image)}
               src={category.image}
@@ -88,7 +88,7 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                 {translateCategoryName(parentCategory.name, locale)}
               </Badge>
             ) : null}
-          </div>
+          </a>
           <div slot="back" class="bg-card relative h-full flex-col rounded-md px-6 pt-16 pb-4">
             <div
               class={cn(
@@ -139,14 +139,10 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                 {t(locale, 'category.postCount', { count: category.posts?.length ?? 0 })}
               </Fragment>
             </p>
-            <a href={categoryLink} aria-label="more info" class="absolute right-0 bottom-0">
-              <Button
-                className={cn(
+            <a href={categoryLink} aria-label={t(locale, 'category.postsInCategory', { name: displayName })} class={cn('absolute right-0 bottom-0', buttonVariants(),
                   'bg-gradient-shoka-button rounded-2xl rounded-se-none rounded-es-none transition-all hover:translate-x-1 hover:translate-y-1 hover:scale-105 md:h-7 md:px-2 md:py-1 md:text-xs',
-                )}
-              >
+                )}>
                 more...
-              </Button>
             </a>
           </div>
         </FlippedCard>
