@@ -118,7 +118,7 @@ export function CategoryMappingDialog({ open, onOpenChange, newCategories, onCon
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm">/category/</span>
+                  <span className="text-muted-foreground text-sm">/categories/</span>
                   <input
                     id={`slug-${name}`}
                     type="text"

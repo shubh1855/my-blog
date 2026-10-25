@@ -6,7 +6,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -73,6 +73,7 @@ function CustomCategoryChip({
 
 export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuccess }: CreatePostDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const selectedCategorySet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
   const [newCategoryInput, setNewCategoryInput] = useState('');
@@ -101,13 +102,18 @@ export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuc
     },
   });
 
-  const handleClose = useCallback(() => {
+  const resetAndClose = useCallback(() => {
     reset();
     setSelectedCategories([]);
     setNewCategoryInput('');
     resetCustomCategories();
     onOpenChange(false);
   }, [reset, resetCustomCategories, onOpenChange]);
+
+  const handleClose = useCallback(() => {
+    if (isSubmittingRef.current) return;
+    resetAndClose();
+  }, [resetAndClose]);
 
   const toggleCategory = useCallback((category: string) => {
     setSelectedCategories((prev) => (prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]));
@@ -132,6 +138,7 @@ export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuc
   );
 
   const onSubmit = async (data: CreatePostFormData) => {
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
     try {
       // Parse tags from comma-separated string
@@ -163,19 +170,20 @@ export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuc
       }
 
       const result = await response.json();
-      handleClose();
+      resetAndClose();
       onSuccess(result.postId);
     } catch (error) {
       console.error('Failed to create post:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to create post');
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && handleClose()}>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
           <DialogDescription>Fill in the details below to create a new blog post.</DialogDescription>
@@ -238,8 +246,8 @@ export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuc
             )}
 
             {/* Existing categories */}
-            <div className="flex flex-wrap gap-2">
-              {existingCategories.slice(0, 12).map((cat) => (
+            <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto">
+              {existingCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -271,6 +279,7 @@ export function CreatePostDialog({ open, onOpenChange, existingCategories, onSuc
               />
               <Button type="button" variant="outline" size="sm" onClick={handleAddCustomCategory}>
                 <Icon icon="ri:add-line" className="size-4" />
+                <span className="sr-only">Add custom category</span>
               </Button>
             </div>
           </div>

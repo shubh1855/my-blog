@@ -4,7 +4,7 @@
  * Manages the main dashboard state including posts data, filters, sorting, and actions.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { getCMSConfig, listPosts, toggleDraft, toggleSticky } from '@/lib/api';
 import { buildEditorUrl, buildFilePath, getDefaultEditor } from '@/lib/editor-url';
@@ -71,6 +71,7 @@ export function useDashboardState(): UseDashboardStateResult {
   const [status, setStatus] = useState<StatusFilter>('all');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const requestId = useRef(0);
 
   const params = useMemo(
     () => ({
@@ -84,15 +85,16 @@ export function useDashboardState(): UseDashboardStateResult {
   );
 
   const fetchData = useCallback(async () => {
+    const currentRequest = ++requestId.current;
     setIsLoading(true);
     setError(null);
     try {
       const result = await listPosts(params);
-      setData(result);
+      if (currentRequest === requestId.current) setData(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load posts');
+      if (currentRequest === requestId.current) setError(err instanceof Error ? err.message : 'Failed to load posts');
     } finally {
-      setIsLoading(false);
+      if (currentRequest === requestId.current) setIsLoading(false);
     }
   }, [params]);
 

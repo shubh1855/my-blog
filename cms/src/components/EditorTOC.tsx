@@ -49,14 +49,14 @@ export function EditorTOC({ headings, onNavigate }: EditorTOCProps) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
         <Icon icon="ri:list-unordered" className="size-8 opacity-50" />
-        <p className="text-sm">暂无标题</p>
-        <p className="text-center text-xs">添加 Heading 块来生成目录</p>
+        <p className="text-sm">No headings yet</p>
+        <p className="text-center text-xs">Add a heading block to build the outline.</p>
       </div>
     );
   }
 
   return (
-    <nav className="space-y-0.5" aria-label="文章目录">
+    <nav className="space-y-0.5" aria-label="Post outline">
       {headings.map((heading) => (
         <button
           key={heading.id}

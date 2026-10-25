@@ -6,8 +6,13 @@ const SIDEBAR_DEFAULT_WIDTH = 320;
 export const SIDEBAR_MAX_WIDTH = 640;
 const SIDEBAR_KEYBOARD_STEP = 16;
 
+export function getSidebarMaxWidth(): number {
+  // Preserve at least 320px for the editor canvas, including the resize handle.
+  return Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, window.innerWidth - 324));
+}
+
 function clampSidebarWidth(width: number): number {
-  return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
+  return Math.min(getSidebarMaxWidth(), Math.max(SIDEBAR_MIN_WIDTH, width));
 }
 
 export function useSidebarResize() {
@@ -19,25 +24,34 @@ export function useSidebarResize() {
   const [isResizing, setIsResizing] = useState(false);
 
   useEffect(() => {
+    const clampToViewport = () => setSidebarWidth((width) => clampSidebarWidth(width));
+    window.addEventListener('resize', clampToViewport);
+    clampToViewport();
+    return () => window.removeEventListener('resize', clampToViewport);
+  }, []);
+
+  useEffect(() => {
     if (!isResizing) return;
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handlePointerMove = (event: PointerEvent) => {
       setSidebarWidth(clampSidebarWidth(window.innerWidth - event.clientX));
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsResizing(false);
       localStorage.setItem(SIDEBAR_WIDTH_KEY, String(sidebarWidth));
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('pointerup', handlePointerUp);
+    document.addEventListener('pointercancel', handlePointerUp);
     document.body.style.userSelect = 'none';
     document.body.style.cursor = 'col-resize';
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
+      document.removeEventListener('pointercancel', handlePointerUp);
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
     };
@@ -50,7 +64,7 @@ export function useSidebarResize() {
       if (event.key === 'ArrowLeft') nextWidth = sidebarWidth + SIDEBAR_KEYBOARD_STEP;
       if (event.key === 'ArrowRight') nextWidth = sidebarWidth - SIDEBAR_KEYBOARD_STEP;
       if (event.key === 'Home') nextWidth = SIDEBAR_MIN_WIDTH;
-      if (event.key === 'End') nextWidth = SIDEBAR_MAX_WIDTH;
+      if (event.key === 'End') nextWidth = getSidebarMaxWidth();
       if (nextWidth === null) return;
 
       event.preventDefault();

@@ -51,9 +51,14 @@ function AppContent() {
     handleEditorSaved,
   } = useDashboardState();
 
-  // Show editor if editing
+  // Keep the toast renderer mounted while the editor is open so save feedback remains visible.
   if (editingPostId) {
-    return <PostEditor postId={editingPostId} onClose={handleEditorClose} onSaved={handleEditorSaved} />;
+    return (
+      <>
+        <Toaster position="top-right" richColors />
+        <PostEditor postId={editingPostId} onClose={handleEditorClose} onSaved={handleEditorSaved} />
+      </>
+    );
   }
 
   return (
@@ -111,11 +116,11 @@ function AppContent() {
         {/* Content */}
         <main className="flex-1 bg-background">
           <div className="mx-auto max-w-7xl p-6">
-            {isLoading ? (
+            {isLoading && !data ? (
               <div className="flex h-64 items-center justify-center">
                 <Icon icon="ri:loader-4-line" className="size-8 animate-spin text-muted-foreground" />
               </div>
-            ) : error ? (
+            ) : error && !data ? (
               <div className="flex h-64 flex-col items-center justify-center gap-4">
                 <Icon icon="ri:error-warning-line" className="size-12 text-destructive" />
                 <p className="text-destructive">{error}</p>
@@ -204,8 +209,10 @@ function AppContent() {
                     </div>
 
                     {/* Results Count */}
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground text-sm" aria-live="polite">
                       Showing {data.posts.length} of {data.stats.total} posts
+                      {isLoading && <span className="ml-2">Updating results…</span>}
+                      {error && <span className="ml-2 text-destructive">{error}</span>}
                     </p>
 
                     {/* Table */}

@@ -7,8 +7,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
-import { format, isValid, parse } from 'date-fns';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { format, isValid, parse, parseISO } from 'date-fns';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type FrontmatterFormData, frontmatterSchema } from '@/lib/schemas';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import type { BlogSchema } from '@/types';
 export interface FrontmatterEditorRef {
   getFormData: () => FrontmatterFormData;
   isDirty: () => boolean;
+  validate: () => Promise<boolean>;
 }
 
 interface FrontmatterEditorProps {
@@ -94,43 +95,44 @@ function stringToTags(str: string): string[] | undefined {
 /**
  * Converts form data back to BlogSchema format
  */
-function formDataToFrontmatter(data: FrontmatterFormData): BlogSchema {
-  const result: BlogSchema = {
-    title: data.title,
-    draft: data.draft,
-    sticky: data.sticky,
-    tocNumbering: data.tocNumbering,
-    excludeFromSummary: data.excludeFromSummary,
-    math: data.math,
-    quiz: data.quiz,
+function formDataToFrontmatter(data: FrontmatterFormData, original: BlogSchema, dirty: Record<string, boolean>): BlogSchema {
+  const result: BlogSchema = { ...original };
+  const set = (formKey: keyof FrontmatterFormData, key: keyof BlogSchema, value: unknown) => {
+    if (!dirty[formKey]) return;
+    if (value === undefined || value === '') delete result[key];
+    else (result as unknown as Record<string, unknown>)[key] = value;
   };
 
+  set('title', 'title', data.title);
+  set('draft', 'draft', data.draft);
+  set('sticky', 'sticky', data.sticky);
+  set('tocNumbering', 'tocNumbering', data.tocNumbering);
+  set('excludeFromSummary', 'excludeFromSummary', data.excludeFromSummary);
+  set('math', 'math', data.math);
+  set('quiz', 'quiz', data.quiz);
+
   // Parse dates
-  if (data.date) {
-    result.date = parseDate(data.date);
-  }
-  if (data.updated) {
-    result.updated = parseDate(data.updated);
-  }
+  if (dirty.date) set('date', 'date', data.date ? parseDate(data.date) : undefined);
+  if (dirty.updated) set('updated', 'updated', data.updated ? parseDate(data.updated) : undefined);
 
   // Parse categories
   const categories = stringToCategories(data.categories || '');
-  if (categories && categories.length > 0) {
+  if (dirty.categories && categories && categories.length > 0) {
     // Store as nested array for proper YAML format
     result.categories = [categories];
-  }
+  } else if (dirty.categories) delete result.categories;
 
   // Parse tags
   const tags = stringToTags(data.tags || '');
-  if (tags) {
+  if (dirty.tags && tags) {
     result.tags = tags;
-  }
+  } else if (dirty.tags) delete result.tags;
 
   // Optional string fields
-  if (data.description?.trim()) result.description = data.description.trim();
-  if (data.cover?.trim()) result.cover = data.cover.trim();
-  if (data.link?.trim()) result.link = data.link.trim();
-  if (data.subtitle?.trim()) result.subtitle = data.subtitle.trim();
+  set('description', 'description', data.description?.trim());
+  set('cover', 'cover', data.cover?.trim());
+  set('link', 'link', data.link?.trim());
+  set('subtitle', 'subtitle', data.subtitle?.trim());
 
   return result;
 }
@@ -168,9 +170,15 @@ function FormField({
           'focus:outline-none focus:ring-1 focus:ring-ring',
           error && 'border-destructive',
         )}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : undefined}
         {...props}
       />
-      {error && <p className="text-destructive text-xs">{error}</p>}
+      {error && (
+        <p id={`${id}-error`} className="text-destructive text-xs">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -205,9 +213,15 @@ function FormTextarea({
           'focus:outline-none focus:ring-1 focus:ring-ring',
           error && 'border-destructive',
         )}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : undefined}
         {...props}
       />
-      {error && <p className="text-destructive text-xs">{error}</p>}
+      {error && (
+        <p id={`${id}-error`} className="text-destructive text-xs">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -270,17 +284,36 @@ export const FrontmatterEditor = forwardRef<FrontmatterEditorRef, FrontmatterEdi
     watch,
     formState: { errors, isDirty },
   } = form;
+  const changedFields = useRef<Record<string, boolean>>({});
 
   // Expose form methods via ref
   useImperativeHandle(ref, () => ({
     getFormData: () => form.getValues(),
     isDirty: () => isDirty,
+    validate: async () => {
+      const valid = await form.trigger();
+      const values = form.getValues();
+      let datesValid = true;
+      for (const field of ['date', 'updated'] as const) {
+        const value = values[field]?.trim();
+        if (!value) continue;
+        const parsed = parseDate(value);
+        const isCanonical = parsed && formatDate(parsed) === value;
+        const isIso = /^\d{4}-\d{2}-\d{2}(?:T|$)/.test(value) && isValid(parseISO(value));
+        if (!isCanonical && !isIso) {
+          form.setError(field, { type: 'validate', message: 'Use YYYY-MM-DD HH:mm:ss or a valid ISO date.' });
+          datesValid = false;
+        }
+      }
+      return valid && datesValid;
+    },
   }));
 
   // Watch for changes and notify parent
   useEffect(() => {
-    const subscription = watch((values) => {
-      const fm = formDataToFrontmatter(values as FrontmatterFormData);
+    const subscription = watch((values, metadata) => {
+      if (metadata.name) changedFields.current[metadata.name] = true;
+      const fm = formDataToFrontmatter(values as FrontmatterFormData, frontmatter, changedFields.current);
       onChange(fm);
 
       // Notify about categories change for new category detection
@@ -290,7 +323,7 @@ export const FrontmatterEditor = forwardRef<FrontmatterEditorRef, FrontmatterEdi
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onChange, onCategoriesChange]);
+  }, [watch, onChange, onCategoriesChange, frontmatter]);
 
   return (
     <div className="space-y-4 p-4">
@@ -329,7 +362,7 @@ export const FrontmatterEditor = forwardRef<FrontmatterEditorRef, FrontmatterEdi
         <FormField
           label="Categories"
           id="categories"
-          placeholder="笔记 > 前端 > React"
+          placeholder="Notes > Frontend > React"
           error={errors.categories?.message}
           {...register('categories')}
         />
@@ -345,9 +378,9 @@ export const FrontmatterEditor = forwardRef<FrontmatterEditorRef, FrontmatterEdi
         />
 
         <FormField
-          label="External Link"
+          label="Post Permalink"
           id="link"
-          placeholder="https://example.com"
+          placeholder="writeups/event/post"
           error={errors.link?.message}
           {...register('link')}
         />

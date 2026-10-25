@@ -11,7 +11,7 @@ import { z } from 'zod';
  * Schema for creating a new post
  */
 export const createPostSchema = z.object({
-  title: z.string().min(1, '标题不能为空'),
+  title: z.string().trim().min(1, 'Title is required.'),
   categories: z.array(z.string()).optional(),
   tags: z.string().optional(),
   draft: z.boolean(),
@@ -23,7 +23,7 @@ export const createPostSchema = z.object({
  * then parsed to the correct format on blur/submit.
  */
 export const frontmatterSchema = z.object({
-  title: z.string().min(1, '标题不能为空'),
+  title: z.string().trim().min(1, 'Title is required.'),
   date: z.string().optional(),
   updated: z.string().optional(),
   description: z.string().optional(),
@@ -45,8 +45,8 @@ export const frontmatterSchema = z.object({
  */
 export const categorySlugSchema = z
   .string()
-  .min(1, 'Slug 不能为空')
-  .regex(/^[a-z0-9-]+$/, '只允许小写字母、数字和连字符');
+  .min(1, 'Slug is required.')
+  .regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers, and hyphens only.');
 
 /**
  * Schema for category mapping dialog

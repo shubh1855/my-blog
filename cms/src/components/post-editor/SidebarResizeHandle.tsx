@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { SIDEBAR_MAX_WIDTH, SIDEBAR_MIN_WIDTH } from '@/components/post-editor/useSidebarResize';
+import { getSidebarMaxWidth, SIDEBAR_MIN_WIDTH } from '@/components/post-editor/useSidebarResize';
 import { cn } from '@/lib/utils';
 
 interface SidebarResizeHandleProps {
@@ -16,14 +16,14 @@ export function SidebarResizeHandle({ width, isResizing, onMouseDown, onKeyDown 
       aria-orientation="vertical"
       aria-label="Resize sidebar"
       aria-valuemin={SIDEBAR_MIN_WIDTH}
-      aria-valuemax={SIDEBAR_MAX_WIDTH}
+      aria-valuemax={getSidebarMaxWidth()}
       aria-valuenow={width}
       aria-valuetext={`${width} pixels`}
       className={cn(
-        'h-full w-1 shrink-0 cursor-col-resize border-none transition-colors hover:bg-primary/50',
+        'h-full w-1 shrink-0 cursor-col-resize touch-none border-none transition-colors hover:bg-primary/50',
         isResizing && 'bg-primary',
       )}
-      onMouseDownCapture={onMouseDown}
+      onPointerDownCapture={onMouseDown}
       onKeyDownCapture={onKeyDown}
     />
   );

@@ -26,8 +26,8 @@ export function PostEditorHeader({
   onToggleSidebar,
 }: PostEditorHeaderProps) {
   return (
-    <header className="flex items-center justify-between border-border border-b px-4 py-2">
-      <div className="flex items-center gap-3">
+    <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-border border-b px-4 py-2">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
           onClick={onClose}
@@ -36,14 +36,16 @@ export function PostEditorHeader({
         >
           <Icon icon="ri:arrow-left-line" className="size-5" />
         </button>
-        <div>
+        <div className="min-w-0">
           <h1 className="line-clamp-1 font-medium">{title || 'Untitled'}</h1>
-          <p className="text-muted-foreground text-xs">{postId}</p>
+          <p className="max-w-[min(60vw,40rem)] truncate text-muted-foreground text-xs" title={postId}>
+            {postId}
+          </p>
         </div>
         {hasUnsavedChanges && <span className="rounded bg-orange-500/10 px-2 py-0.5 text-orange-500 text-xs">Unsaved</span>}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
         <a
           href={previewUrl}
           target="_blank"
@@ -51,7 +53,7 @@ export function PostEditorHeader({
           className="flex items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground"
         >
           <Icon icon="ri:external-link-line" className="size-4" />
-          Preview
+          Saved preview
         </a>
         <button
           type="button"
@@ -60,6 +62,7 @@ export function PostEditorHeader({
             'rounded-lg p-2 transition-colors',
             showSidebar ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted',
           )}
+          aria-expanded={showSidebar}
           title="Toggle frontmatter panel"
         >
           <Icon icon="ri:sidebar-unfold-line" className="size-5" />

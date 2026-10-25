@@ -10,13 +10,14 @@ import type { BlogSchema } from '@/types';
 export type SidebarTab = 'frontmatter' | 'toc' | 'preview';
 
 const SIDEBAR_TABS = [
-  { id: 'frontmatter', icon: 'ri:settings-3-line', label: '属性' },
-  { id: 'toc', icon: 'ri:list-unordered', label: '目录' },
-  { id: 'preview', icon: 'ri:eye-line', label: '预览' },
+  { id: 'frontmatter', icon: 'ri:settings-3-line', label: 'Metadata' },
+  { id: 'toc', icon: 'ri:list-unordered', label: 'Outline' },
+  { id: 'preview', icon: 'ri:eye-line', label: 'Preview' },
 ] as const;
 
 interface PostEditorSidebarProps {
   width: number;
+  overlay: boolean;
   activeTab: SidebarTab;
   frontmatter: BlogSchema;
   frontmatterRef: Ref<FrontmatterEditorRef>;
@@ -30,6 +31,7 @@ interface PostEditorSidebarProps {
 
 export function PostEditorSidebar({
   width,
+  overlay,
   activeTab,
   frontmatter,
   frontmatterRef,
@@ -41,7 +43,7 @@ export function PostEditorSidebar({
   onTOCNavigate,
 }: PostEditorSidebarProps) {
   return (
-    <aside style={{ width }} className="flex shrink-0 flex-col border-border border-l bg-card">
+    <aside style={{ width: overlay ? '100%' : width }} className="flex h-full shrink-0 flex-col border-border border-l bg-card">
       <div className="flex border-border border-b">
         {SIDEBAR_TABS.map((tab) => (
           <button
@@ -62,14 +64,14 @@ export function PostEditorSidebar({
       </div>
 
       <div className="flex-1 overflow-auto">
-        {activeTab === 'frontmatter' && (
+        <div hidden={activeTab !== 'frontmatter'}>
           <FrontmatterEditor
             ref={frontmatterRef}
             frontmatter={frontmatter}
             onChange={onFrontmatterChange}
             onCategoriesChange={onCategoriesChange}
           />
-        )}
+        </div>
         {activeTab === 'toc' && (
           <div className="p-4">
             <EditorTOC headings={headings} onNavigate={onTOCNavigate} />

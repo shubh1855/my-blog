@@ -6,6 +6,7 @@
 
 import { Icon } from '@iconify/react';
 import { format } from 'date-fns';
+import { useRef, useState } from 'react';
 import type { SortField, SortOrder } from '@/hooks';
 import { cn } from '@/lib/utils';
 import type { PostListItem } from '@/types';
@@ -40,8 +41,8 @@ interface PostTableProps {
   sortField: SortField;
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
-  onToggleDraft: (postId: string) => void;
-  onToggleSticky?: (postId: string) => void;
+  onToggleDraft: (postId: string) => Promise<void>;
+  onToggleSticky?: (postId: string) => Promise<void>;
   onEdit?: (postId: string) => void;
   onOpenInEditor?: (postId: string) => void;
 }
@@ -56,6 +57,23 @@ export function PostTable({
   onEdit,
   onOpenInEditor,
 }: PostTableProps) {
+  const [pendingRows, setPendingRows] = useState<Set<string>>(() => new Set());
+  const pendingRowsRef = useRef(new Set<string>());
+  const runRowAction = async (postId: string, action: (id: string) => Promise<void>) => {
+    if (pendingRowsRef.current.has(postId)) return;
+    pendingRowsRef.current.add(postId);
+    setPendingRows((current) => new Set(current).add(postId));
+    try {
+      await action(postId);
+    } finally {
+      setPendingRows((current) => {
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
+      pendingRowsRef.current.delete(postId);
+    }
+  };
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-border border-dashed p-8 text-center">
@@ -71,7 +89,10 @@ export function PostTable({
         <table className="w-full">
           <thead className="border-border border-b bg-muted/50">
             <tr>
-              <th className="px-4 py-3 text-left">
+              <th
+                aria-sort={sortField === 'title' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
+                className="px-4 py-3 text-left"
+              >
                 <SortableHeader label="Title" field="title" sortField={sortField} sortOrder={sortOrder} onSort={onSort} />
               </th>
               <th className="hidden px-4 py-3 text-left md:table-cell">
@@ -80,7 +101,10 @@ export function PostTable({
               <th className="hidden px-4 py-3 text-left lg:table-cell">
                 <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Tags</span>
               </th>
-              <th className="px-4 py-3 text-left">
+              <th
+                aria-sort={sortField === 'date' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
+                className="px-4 py-3 text-left"
+              >
                 <SortableHeader label="Date" field="date" sortField={sortField} sortOrder={sortOrder} onSort={onSort} />
               </th>
               <th className="px-4 py-3 text-left">
@@ -142,7 +166,8 @@ export function PostTable({
                         type="button"
                         onClick={() => onEdit(post.id)}
                         className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                        title="Edit post"
+                        title={`Edit ${post.title}`}
+                        aria-label={`Edit ${post.title}`}
                       >
                         <Icon icon="ri:edit-line" className="size-4" />
                       </button>
@@ -152,7 +177,8 @@ export function PostTable({
                         type="button"
                         onClick={() => onOpenInEditor(post.id)}
                         className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                        title="Open in VS Code"
+                        title={`Open ${post.title} in VS Code`}
+                        aria-label={`Open ${post.title} in VS Code`}
                       >
                         <Icon icon="ri:vscode-line" className="size-4" />
                       </button>
@@ -160,21 +186,25 @@ export function PostTable({
                     {onToggleSticky && (
                       <button
                         type="button"
-                        onClick={() => onToggleSticky(post.id)}
+                        onClick={() => runRowAction(post.id, onToggleSticky)}
+                        disabled={pendingRows.has(post.id)}
                         className={cn(
                           'rounded-md p-1.5 transition-colors hover:bg-accent hover:text-foreground',
                           post.sticky ? 'text-orange-500' : 'text-muted-foreground',
                         )}
-                        title={post.sticky ? 'Unpin post' : 'Pin post'}
+                        title={post.sticky ? `Unpin ${post.title}` : `Pin ${post.title}`}
+                        aria-label={post.sticky ? `Unpin ${post.title}` : `Pin ${post.title}`}
                       >
                         <Icon icon={post.sticky ? 'ri:pushpin-fill' : 'ri:pushpin-line'} className="size-4" />
                       </button>
                     )}
                     <button
                       type="button"
-                      onClick={() => onToggleDraft(post.id)}
+                      onClick={() => runRowAction(post.id, onToggleDraft)}
+                      disabled={pendingRows.has(post.id)}
                       className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                      title={post.draft ? 'Publish' : 'Mark as draft'}
+                      title={post.draft ? `Publish ${post.title}` : `Mark ${post.title} as draft`}
+                      aria-label={post.draft ? `Publish ${post.title}` : `Mark ${post.title} as draft`}
                     >
                       <Icon icon={post.draft ? 'ri:check-line' : 'ri:draft-line'} className="size-4" />
                     </button>

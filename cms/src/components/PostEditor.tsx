@@ -31,6 +31,29 @@ interface PostEditorProps {
   onSaved?: () => void;
 }
 
+function hasSourceSensitiveMarkdown(markdown: string): boolean {
+  let fence: { marker: string; character: string } | undefined;
+  for (const line of markdown.split('\n')) {
+    const fenceMatch = line.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/);
+    if (fenceMatch?.[1]) {
+      if (!fence && /\btitle\s*(?:=|:)/i.test(fenceMatch[2] ?? '')) return true;
+      if (!fence) fence = { marker: fenceMatch[1], character: fenceMatch[1].charAt(0) };
+      else if (
+        fenceMatch[1]?.[0] === fence.character &&
+        fenceMatch[1].length >= fence.marker.length &&
+        !(fenceMatch[2] ?? '').trim()
+      ) {
+        fence = undefined;
+      }
+      continue;
+    }
+    if (!fence && (/^\s*(?:::|\+\+\+|;;;)/.test(line) || /<\/?[A-Za-z][A-Za-z0-9:-]*(?=\s|\/?>)[^>]*>/i.test(line))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -38,6 +61,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('frontmatter');
+  const [isNarrow, setIsNarrow] = useState(() => window.matchMedia('(max-width: 639px)').matches);
 
   const { sidebarWidth, isResizing, startResizing, handleResizeKeyDown } = useSidebarResize();
 
@@ -54,8 +78,21 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
   const editor = useCreateBlockNote({ schema: postEditorSchema });
   const initialContentLoaded = useRef(false);
   const initialFrontmatterLoaded = useRef(false);
+  const originalContent = useRef('');
+  const initialDocument = useRef('');
+  const importedMarkdown = useRef('');
+  const contentChanged = useRef(false);
+  const revision = useRef(0);
+  const saveInFlight = useRef(false);
 
   const headings = useEditorHeadings(editor);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsNarrow(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   // Load post data
   useEffect(() => {
@@ -67,12 +104,16 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
         const data = await readPost(postId);
         setFrontmatter(data.frontmatter);
         initialFrontmatterLoaded.current = true;
+        originalContent.current = data.content;
 
         // Load content into editor
         if (data.content && editor) {
           await markdownToBlocks(editor, data.content);
-          initialContentLoaded.current = true;
         }
+        importedMarkdown.current = (await blocksToMarkdown(editor)).trimEnd();
+        initialDocument.current = JSON.stringify(editor.document);
+        // Empty Markdown is a valid loaded document too.
+        initialContentLoaded.current = true;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load post');
       } finally {
@@ -90,6 +131,10 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
     const unsubscribe = editor.onChange(() => {
       // Only mark as changed after initial content is loaded
       if (initialContentLoaded.current) {
+        const changed = JSON.stringify(editor.document) !== initialDocument.current;
+        if (!changed && !contentChanged.current) return;
+        contentChanged.current = changed;
+        revision.current += 1;
         setHasUnsavedChanges(true);
       }
     });
@@ -102,6 +147,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
     setFrontmatter(fm);
     // Only mark as changed after initial frontmatter is loaded
     if (initialFrontmatterLoaded.current) {
+      revision.current += 1;
       setHasUnsavedChanges(true);
     }
   }, []);
@@ -114,12 +160,23 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
   // Actual save operation (defined first so handleSave can reference it)
   const performSave = useCallback(
     async (categoryMappings?: Record<string, string>) => {
-      if (!editor) return;
+      if (!editor || saveInFlight.current) return;
 
-      setIsSaving(true);
+      saveInFlight.current = true;
+      const savedRevision = revision.current;
       try {
-        // Get markdown content
-        const content = await blocksToMarkdown(editor);
+        const converted = contentChanged.current ? await blocksToMarkdown(editor) : null;
+        const bodyChanged = converted !== null && converted.trimEnd() !== importedMarkdown.current;
+        if (
+          bodyChanged &&
+          hasSourceSensitiveMarkdown(originalContent.current) &&
+          !window.confirm(
+            'This post contains Markdown that the visual editor may change or remove (custom containers, titled code fences, or raw HTML). Continue saving the edited body? Cancel to keep the original source unchanged.',
+          )
+        )
+          return;
+        setIsSaving(true);
+        const content = bodyChanged ? converted : originalContent.current;
 
         // Update the updated date
         const now = new Date();
@@ -130,6 +187,13 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
           date: frontmatter.date || now,
         };
 
+        if (frontmatterRef.current && !(await frontmatterRef.current.validate())) {
+          setShowSidebar(true);
+          setSidebarTab('frontmatter');
+          toast.error('Please fix the highlighted frontmatter fields before saving.');
+          return;
+        }
+
         await writePost(postId, updatedFrontmatter, content, categoryMappings);
 
         // Update category map if we added new mappings
@@ -138,12 +202,13 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
           setCategoryMap({ ...currentMap, ...categoryMappings });
         }
 
-        setHasUnsavedChanges(false);
+        if (revision.current === savedRevision) setHasUnsavedChanges(false);
         toast.success('Post saved successfully');
         onSaved?.();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Failed to save post');
       } finally {
+        saveInFlight.current = false;
         setIsSaving(false);
       }
     },
@@ -152,7 +217,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
 
   // Save post with new category detection
   const handleSave = useCallback(async () => {
-    if (!editor) return;
+    if (!editor || saveInFlight.current || isSaving) return;
 
     // Check for new categories
     const newCats = detectNewCategories(currentCategories);
@@ -163,7 +228,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
     }
 
     await performSave();
-  }, [editor, currentCategories, performSave]);
+  }, [editor, currentCategories, performSave, isSaving]);
 
   // Handle category mapping confirmation
   const handleCategoryMappingConfirm = useCallback(
@@ -209,12 +274,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
     onClose();
   }, [hasUnsavedChanges, onClose]);
 
-  const previewSlug =
-    frontmatter.link ||
-    postId
-      .replace(/\.mdx?$/, '')
-      .split('/')
-      .pop();
+  const previewSlug = frontmatter.link || postId.replace(/\.mdx?$/, '');
   const previewUrl = `${DEV_SERVER_URL}/post/${previewSlug}`;
 
   // Handle TOC navigation
@@ -250,6 +310,26 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
     },
     [editor],
   );
+
+  // Keep the preview current when the canvas changes while the preview tab is open.
+  useEffect(() => {
+    if (!editor || sidebarTab !== 'preview') return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let updateId = 0;
+    const unsubscribe = editor.onChange(() => {
+      if (timer) clearTimeout(timer);
+      const currentUpdate = ++updateId;
+      timer = setTimeout(() => {
+        blocksToMarkdown(editor).then((markdown) => {
+          if (currentUpdate === updateId) setPreviewContent(markdown);
+        });
+      }, 250);
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [editor, sidebarTab]);
 
   if (isLoading) {
     return (
@@ -290,10 +370,12 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
         onToggleSidebar={() => setShowSidebar(!showSidebar)}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <PostEditorCanvas editor={editor} />
+      <div className="relative flex flex-1 overflow-hidden">
+        <div className={isNarrow && showSidebar ? 'hidden' : 'min-w-0 flex-1'}>
+          <PostEditorCanvas editor={editor} />
+        </div>
 
-        {showSidebar && (
+        {showSidebar && !isNarrow && (
           <SidebarResizeHandle
             width={sidebarWidth}
             isResizing={isResizing}
@@ -302,9 +384,14 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
           />
         )}
 
-        {showSidebar && (
+        <div
+          className={
+            showSidebar ? (isNarrow ? 'absolute inset-0 z-30 bg-background' : 'relative flex min-h-0 shrink-0') : 'hidden'
+          }
+        >
           <PostEditorSidebar
             width={sidebarWidth}
+            overlay={isNarrow}
             activeTab={sidebarTab}
             frontmatter={frontmatter}
             frontmatterRef={frontmatterRef}
@@ -315,7 +402,7 @@ export function PostEditor({ postId, onClose, onSaved }: PostEditorProps) {
             onCategoriesChange={handleCategoriesChange}
             onTOCNavigate={handleTOCNavigate}
           />
-        )}
+        </div>
       </div>
 
       {/* Category Mapping Dialog */}
