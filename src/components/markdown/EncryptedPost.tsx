@@ -7,7 +7,6 @@
  */
 
 import geassSymbol from '@assets/svg/geass-symbol.svg?url';
-import { useRetimer } from '@hooks/useRetimer';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { decryptContent } from '@lib/crypto/decrypt';
@@ -24,12 +23,11 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
   const [state, setState] = useState<DecryptState>('locked');
   const decryptedRef = useRef('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const retimer = useRetimer();
   const { t } = useTranslation();
 
   const handleDecrypt = useCallback(async () => {
     const password = inputRef.current?.value;
-    if (!password) return;
+    if (!password || state === 'decrypting') return;
 
     const { cipher, iv, salt } = element.dataset;
     if (!cipher || !iv || !salt) return;
@@ -42,9 +40,9 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
       setState('unlocked');
     } else {
       setState('error');
-      retimer(setTimeout(() => setState('locked'), 600));
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
-  }, [element, retimer]);
+  }, [element, state]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -69,6 +67,11 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
       const container = document.querySelector('.custom-content');
       if (container) container.removeAttribute('data-enhanced');
       document.dispatchEvent(new CustomEvent('content:decrypted'));
+      const heading = element.querySelector<HTMLElement>('h1, h2, h3');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
     });
   }, [state, element]);
 
@@ -96,6 +99,8 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
           ref={inputRef}
           type="password"
           className="encrypted-post-input"
+          aria-label={t('encrypted.placeholder')}
+          aria-invalid={state === 'error'}
           placeholder={t('encrypted.placeholder')}
           autoComplete="off"
           onKeyDown={handleKeyDown}
@@ -115,7 +120,11 @@ export function EncryptedPost({ element }: EncryptedPostProps) {
           )}
         </button>
       </div>
-      {state === 'error' && <p className="encrypted-post-error-text">{t('encrypted.incorrect')}</p>}
+      {state === 'error' && (
+        <p role="alert" className="encrypted-post-error-text">
+          {t('encrypted.incorrect')}
+        </p>
+      )}
     </div>
   );
 }

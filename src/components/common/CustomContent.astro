@@ -78,14 +78,25 @@ const spoilerRevealLabel = t(getLocaleFromUrl(Astro.url.pathname), 'content.reve
       const anchorLinks = contentContainer.querySelectorAll('a.anchor-link[href^="#"]');
       anchorLinks.forEach((link: Element) => {
         const anchor = link as HTMLAnchorElement;
+        if (anchor.dataset.anchorReady === 'true') return;
+        anchor.dataset.anchorReady = 'true';
         anchor.addEventListener('click', (e) => {
+          if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault();
           const targetId = anchor.getAttribute('href')?.substring(1);
           if (!targetId) return;
-          const targetElement = document.getElementById(targetId);
+          const targetElement = document.getElementById(decodeURIComponent(targetId));
           if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            history.pushState(null, '', `#${targetId}`);
+            targetElement.scrollIntoView({
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+              block: 'start',
+            });
+            if (location.hash !== `#${targetId}`) history.pushState(history.state, '', `#${targetId}`);
+            if (!targetElement.hasAttribute('tabindex')) {
+              targetElement.tabIndex = -1;
+              targetElement.addEventListener('blur', () => targetElement.removeAttribute('tabindex'), { once: true });
+            }
+            targetElement.focus({ preventScroll: true });
           }
         });
       });
@@ -106,33 +117,75 @@ const spoilerRevealLabel = t(getLocaleFromUrl(Astro.url.pathname), 'content.reve
     // Enhance link preview images with error handling
     enhanceLinkPreviews(contentContainer);
 
-    // Tab group switching logic
-    const tabHeaders = contentContainer.querySelectorAll<HTMLElement>('.tab-header[role="tab"]');
-    tabHeaders.forEach((header) => {
-      header.addEventListener('click', () => {
-        const groupId = header.dataset.tabGroup;
-        const tabIndex = header.dataset.tabIndex;
-        if (!groupId || tabIndex === undefined) return;
-
-        const group = contentContainer.querySelector(`.tab-group[data-tab-group="${groupId}"]`);
-        if (!group) return;
-
-        // Update headers
-        group.querySelectorAll<HTMLElement>('.tab-header').forEach((h) => {
-          h.setAttribute('aria-selected', String(h.dataset.tabIndex === tabIndex));
-        });
-
-        // Update panels
-        group.querySelectorAll<HTMLElement>('.tab-panel').forEach((panel) => {
-          panel.classList.toggle('active', panel.dataset.tabIndex === tabIndex);
+    // Scope each group to its own controls, so nested tabs stay independent.
+    contentContainer.querySelectorAll<HTMLElement>('.tab-group').forEach((group, groupIndex) => {
+      const own = (selector: string) => Array.from(group.querySelectorAll<HTMLElement>(selector))
+        .filter((node) => node.closest('.tab-group') === group);
+      const headers = own('.tab-header[role="tab"]');
+      const panels = own('.tab-panel');
+      const activate = (header: HTMLElement) => {
+        for (const tab of headers) {
+          const selected = tab === header;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        }
+        for (const panel of panels) {
+          const selected = panel.dataset.tabIndex === header.dataset.tabIndex;
+          panel.classList.toggle('active', selected);
+          panel.hidden = !selected;
+        }
+      };
+      headers.forEach((header, index) => {
+        if (header.dataset.tabReady === 'true') return;
+        header.dataset.tabReady = 'true';
+        header.id ||= `content-tab-${groupIndex}-${index}`;
+        const panel = panels.find((item) => item.dataset.tabIndex === header.dataset.tabIndex);
+        if (panel) {
+          panel.id ||= `${header.id}-panel`;
+          panel.setAttribute('role', 'tabpanel');
+          panel.setAttribute('aria-labelledby', header.id);
+          panel.tabIndex = 0;
+          header.setAttribute('aria-controls', panel.id);
+        }
+        header.addEventListener('click', () => activate(header));
+        header.addEventListener('keydown', (event) => {
+          let next: number;
+          switch (event.key) {
+            case 'ArrowRight': next = (index + 1) % headers.length; break;
+            case 'ArrowLeft': next = (index - 1 + headers.length) % headers.length; break;
+            case 'Home': next = 0; break;
+            case 'End': next = headers.length - 1; break;
+            default: return;
+          }
+          event.preventDefault();
+          activate(headers[next]);
+          headers[next].focus();
         });
       });
+      if (headers.length) activate(headers.find((header) => header.getAttribute('aria-selected') === 'true') ?? headers[0]);
     });
 
-    // Blur spoiler click-to-reveal (default spoilers handled by spoilerjs)
-    const blurSpoilers = contentContainer.querySelectorAll<HTMLElement>('.spoiler.blur');
-    blurSpoilers.forEach((spoiler) => {
-      spoiler.addEventListener('click', () => spoiler.classList.toggle('revealed'));
+    contentContainer.querySelectorAll<HTMLElement>('.spoiler.blur').forEach((spoiler) => {
+      if (spoiler.dataset.blurReady === 'true') return;
+      spoiler.dataset.blurReady = 'true';
+      spoiler.setAttribute('role', 'button');
+      spoiler.tabIndex = 0;
+      const toggle = () => {
+        const revealed = spoiler.classList.toggle('revealed');
+        spoiler.setAttribute('aria-expanded', String(revealed));
+        if (revealed) spoiler.removeAttribute('aria-label');
+        else spoiler.setAttribute('aria-label', contentContainer.getAttribute('data-spoiler-reveal-label') ?? 'Reveal spoiler');
+      };
+      spoiler.setAttribute('aria-expanded', String(spoiler.classList.contains('revealed')));
+      if (!spoiler.classList.contains('revealed')) {
+        spoiler.setAttribute('aria-label', contentContainer.getAttribute('data-spoiler-reveal-label') ?? 'Reveal spoiler');
+      }
+      spoiler.addEventListener('click', toggle);
+      spoiler.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        toggle();
+      });
     });
 
     // Mark as enhanced

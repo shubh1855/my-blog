@@ -345,6 +345,17 @@ export const uiStrings: UIStrings = {
 
   // ── オーディオプレーヤー ────────────────────────────────────────────
   'audio.loading': 'プレイリストを読み込み中...',
+  'audio.bgmTitle': 'BGMプレーヤー',
+  'audio.playbackError': '再生できませんでした。接続を確認して再試行してください。',
+  'announcement.markRead': '既読にする',
+  'audio.playerLoadFailed': '音楽プレーヤーを読み込めませんでした。',
+  'settings.loading': '設定を読み込み中…',
+  'settings.loadFailed': '設定を読み込めませんでした。再試行してください。',
+  'settings.retry': '再試行',
+  'about.contributionsLoading': '貢献データを読み込み中…',
+  'about.contributionsLoadFailed': '貢献データを読み込めませんでした。',
+  'about.contributionsRetry': '再試行',
+  'about.viewGithubProfile': 'GitHubプロフィールを表示',
   'audio.loadError': '読み込みに失敗: {error}',
   'audio.retry': '再試行',
   'audio.empty': 'トラックが見つかりません',

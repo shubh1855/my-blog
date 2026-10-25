@@ -84,7 +84,6 @@ const { nextHref, backHref, labels } = Astro.props;
   const CONTENT_APPENDED_EVENT = 'moments:content-appended';
   // Keep the loading indicator on screen at least this long on successful
   // loads so fast responses do not make it flash.
-  const MIN_LOADING_INDICATOR_MS = 600;
   const LOAD_TIMEOUT_MS = 15_000;
   const LOAD_ROOT_MARGIN_PX = 320;
 
@@ -94,7 +93,6 @@ const { nextHref, backHref, labels } = Astro.props;
     private sentinel?: HTMLElement;
     private loadAbortController?: AbortController;
     private loading = false;
-    private loadingStartedAt = 0;
     private isIntersecting = false;
     private pendingIntersectionLoad = false;
     private statusClearTimer?: number;
@@ -207,7 +205,6 @@ const { nextHref, backHref, labels } = Astro.props;
       );
       this.loadAbortController = controller;
       this.loading = true;
-      this.loadingStartedAt = Date.now();
       if (this.statusClearTimer !== undefined) window.clearTimeout(this.statusClearTimer);
       this.setState('loading', this.dataset.loadingLabel ?? '');
       let completedWithNextPage = false;
@@ -243,12 +240,6 @@ const { nextHref, backHref, labels } = Astro.props;
         const candidateHref = nextPagination?.dataset.nextHref;
         const nextUrl = candidateHref ? new URL(candidateHref, response.url || requestedUrl).href : undefined;
 
-        // Keep the loading strip visible before revealing the new batch. Waiting
-        // after append would leave a spinner beside content that has already loaded.
-        const remainingIndicatorMs = MIN_LOADING_INDICATOR_MS - (Date.now() - this.loadingStartedAt);
-        if (remainingIndicatorMs > 0) {
-          await new Promise<void>((resolve) => window.setTimeout(resolve, remainingIndicatorMs));
-        }
         if (!this.isConnected) {
           controller.abort();
           return;

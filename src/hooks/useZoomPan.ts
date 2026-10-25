@@ -171,7 +171,8 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
       const s = transformRef.current;
       if (e.touches.length === 2) {
         e.preventDefault();
-        d.initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
+        d.isDragging = false;
+        d.initialPinchDistance = Math.max(1, getDistance(e.touches[0], e.touches[1]));
         d.initialPinchScale = s.scale;
       } else if (e.touches.length === 1) {
         d.isDragging = true;
@@ -200,7 +201,11 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
       }
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (e: TouchEvent) => {
+      dragRef.current.isDragging = false;
+      if (e.touches.length === 1) handleTouchStart(e);
+    };
+    const handleTouchCancel = () => {
       dragRef.current.isDragging = false;
     };
 
@@ -211,6 +216,7 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
     viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
     viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
     viewport.addEventListener('touchend', handleTouchEnd);
+    viewport.addEventListener('touchcancel', handleTouchCancel);
 
     return () => {
       viewport.removeEventListener('wheel', handleWheel);
@@ -220,6 +226,7 @@ export function useZoomPan(enabled = true): UseZoomPanReturn {
       viewport.removeEventListener('touchstart', handleTouchStart);
       viewport.removeEventListener('touchmove', handleTouchMove);
       viewport.removeEventListener('touchend', handleTouchEnd);
+      viewport.removeEventListener('touchcancel', handleTouchCancel);
     };
   }, [flushState, enabled, viewport]);
 

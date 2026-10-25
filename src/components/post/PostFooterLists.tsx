@@ -30,7 +30,8 @@ export default function PostFooterLists({ allPosts, relatedPosts, leftCount, rig
     }
 
     // Shuffle once and split to avoid duplicates
-    const shuffled = shuffleArray(allPosts);
+    const relatedSlugs = new Set(relatedPosts.map((post) => post.slug));
+    const shuffled = shuffleArray(allPosts.filter((post) => !relatedSlugs.has(post.slug)));
     return {
       leftPosts: shuffled.slice(0, leftCount),
       rightPosts: hasRelated ? relatedPosts : shuffled.slice(leftCount, leftCount + rightCount),
@@ -38,12 +39,12 @@ export default function PostFooterLists({ allPosts, relatedPosts, leftCount, rig
     };
   }, [allPosts, relatedPosts, leftCount, rightCount]);
 
-  const rightTitle = hasRelatedPosts ? t('post.relatedPosts') : '';
+  const rightTitle = hasRelatedPosts ? t('post.relatedPosts') : t('post.randomPosts');
 
   return (
     <>
       {/* Left side: Random posts */}
-      <div className="flex flex-col gap-4">
+      <div className={leftPosts.length ? 'flex flex-col gap-4' : 'hidden'}>
         <h2 className="font-semibold text-2xl text-foreground/80">{t('post.randomPosts')}</h2>
         <div className="flex flex-col gap-2">
           {leftPosts.map((post, index) => (
@@ -68,7 +69,7 @@ export default function PostFooterLists({ allPosts, relatedPosts, leftCount, rig
 
       {/* Right side: Related or fallback posts */}
       {rightPosts.length > 0 && (
-        <div className="flex flex-col gap-4">
+        <div className={rightPosts.length ? 'flex flex-col gap-4' : 'hidden'}>
           <h2 className="font-semibold text-2xl text-foreground/80">{rightTitle}</h2>
           <div className={cn('flex flex-col gap-2', { '-mt-4 pt-12 md:-mt-5 md:pt-0': !hasRelatedPosts })}>
             {rightPosts.map((post, index) => (

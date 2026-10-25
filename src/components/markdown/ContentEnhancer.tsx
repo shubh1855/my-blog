@@ -88,10 +88,7 @@ export default function ContentEnhancer({
 
     // Re-scan after encrypted post is decrypted (new DOM content needs enhancement)
     const handleDecrypted = () => {
-      requestAnimationFrame(() => {
-        setEntries([]);
-        scan();
-      });
+      requestAnimationFrame(scan);
     };
 
     document.addEventListener('astro:page-load', handlePageLoad);

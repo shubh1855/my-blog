@@ -59,6 +59,8 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
   stateRef.current = state;
 
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingTrackIndexRef = useRef<number | null>(null);
 
   const loadAndPlayRef = useRef<(index: number) => void>(() => {});
 
@@ -84,17 +86,25 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
       }
 
       if (type === 'onReady') {
+        if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
         setState((s) => ({ ...s, loading: false }));
+        const pendingIndex = pendingTrackIndexRef.current;
+        if (pendingIndex !== null) {
+          pendingTrackIndexRef.current = null;
+          loadAndPlayRef.current(pendingIndex);
+        }
       } else if (type === 'onStateChange' && event) {
         const YTState = window.YT.PlayerState;
         switch (event.data) {
           case -1: // UNSTARTED
             break;
           case YTState.PLAYING:
+            if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
             setState((s) => ({ ...s, playing: true, loading: false, error: null }));
             timeStore.setDuration(event.target.getDuration());
             break;
           case YTState.PAUSED:
+            if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
             setState((s) => ({ ...s, playing: false }));
             break;
           case YTState.BUFFERING:
@@ -123,6 +133,7 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
             break;
         }
       } else if (type === 'onError') {
+        if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
         console.error('YouTube Player Error:', event?.data);
         setState((s) => ({ ...s, playing: false, loading: false, error: 'Failed to load media' }));
 
@@ -144,19 +155,48 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
 
     const unsubscribe = subscribeToManager(handleEvent);
 
-    ensurePlayer().then(() => {
-      if (unmounted) return;
-      if (isPlayerReady()) {
-        setState((s) => ({ ...s, loading: false }));
-      }
-    });
+    if (tracksRef.current.length > 0) {
+      startupTimerRef.current = setTimeout(() => {
+        setState((s) => ({ ...s, loading: false, error: 'Player initialization failed' }));
+      }, 15000);
+    } else {
+      setState((s) => ({ ...s, loading: false }));
+    }
+
+    ensurePlayer()
+      .then(() => {
+        if (unmounted) return;
+        if (isPlayerReady()) {
+          if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+          setState((s) => ({ ...s, loading: false }));
+        }
+      })
+      .catch(() => {
+        if (!unmounted) {
+          if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+          setState((s) => ({ ...s, loading: false, error: 'Player initialization failed' }));
+        }
+      });
 
     return () => {
       unmounted = true;
       unsubscribe();
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
     };
   }, [playerId, timeStore]);
+
+  // Track data may arrive after the hook mounts. Bound that delayed startup too,
+  // since the initial ensurePlayer request can remain pending indefinitely.
+  useEffect(() => {
+    if (tracks.length === 0 || isPlayerReady()) return;
+    setState((s) => ({ ...s, loading: true, error: null }));
+    if (!startupTimerRef.current) {
+      startupTimerRef.current = setTimeout(() => {
+        setState((s) => ({ ...s, loading: false, error: 'Player initialization failed' }));
+      }, 15000);
+    }
+  }, [tracks.length]);
 
   // Sync playback time to store via interval (~4 updates/s, matching YT API resolution)
   useEffect(() => {
@@ -190,6 +230,10 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
       $activePlayerId.set(playerId);
       timeStore.reset();
       setState((s) => ({ ...s, currentIndex: index, loading: true, error: null, playing: true }));
+      if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+      startupTimerRef.current = setTimeout(() => {
+        setState((s) => ({ ...s, playing: false, loading: false, error: 'Playback did not start' }));
+      }, 15000);
     },
     [playerId, timeStore],
   );
@@ -198,8 +242,12 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
   // Pause when another player starts (imperative subscription, no re-renders)
   useEffect(() => {
     return $activePlayerId.subscribe((id) => {
-      if (id !== null && id !== playerId && stateRef.current.playing) {
-        getPlayer()?.pauseVideo?.();
+      if (id !== null && id !== playerId) {
+        if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+        const hadPendingTrack = pendingTrackIndexRef.current !== null;
+        pendingTrackIndexRef.current = null;
+        if (hadPendingTrack) setState((s) => ({ ...s, loading: false }));
+        if (stateRef.current.playing) getPlayer()?.pauseVideo?.();
       }
     });
   }, [playerId]);
@@ -207,8 +255,23 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
   const play = useCallback(
     (index?: number) => {
       const ytPlayer = getPlayer();
-      if (!isPlayerReady() || !ytPlayer || tracksRef.current.length === 0) return;
+      if (tracksRef.current.length === 0) return;
       const targetIndex = index ?? state.currentIndex;
+      if (!isPlayerReady() || !ytPlayer) {
+        pendingTrackIndexRef.current = targetIndex;
+        setState((s) => ({ ...s, currentIndex: targetIndex, playing: false, loading: true, error: null }));
+        if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+        startupTimerRef.current = setTimeout(() => {
+          pendingTrackIndexRef.current = null;
+          setState((s) => ({ ...s, playing: false, loading: false, error: 'Player initialization failed' }));
+        }, 15000);
+        ensurePlayer().catch(() => {
+          pendingTrackIndexRef.current = null;
+          if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+          setState((s) => ({ ...s, playing: false, loading: false, error: 'Player initialization failed' }));
+        });
+        return;
+      }
 
       const isActive = $activePlayerId.get() === playerId;
 
@@ -225,6 +288,10 @@ export function useYouTubePlayer(tracks: YouTubeTrack[]) {
   );
 
   const pause = useCallback(() => {
+    if (startupTimerRef.current) clearTimeout(startupTimerRef.current);
+    const hadPendingTrack = pendingTrackIndexRef.current !== null;
+    pendingTrackIndexRef.current = null;
+    if (hadPendingTrack) setState((s) => ({ ...s, loading: false }));
     const ytPlayer = getPlayer();
     if (isPlayerReady() && ytPlayer?.pauseVideo) {
       ytPlayer.pauseVideo();

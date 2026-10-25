@@ -1,3 +1,4 @@
+import { useTranslation } from '@hooks/useTranslation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -19,52 +20,11 @@ interface Props {
   username: string;
 }
 
-function generatePlaceholderContributions(): ContributionResponse {
-  const contributions = Array.from(
-    { length: 371 },
-    (_, index): Contribution => ({
-      date: new Date(Date.now() - (371 - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      count: 0,
-      level: 0,
-    }),
-  );
-
-  return {
-    contributions,
-    total: { lastYear: 0 },
-  };
-}
-
-const ERROR_PATTERN = [
-  [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-  [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1],
-  [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-] as const;
-
-function generateErrorContributions(): ContributionResponse {
-  const contributions = Array.from({ length: 371 }, (_, index): Contribution => {
-    const weekIndex = Math.floor(index / 7);
-    const dayIndex = index % 7;
-    const patternStartWeek = Math.floor((53 - 19) / 2);
-    const patternStartRow = Math.floor((7 - 5) / 2);
-    const relativeWeek = weekIndex - patternStartWeek;
-    const relativeRow = dayIndex - patternStartRow;
-
-    let count = 0;
-    if (relativeWeek >= 0 && relativeWeek < 19 && relativeRow >= 0 && relativeRow < 5) {
-      count = ERROR_PATTERN[relativeRow]?.[relativeWeek] === 1 ? 10 : 0;
-    }
-
-    return { date: '1', count, level: 0 };
+async function fetchContributions(username: string, signal: AbortSignal, retry: number): Promise<ContributionResponse> {
+  const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`, {
+    signal,
+    cache: retry > 0 ? 'reload' : 'default',
   });
-
-  return { contributions, total: { lastYear: 0 } };
-}
-
-async function fetchContributions(username: string): Promise<ContributionResponse> {
-  const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -86,12 +46,15 @@ function formatDate(dateStr: string): string {
 }
 
 export default function GithubContributions({ username }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [data, setData] = useState<ContributionResponse | null>(generatePlaceholderContributions());
+  const { t } = useTranslation();
+  const containerRef = useRef<HTMLFieldSetElement>(null);
+  const cellRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [data, setData] = useState<ContributionResponse | null>(null);
   const [totalContributions, setTotalContributions] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const [hasError, setHasError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const [activeDay, setActiveDay] = useState<Contribution | null>(null);
 
   const scrollToRight = useCallback(() => {
     if (containerRef.current) {
@@ -100,17 +63,34 @@ export default function GithubContributions({ username }: Props) {
   }, []);
 
   useEffect(() => {
-    fetchContributions(username)
+    const controller = new AbortController();
+    let cancelled = false;
+    let scrollTimer: ReturnType<typeof setTimeout> | undefined;
+    setHasError(false);
+    setData(null);
+    setTotalContributions(0);
+    setActiveDay(null);
+    setActiveDayIndex(0);
+    fetchContributions(username, controller.signal, retry)
       .then((res) => {
+        if (cancelled) return;
         setData(res);
         setTotalContributions(res.total?.lastYear ?? 0);
-        setIsLoaded(true);
-        setTimeout(scrollToRight, 100);
+        setActiveDayIndex(0);
+        setActiveDay(res.contributions[0] ?? null);
+        scrollTimer = setTimeout(scrollToRight, 100);
       })
       .catch(() => {
-        setData(generateErrorContributions());
+        if (cancelled) return;
+        setData(null);
+        setHasError(true);
       });
-  }, [username, scrollToRight]);
+    return () => {
+      cancelled = true;
+      controller.abort();
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
+  }, [username, scrollToRight, retry]);
 
   const weeks =
     data?.contributions.reduce<Contribution[][]>((acc, day, index) => {
@@ -122,75 +102,135 @@ export default function GithubContributions({ username }: Props) {
       return acc;
     }, []) || [];
 
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>, contribution: Contribution) => {
-      if (!isLoaded || !wrapperRef.current) return;
-      const wrapperRect = wrapperRef.current.getBoundingClientRect();
-      const cellRect = e.currentTarget.getBoundingClientRect();
-      const x = cellRect.left + cellRect.width / 2 - wrapperRect.left;
-      const y = cellRect.top - wrapperRect.top;
-      const { count, date } = contribution;
-      const text = `${count} contribution${count !== 1 ? 's' : ''} on ${formatDate(date)}`;
-      setTooltip({ text, x, y });
-    },
-    [isLoaded],
-  );
+  const focusDay = (index: number) => {
+    const day = data?.contributions[index];
+    if (!day) return;
+    setActiveDayIndex(index);
+    setActiveDay(day);
+    cellRefs.current[index]?.focus();
+  };
 
-  const handleMouseLeave = useCallback(() => {
-    setTooltip(null);
-  }, []);
+  const handleDayKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const weekStart = Math.floor(index / 7) * 7;
+    const weekEnd = Math.min(weekStart + 6, (data?.contributions.length ?? 0) - 1);
+    let nextIndex: number | null = null;
+    switch (event.key) {
+      case 'ArrowRight':
+        nextIndex = index + 7;
+        break;
+      case 'ArrowLeft':
+        nextIndex = index - 7;
+        break;
+      case 'ArrowDown':
+        nextIndex = index + 1;
+        break;
+      case 'ArrowUp':
+        nextIndex = index - 1;
+        break;
+      case 'Home':
+        nextIndex = weekStart;
+        break;
+      case 'End':
+        nextIndex = weekEnd;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    focusDay(Math.max(0, Math.min(nextIndex, (data?.contributions.length ?? 1) - 1)));
+  };
+
+  const dayDetail = activeDay
+    ? `${activeDay.count} contribution${activeDay.count !== 1 ? 's' : ''} on ${formatDate(activeDay.date)}`
+    : '';
 
   return (
-    <div
-      ref={wrapperRef}
-      className="contrib-wrapper not-prose my-6 rounded-xl border border-border/50 bg-card/50 p-4 shadow-sm"
-    >
+    <div className="contrib-wrapper not-prose my-6 rounded-xl border border-border/50 bg-card/50 p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-semibold text-foreground text-sm">
           {totalContributions > 0 ? `${totalContributions} contributions in the last year` : 'Contributions'}
         </h3>
+        <a
+          href={`https://github.com/${encodeURIComponent(username)}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary text-xs underline-offset-4 hover:underline"
+        >
+          {t('about.viewGithubProfile')}
+        </a>
       </div>
 
       <div className="relative">
-        {tooltip && (
+        {hasError ? (
           <div
-            className="contrib-tooltip"
-            style={{
-              left: `${tooltip.x}px`,
-              top: `${tooltip.y}px`,
-            }}
+            aria-live="polite"
+            className="flex min-h-20 flex-col items-start justify-center gap-2 text-muted-foreground text-sm"
           >
-            {tooltip.text}
+            <p>{t('about.contributionsLoadFailed')}</p>
+            <button
+              type="button"
+              className="text-primary underline underline-offset-4"
+              onClick={() => setRetry((value) => value + 1)}
+            >
+              {t('about.contributionsRetry')}
+            </button>
           </div>
+        ) : !data ? (
+          <div aria-live="polite" className="flex min-h-20 items-center text-muted-foreground text-sm">
+            {t('about.contributionsLoading')}
+          </div>
+        ) : null}
+        {data && (
+          <fieldset
+            ref={containerRef}
+            className="contrib-scroll m-0 grid min-w-0 grid-flow-col gap-[3px] overflow-x-auto scroll-smooth border-0 p-0 py-1"
+          >
+            <legend className="sr-only">{username} GitHub contributions</legend>
+            {weeks.map((week, weekIndex) => (
+              <div key={week[0]?.date || weekIndex} className="grid grid-rows-7 gap-[3px]">
+                {week.map((contribution, dayIndex) => {
+                  const flatIndex = weekIndex * 7 + dayIndex;
+                  const { count, date } = contribution;
+                  return (
+                    <button
+                      type="button"
+                      key={date}
+                      ref={(element) => {
+                        cellRefs.current[flatIndex] = element;
+                      }}
+                      tabIndex={flatIndex === activeDayIndex ? 0 : -1}
+                      aria-label={`${count} contribution${count !== 1 ? 's' : ''} on ${formatDate(date)}`}
+                      onFocus={() => {
+                        setActiveDayIndex(flatIndex);
+                        setActiveDay(contribution);
+                      }}
+                      onClick={() => {
+                        setActiveDayIndex(flatIndex);
+                        setActiveDay(contribution);
+                      }}
+                      onKeyDown={(event) => handleDayKeyDown(event, flatIndex)}
+                      className={cn(
+                        'size-[10px] rounded-[2px] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1',
+                        count === 0
+                          ? 'bg-muted-foreground/10'
+                          : count < 5
+                            ? 'bg-green-400/50 dark:bg-green-700/60'
+                            : count < 10
+                              ? 'bg-green-500/70 dark:bg-green-500/70'
+                              : 'bg-green-600 dark:bg-green-400',
+                      )}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </fieldset>
         )}
-
-        <div ref={containerRef} className="contrib-scroll grid grid-flow-col gap-[3px] overflow-x-auto scroll-smooth py-1">
-          {weeks.map((week) => (
-            <div key={week[0]?.date || Math.random().toString()} className="grid grid-rows-7 gap-[3px]">
-              {week.map((contribution) => {
-                const { count, date } = contribution;
-                return (
-                  // biome-ignore lint/a11y/noStaticElementInteractions: tooltip wrapper
-                  <div
-                    key={date}
-                    onMouseEnter={(e) => handleMouseEnter(e, contribution)}
-                    onMouseLeave={handleMouseLeave}
-                    className={cn(
-                      'size-[10px] rounded-[2px] transition-colors duration-300',
-                      count === 0
-                        ? 'bg-muted-foreground/10'
-                        : count < 5
-                          ? 'bg-green-400/50 dark:bg-green-700/60'
-                          : count < 10
-                            ? 'bg-green-500/70 dark:bg-green-500/70'
-                            : 'bg-green-600 dark:bg-green-400',
-                    )}
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
+        {data && (
+          <output aria-live="polite" className="mt-2 block min-h-4 text-muted-foreground text-xs">
+            {dayDetail}
+          </output>
+        )}
       </div>
 
       <style>{`
@@ -200,21 +240,6 @@ export default function GithubContributions({ username }: Props) {
         }
         .contrib-scroll::-webkit-scrollbar {
           display: none;
-        }
-        .contrib-tooltip {
-          position: absolute;
-          transform: translate(-50%, -100%) translateY(-8px);
-          padding: 4px 10px;
-          border-radius: 6px;
-          background: hsl(var(--popover));
-          border: 1px solid hsl(var(--border));
-          color: hsl(var(--popover-foreground));
-          font-size: 11px;
-          line-height: 1.4;
-          white-space: nowrap;
-          pointer-events: none;
-          z-index: 50;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
       `}</style>
     </div>

@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@components/ui/dropdown-menu';
 import { cn } from '@lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Option {
   value: string;
@@ -114,6 +114,7 @@ export default function MomentsSearchFilters({
   labels,
 }: MomentsSearchFiltersProps) {
   const [mounted, setMounted] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // The native <select> grid is the no-JS baseline; swap it for this island.
@@ -125,7 +126,9 @@ export default function MomentsSearchFilters({
 
   const apply = (channel: string, nextSort: string) => {
     const url = new URL(action, window.location.origin);
-    if (query) url.searchParams.set('q', query);
+    const form = rootRef.current?.closest('[data-moments-search-filters]')?.previousElementSibling;
+    const currentQuery = form?.querySelector<HTMLInputElement>('input[name="q"]')?.value ?? query;
+    if (currentQuery) url.searchParams.set('q', currentQuery);
     if (channel) url.searchParams.set('channel', channel);
     if (nextSort && nextSort !== 'relevance') url.searchParams.set('sort', nextSort);
     window.location.assign(`${url.pathname}${url.search}`);
@@ -138,7 +141,7 @@ export default function MomentsSearchFilters({
   ];
 
   return (
-    <div className={cn('grid grid-cols-2 gap-2')}>
+    <div ref={rootRef} className={cn('grid grid-cols-2 gap-2')}>
       <FilterSelect
         label={labels.channel}
         value={selectedChannelId}

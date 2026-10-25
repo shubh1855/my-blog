@@ -7,13 +7,16 @@
 
 import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
 import { useIsMounted } from '@hooks/useIsMounted';
+import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { cn } from '@lib/utils';
 import { useStore } from '@nanostores/react';
-import { activeAnnouncements, openAnnouncementList, unreadCount } from '@store/announcement';
+import { activeAnnouncements, announcementListOpen, openAnnouncementList, unreadCount } from '@store/announcement';
 import { AnimatePresence, m } from 'motion/react';
 
 export default function FooterAnnouncementEntry() {
+  const { t } = useTranslation();
+  const isOpen = useStore(announcementListOpen);
   const isMounted = useIsMounted();
   const count = useStore(unreadCount);
   const announcements = useStore(activeAnnouncements);
@@ -28,16 +31,16 @@ export default function FooterAnnouncementEntry() {
       <button
         type="button"
         onClick={openAnnouncementList}
-        aria-expanded={false}
+        aria-expanded={isOpen}
         aria-haspopup="dialog"
         className={cn(
           'relative flex items-center gap-1.5 opacity-75 transition-opacity duration-300 hover:opacity-100',
           'text-muted-foreground text-sm',
         )}
-        title="View announcements"
+        title={t('announcement.title')}
       >
         <Icon icon="ri:notification-3-line" className="h-4 w-4" />
-        <span>Announcements</span>
+        <span>{t('announcement.title')}</span>
 
         {/* Unread badge - only show after mount to avoid hydration mismatch */}
         <AnimatePresence>

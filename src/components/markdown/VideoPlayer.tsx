@@ -6,6 +6,7 @@
  * an optional playlist (shown only for multiple videos).
  */
 
+import { useTranslation } from '@hooks/useTranslation';
 import { useVideoPlayer } from '@hooks/useVideoPlayer';
 import { useCallback, useMemo, useRef } from 'react';
 import type { VideoTrack } from './video-player/utils';
@@ -17,6 +18,7 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({ element }: VideoPlayerProps) {
+  const { t } = useTranslation();
   const dataSrc = element.dataset.src || '[]';
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -69,6 +71,18 @@ export function VideoPlayer({ element }: VideoPlayerProps) {
         onSetVolume={player.setVolume}
         onToggleMute={player.toggleMute}
       />
+      {player.state.error && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2 text-red-700 text-sm dark:text-red-300" role="alert">
+          <span>{t('audio.playbackError')}</span>
+          <button
+            type="button"
+            className="shrink-0 underline underline-offset-4"
+            onClick={() => player.play(player.state.currentIndex)}
+          >
+            {t('audio.retry')}
+          </button>
+        </div>
+      )}
       {hasMultiple && (
         <VideoPlaylist
           tracks={tracks}

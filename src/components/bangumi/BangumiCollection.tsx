@@ -66,7 +66,8 @@ export function BangumiCollection({ userId }: BangumiCollectionProps) {
     );
   }, [data, t]);
 
-  const tabItems = data[activeTab];
+  const selectedTab = tabs.some((tab) => tab.key === activeTab) ? activeTab : (tabs[0]?.key ?? activeTab);
+  const tabItems = data[selectedTab];
 
   const filterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: tabItems.length };
@@ -98,7 +99,8 @@ export function BangumiCollection({ userId }: BangumiCollectionProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 py-8" aria-hidden="true">
+      <div className="space-y-4 py-8">
+        <output className="sr-only">{t('common.loading')}</output>
         <div className="flex gap-2">
           {Array.from({ length: 4 }, (_, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders have no stable id
@@ -150,21 +152,22 @@ export function BangumiCollection({ userId }: BangumiCollectionProps) {
               key={tab.key}
               type="button"
               onClick={() => handleTabChange(tab.key)}
+              aria-pressed={selectedTab === tab.key}
               className={cn(
                 'relative flex items-center gap-1.5 pb-2.5 font-medium text-sm transition-colors',
-                activeTab === tab.key ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+                selectedTab === tab.key ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {tab.label}
               <span
                 className={cn(
                   'rounded-full px-1.5 text-xs tabular-nums',
-                  activeTab === tab.key ? 'text-primary' : 'text-muted-foreground/60',
+                  selectedTab === tab.key ? 'text-primary' : 'text-muted-foreground/60',
                 )}
               >
                 {tab.count}
               </span>
-              {activeTab === tab.key && (
+              {selectedTab === tab.key && (
                 <m.span
                   layoutId="bangumi-tab-indicator"
                   className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary"
@@ -183,6 +186,7 @@ export function BangumiCollection({ userId }: BangumiCollectionProps) {
                   key={key}
                   type="button"
                   onClick={() => handleFilterChange(key)}
+                  aria-pressed={activeFilter === key}
                   className={cn(
                     'rounded-full border px-3 py-1 font-medium text-xs transition-colors',
                     activeFilter === key
@@ -199,7 +203,7 @@ export function BangumiCollection({ userId }: BangumiCollectionProps) {
 
         <AnimatePresence mode="popLayout">
           <m.div
-            key={`${activeTab}-${activeFilter}-${currentPage}`}
+            key={`${selectedTab}-${activeFilter}-${currentPage}`}
             className="grid desktop:grid-cols-4 grid-cols-3 gap-3 md:grid-cols-2"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}

@@ -98,6 +98,18 @@ export function AudioPlayer({ element }: AudioPlayerProps) {
         onSetVolume={player.setVolume}
         onToggleMute={player.toggleMute}
       />
+      {player.state.error && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2 text-red-700 text-sm dark:text-red-300" role="alert">
+          <span>{t('audio.playbackError')}</span>
+          <button
+            type="button"
+            className="shrink-0 underline underline-offset-4"
+            onClick={() => player.play(player.state.currentIndex)}
+          >
+            {t('audio.retry')}
+          </button>
+        </div>
+      )}
       <PlayerPlaylist
         tracks={tracks}
         groups={groups}

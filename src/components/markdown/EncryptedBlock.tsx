@@ -1,9 +1,8 @@
-import { useRetimer } from '@hooks/useRetimer';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { decryptContent } from '@lib/crypto/decrypt';
 import { cn } from '@lib/utils';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface EncryptedBlockProps {
   element: HTMLElement;
@@ -13,14 +12,13 @@ type DecryptState = 'locked' | 'decrypting' | 'unlocked' | 'error';
 
 export function EncryptedBlock({ element }: EncryptedBlockProps) {
   const [state, setState] = useState<DecryptState>('locked');
-  const [html, setHtml] = useState('');
+  const decryptedRef = useRef('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const retimer = useRetimer();
   const { t } = useTranslation();
 
   const handleDecrypt = useCallback(async () => {
     const password = inputRef.current?.value;
-    if (!password) return;
+    if (!password || state === 'decrypting') return;
 
     const { cipher, iv, salt } = element.dataset;
     if (!cipher || !iv || !salt) return;
@@ -29,13 +27,13 @@ export function EncryptedBlock({ element }: EncryptedBlockProps) {
     const result = await decryptContent(cipher, iv, salt, password);
 
     if (result) {
-      setHtml(result);
+      decryptedRef.current = result;
       setState('unlocked');
     } else {
       setState('error');
-      retimer(setTimeout(() => setState('locked'), 600));
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
-  }, [element, retimer]);
+  }, [element, state]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -44,18 +42,22 @@ export function EncryptedBlock({ element }: EncryptedBlockProps) {
     [handleDecrypt],
   );
 
+  useEffect(() => {
+    if (state !== 'unlocked') return;
+    element.innerHTML = decryptedRef.current;
+    element.classList.remove('encrypted-block');
+    element.classList.add('encrypted-block-content');
+    for (const key of ['cipher', 'iv', 'salt', 'react-enhanced']) element.removeAttribute(`data-${key}`);
+    element.tabIndex = -1;
+    element.focus({ preventScroll: true });
+    document.dispatchEvent(new CustomEvent('content:decrypted'));
+  }, [state, element]);
+
   if (!element.dataset.cipher || !element.dataset.iv || !element.dataset.salt) {
     return <div className="encrypted-block-error">Error: Missing encryption data</div>;
   }
 
-  if (state === 'unlocked') {
-    return (
-      <div className="encrypted-block-content prose dark:prose-invert max-w-none">
-        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: content is from our own build-time markdown pipeline */}
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-      </div>
-    );
-  }
+  if (state === 'unlocked') return null;
 
   return (
     <div className="encrypted-block-locked">
@@ -69,6 +71,8 @@ export function EncryptedBlock({ element }: EncryptedBlockProps) {
           ref={inputRef}
           type="password"
           className="encrypted-block-input"
+          aria-label={t('encrypted.placeholder')}
+          aria-invalid={state === 'error'}
           placeholder={t('encrypted.placeholder')}
           autoComplete="off"
           onKeyDown={handleKeyDown}
@@ -88,6 +92,7 @@ export function EncryptedBlock({ element }: EncryptedBlockProps) {
           )}
         </button>
       </div>
+      {state === 'error' && <p role="alert">{t('encrypted.incorrect')}</p>}
     </div>
   );
 }

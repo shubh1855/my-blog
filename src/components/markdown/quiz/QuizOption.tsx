@@ -25,10 +25,10 @@ export function QuizOption({ index, html, isCorrect, isSelected, revealed, disab
       )}
       onClick={onClick}
       disabled={disabled}
-      aria-label={`选项 ${String.fromCharCode(65 + index)}`}
       aria-pressed={isSelected}
     >
       <span
+        aria-hidden="true"
         className={cn(
           'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full font-semibold text-xs',
           !revealed && !isSelected && 'bg-muted text-muted-foreground',

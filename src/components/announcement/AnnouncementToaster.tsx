@@ -5,7 +5,7 @@
  * Each toast can be dismissed, which marks it as read.
  */
 
-import { useRetimer } from '@hooks/useRetimer';
+import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { useStore } from '@nanostores/react';
 import {
@@ -15,11 +15,9 @@ import {
   openAnnouncementList,
   unreadAnnouncements,
 } from '@store/announcement';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import type { Announcement } from '@/types/announcement';
-
-const HOVER_READ_DELAY = 1000; // ms before marking as read on hover
 
 const typeStyles: Record<string, { color: string; icon: string }> = {
   info: { color: '#3b82f6', icon: 'ri:information-line' },
@@ -40,11 +38,12 @@ export function getAnnouncementIcon(announcement: Announcement): string {
 }
 
 function AnnouncementToastContent({ announcement }: { announcement: Announcement }) {
+  const { t } = useTranslation();
   const color = getAnnouncementColor(announcement);
   const icon = getAnnouncementIcon(announcement);
 
   return (
-    <div className="flex w-full flex-col gap-2 border-l-4 pl-3" style={{ borderLeftColor: color }}>
+    <div className="flex w-full flex-col gap-2 border-l pl-3" style={{ borderLeftColor: color }}>
       {/* Header */}
       <div className="flex items-center gap-2">
         <Icon icon={icon} className="h-4 w-4 shrink-0 opacity-70" />
@@ -62,7 +61,7 @@ function AnnouncementToastContent({ announcement }: { announcement: Announcement
           rel={announcement.link.external ? 'noopener noreferrer' : undefined}
           className="inline-flex items-center gap-1 text-primary text-sm hover:underline"
         >
-          {announcement.link.text ?? 'Learn more'}
+          {announcement.link.text ?? t('announcement.learnMore')}
           {announcement.link.external && <Icon icon="ri:external-link-line" className="h-3 w-3" />}
         </a>
       )}
@@ -71,34 +70,24 @@ function AnnouncementToastContent({ announcement }: { announcement: Announcement
 }
 
 function AnnouncementToast({ announcement, toastId }: { announcement: Announcement; toastId: string | number }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const retimer = useRetimer();
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    retimer(setTimeout(() => markAsRead(announcement.id), HOVER_READ_DELAY));
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    retimer(null);
-  };
+  const { t } = useTranslation();
 
   return (
-    <output
-      className={`block w-full min-w-50 rounded-lg border border-border/50 bg-card/95 p-4 shadow-lg backdrop-blur-md transition-all duration-200 ${
-        isHovered ? 'scale-[1.02] shadow-xl' : ''
-      }`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <output className="block w-full min-w-50 rounded-lg border border-border/50 bg-card/95 p-4 shadow-lg backdrop-blur-md">
       <AnnouncementToastContent announcement={announcement} />
       <div className="mt-3 flex items-center justify-between border-border/50 border-t pt-2 text-muted-foreground text-xs">
         <button onClick={openAnnouncementList} className="text-primary hover:underline" type="button">
-          View all
+          {t('announcement.title')}
         </button>
-        <button onClick={() => toast.dismiss(toastId)} className="opacity-70 hover:opacity-100" type="button">
-          Dismiss
+        <button
+          onClick={() => {
+            markAsRead(announcement.id);
+            toast.dismiss(toastId);
+          }}
+          className="opacity-70 hover:opacity-100"
+          type="button"
+        >
+          {t('announcement.markRead')}
         </button>
       </div>
     </output>

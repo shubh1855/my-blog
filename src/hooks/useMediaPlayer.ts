@@ -48,6 +48,7 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
   const getUrlRef = useRef(getUrl);
   const getElementRef = useRef(getElement);
   const loadAndPlayRef = useRef<(index: number) => void>(() => {});
+  const playRequestIdRef = useRef(0);
   const [timeStore] = useState(() => createPlaybackTimeStore());
 
   const [state, setState] = useState<MediaPlayerState>({
@@ -66,11 +67,18 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
       const el = getElementRef.current();
       const currentTracks = tracksRef.current;
       if (!el || !currentTracks[index]) return;
-      el.src = getUrlRef.current(currentTracks[index]);
-      el.play().catch(() => {});
+      const requestId = ++playRequestIdRef.current;
+      const source = getUrlRef.current(currentTracks[index]);
+      el.src = source;
+      const playRequest = el.play();
       $activePlayerId.set(playerId);
       timeStore.reset();
       setState((s) => ({ ...s, currentIndex: index, loading: true, error: null }));
+      playRequest?.catch(() => {
+        if (requestId !== playRequestIdRef.current || getElementRef.current() !== el || el.getAttribute('src') !== source)
+          return;
+        setState((s) => ({ ...s, playing: false, loading: false, error: 'Playback could not start' }));
+      });
     },
     [playerId, timeStore],
   );
@@ -155,6 +163,7 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
     el.addEventListener('ended', onEnded);
 
     return () => {
+      playRequestIdRef.current++;
       el.removeEventListener('timeupdate', onTimeUpdate);
       el.removeEventListener('durationchange', onDurationChange);
       el.removeEventListener('playing', onPlaying);
@@ -168,6 +177,7 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
   // Pause when another player starts
   useEffect(() => {
     if (activeId !== null && activeId !== playerId && state.playing) {
+      playRequestIdRef.current++;
       getElementRef.current()?.pause();
     }
   }, [activeId, playerId, state.playing]);
@@ -180,7 +190,13 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
       if (index != null || !el.src) {
         loadAndPlay(targetIndex);
       } else {
-        el.play().catch(() => {});
+        const requestId = ++playRequestIdRef.current;
+        const source = el.src;
+        el.play()?.catch(() => {
+          if (requestId !== playRequestIdRef.current || getElementRef.current() !== el || el.getAttribute('src') !== source)
+            return;
+          setState((s) => ({ ...s, playing: false, loading: false, error: 'Playback could not start' }));
+        });
         $activePlayerId.set(playerId);
       }
     },
@@ -188,6 +204,7 @@ export function useMediaPlayer<T>({ tracks, getUrl, getElement }: UseMediaPlayer
   );
 
   const pause = useCallback(() => {
+    playRequestIdRef.current++;
     getElementRef.current()?.pause();
   }, []);
 

@@ -107,6 +107,21 @@ export default function BGMPlayerContent({ audioGroups }: GlobalBGMPlayerProps) 
           onSetVolume={player.setVolume}
           onToggleMute={player.toggleMute}
         />
+        {player.state.error && (
+          <div
+            className="flex items-center justify-between gap-3 px-4 py-2 text-red-700 text-sm dark:text-red-300"
+            role="alert"
+          >
+            <span>{t('audio.playbackError')}</span>
+            <button
+              type="button"
+              className="shrink-0 underline underline-offset-4"
+              onClick={() => player.play(player.state.currentIndex)}
+            >
+              {t('audio.retry')}
+            </button>
+          </div>
+        )}
         <PlayerPlaylist
           tracks={tracks}
           groups={groups}
@@ -128,6 +143,7 @@ export default function BGMPlayerContent({ audioGroups }: GlobalBGMPlayerProps) 
           <motion.div
             ref={refs.setFloating}
             {...getFloatingProps()}
+            aria-label={t('audio.bgmTitle')}
             className="fixed right-16 bottom-20 z-40 w-[460px] max-w-[calc(100vw-5rem)]"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

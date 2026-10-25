@@ -342,6 +342,17 @@ export const uiStrings = {
 
   // ── Audio Player ────────────────────────────────────────────
   'audio.loading': '加载播放列表…',
+  'audio.bgmTitle': '背景音乐播放器',
+  'audio.playbackError': '播放失败。请检查网络连接后重试。',
+  'announcement.markRead': '标为已读',
+  'audio.playerLoadFailed': '无法加载音乐播放器。',
+  'settings.loading': '正在加载设置…',
+  'settings.loadFailed': '无法加载设置。请重试。',
+  'settings.retry': '重试',
+  'about.contributionsLoading': '正在加载贡献数据…',
+  'about.contributionsLoadFailed': '无法加载贡献数据。',
+  'about.contributionsRetry': '重试',
+  'about.viewGithubProfile': '查看 GitHub 个人资料',
   'audio.loadError': '加载失败: {error}',
   'audio.retry': '重试',
   'audio.empty': '暂无曲目',

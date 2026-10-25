@@ -344,6 +344,17 @@ export const uiStrings: UIStrings = {
 
   // ── Audio Player ────────────────────────────────────────────
   'audio.loading': 'Loading playlist...',
+  'audio.bgmTitle': 'Background music player',
+  'audio.playbackError': 'Playback failed. Check your connection and try again.',
+  'announcement.markRead': 'Mark as read',
+  'audio.playerLoadFailed': 'The music player could not load.',
+  'settings.loading': 'Loading settings…',
+  'settings.loadFailed': 'Settings could not be loaded. Please try again.',
+  'settings.retry': 'Retry',
+  'about.contributionsLoading': 'Loading contribution data…',
+  'about.contributionsLoadFailed': 'Contribution data could not be loaded.',
+  'about.contributionsRetry': 'Try again',
+  'about.viewGithubProfile': 'View GitHub profile',
   'audio.loadError': 'Load failed: {error}',
   'audio.retry': 'Retry',
   'audio.empty': 'No tracks',

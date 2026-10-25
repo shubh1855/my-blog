@@ -93,6 +93,7 @@ const {
   )}
 </form>
 {showFilters && (
+  <div data-moments-search-filters>
   <SearchFilters
     client:load
     action={action}
@@ -108,4 +109,5 @@ const {
       newest: labels.newest,
     }}
   />
+  </div>
 )}

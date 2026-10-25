@@ -513,6 +513,12 @@
   opacity: 1;
 }
 
+.prose .markdown-image-fullscreen:focus-visible {
+  opacity: 1;
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
 /* Image caption */
 /* Hide caption before image loads but preserve space to reduce CLS */
 .prose .markdown-image-caption {

@@ -1,7 +1,7 @@
 import { useTranslation } from '@hooks/useTranslation';
 import type { ParsedQuiz } from '@lib/quiz';
 import { cn } from '@lib/utils';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { QuizBadge } from './QuizBadge';
 import { QuizExplanation } from './QuizExplanation';
 import { QuizOption } from './QuizOption';
@@ -10,6 +10,10 @@ export function SingleChoiceQuiz({ quiz }: { quiz: ParsedQuiz }) {
   const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const resultRef = useRef<HTMLOutputElement>(null);
+  useEffect(() => {
+    if (revealed) resultRef.current?.focus({ preventScroll: true });
+  }, [revealed]);
 
   const handleSelect = useCallback(
     (index: number) => {
@@ -45,6 +49,8 @@ export function SingleChoiceQuiz({ quiz }: { quiz: ParsedQuiz }) {
         ))}
       </fieldset>
       <output
+        ref={resultRef}
+        tabIndex={-1}
         aria-live="polite"
         className={cn(
           'block rounded-lg px-3 py-2 font-medium text-sm',

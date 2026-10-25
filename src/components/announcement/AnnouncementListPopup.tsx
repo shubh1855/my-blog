@@ -5,8 +5,7 @@
  * Triggered from Footer entry point.
  */
 
-import { LazyMotionProvider } from '@components/common/LazyMotionProvider';
-import { animation, zIndex } from '@constants/design-tokens';
+import { ModalLayer } from '@components/ui/ModalLayer';
 import { useTranslation } from '@hooks/useTranslation';
 import { Icon } from '@iconify/react';
 import { displayDate } from '@lib/date';
@@ -20,7 +19,7 @@ import {
   markAsRead,
   readAnnouncementIds,
 } from '@store/announcement';
-import { AnimatePresence, m } from 'motion/react';
+import { useEffect } from 'react';
 import type { Announcement } from '@/types/announcement';
 import { getAnnouncementColor, getAnnouncementIcon } from './AnnouncementToaster';
 
@@ -85,13 +84,11 @@ function TimelineItem({
       </div>
 
       {/* Card */}
-      <button
-        type="button"
+      <div
         className={cn(
-          'relative mb-3 flex-1 cursor-pointer overflow-hidden rounded-lg border border-border text-left transition-shadow md:mb-5 md:rounded-xl',
+          'relative mb-3 flex-1 overflow-hidden rounded-lg border border-border text-left transition-shadow md:mb-5 md:rounded-xl',
           isRead ? 'bg-muted/20 opacity-60' : 'bg-card shadow-sm hover:shadow-md',
         )}
-        onClick={handleClick}
       >
         {/* Left accent */}
         <div className="absolute inset-y-0 left-0 w-1" style={{ backgroundColor: color }} />
@@ -116,6 +113,11 @@ function TimelineItem({
           {/* Content */}
           <p className="mt-1.5 text-muted-foreground text-xs leading-relaxed md:mt-2 md:text-sm">{announcement.content}</p>
 
+          {!isRead && (
+            <button type="button" onClick={handleClick} className="mt-2 text-primary text-xs hover:underline">
+              {t('announcement.markRead')}
+            </button>
+          )}
           {/* Link */}
           {announcement.link && (
             <a
@@ -124,14 +126,14 @@ function TimelineItem({
               rel={announcement.link.external ? 'noopener noreferrer' : undefined}
               className="mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs transition-all hover:gap-2 md:mt-3 md:px-3 md:py-1 md:text-sm"
               style={{ backgroundColor: `${color}15`, color }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={handleClick}
             >
               {announcement.link.text ?? t('announcement.learnMore')}
               <Icon icon="ri:arrow-right-s-line" className="h-3.5 w-3.5 md:h-4 md:w-4" />
             </a>
           )}
         </div>
-      </button>
+      </div>
     </div>
   );
 }
@@ -145,98 +147,82 @@ export default function AnnouncementListPopup() {
   const unreadCount = announcements.filter((a) => !readIds.has(a.id)).length;
   const hasUnread = unreadCount > 0;
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
   return (
-    <LazyMotionProvider>
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <m.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-              style={{ zIndex: zIndex.modalBackdrop }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeAnnouncementList}
-            />
-
-            {/* Popup */}
-            <m.div
-              className="fixed inset-x-3 top-1/2 mx-auto max-w-lg overflow-hidden rounded-xl bg-card shadow-2xl md:inset-x-4 md:rounded-2xl"
-              style={{ zIndex: zIndex.modal }}
-              initial={{ opacity: 0, y: '-45%', scale: 0.95 }}
-              animate={{ opacity: 1, y: '-50%', scale: 1 }}
-              exit={{ opacity: 0, y: '-45%', scale: 0.95 }}
-              transition={animation.spring.default}
+    <ModalLayer
+      open={isOpen}
+      onClose={closeAnnouncementList}
+      ariaLabel={t('announcement.title')}
+      className="h-auto max-h-[calc(100dvh-2rem)] max-w-lg bg-card md:max-w-lg"
+      backdropClassName="bg-black/50"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between border-border border-b bg-linear-to-r from-primary/5 to-transparent p-3 md:p-4">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 md:h-10 md:w-10 md:rounded-xl">
+            <Icon icon="ri:notification-3-line" className="h-4 w-4 text-primary md:h-5 md:w-5" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm md:text-base">{t('announcement.title')}</h3>
+            <p className="text-[10px] text-muted-foreground md:text-xs">
+              {t('announcement.count', { count: String(announcements.length) })}
+              {hasUnread && (
+                <span className="text-primary"> · {t('announcement.unreadCount', { count: String(unreadCount) })}</span>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 md:gap-2">
+          {hasUnread && (
+            <button
+              onClick={markAllAsRead}
+              className="rounded-md bg-primary/10 px-2 py-1 text-[10px] text-primary transition-colors hover:bg-primary/20 md:rounded-lg md:px-3 md:py-1.5 md:text-xs"
+              type="button"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between border-border border-b bg-linear-to-r from-primary/5 to-transparent p-3 md:p-4">
-                <div className="flex items-center gap-2 md:gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 md:h-10 md:w-10 md:rounded-xl">
-                    <Icon icon="ri:notification-3-line" className="h-4 w-4 text-primary md:h-5 md:w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm md:text-base">{t('announcement.title')}</h3>
-                    <p className="text-[10px] text-muted-foreground md:text-xs">
-                      {t('announcement.count', { count: String(announcements.length) })}
-                      {hasUnread && (
-                        <span className="text-primary"> · {t('announcement.unreadCount', { count: String(unreadCount) })}</span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 md:gap-2">
-                  {hasUnread && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="rounded-md bg-primary/10 px-2 py-1 text-[10px] text-primary transition-colors hover:bg-primary/20 md:rounded-lg md:px-3 md:py-1.5 md:text-xs"
-                      type="button"
-                    >
-                      {t('announcement.markAllRead')}
-                    </button>
-                  )}
-                  <button
-                    onClick={closeAnnouncementList}
-                    className="rounded-md p-1.5 transition-colors hover:bg-black/5 md:rounded-lg md:p-2 dark:hover:bg-white/10"
-                    aria-label={t('common.close')}
-                    type="button"
-                  >
-                    <Icon icon="ri:close-line" className="h-4 w-4 md:h-5 md:w-5" />
-                  </button>
-                </div>
-              </div>
+              {t('announcement.markAllRead')}
+            </button>
+          )}
+          <button
+            onClick={closeAnnouncementList}
+            className="rounded-md p-1.5 transition-colors hover:bg-black/5 md:rounded-lg md:p-2 dark:hover:bg-white/10"
+            aria-label={t('common.close')}
+            type="button"
+          >
+            <Icon icon="ri:close-line" className="h-4 w-4 md:h-5 md:w-5" />
+          </button>
+        </div>
+      </div>
 
-              {/* Content */}
-              <div className="max-h-[60vh] overflow-y-auto p-3 md:p-4">
-                {announcements.length === 0 ? (
-                  <div className="py-8 text-center text-muted-foreground md:py-12">
-                    <Icon
-                      icon="ri:notification-off-line"
-                      className="mx-auto mb-2 h-12 w-12 opacity-20 md:mb-3 md:h-16 md:w-16"
-                    />
-                    <p className="font-medium text-sm md:text-base">{t('announcement.empty')}</p>
-                    <p className="mt-1 text-xs opacity-70 md:text-sm">{t('announcement.emptyHint')}</p>
-                  </div>
-                ) : (
-                  <div>
-                    {announcements.map((announcement, index) => (
-                      <TimelineItem
-                        key={announcement.id}
-                        announcement={announcement}
-                        isRead={readIds.has(announcement.id)}
-                        isLast={index === announcements.length - 1}
-                        nextColor={
-                          index < announcements.length - 1 ? getAnnouncementColor(announcements[index + 1]) : undefined
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </m.div>
-          </>
+      {/* Content */}
+      <div className="min-h-0 overflow-y-auto p-3 md:p-4">
+        {announcements.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground md:py-12">
+            <Icon icon="ri:notification-off-line" className="mx-auto mb-2 h-12 w-12 opacity-20 md:mb-3 md:h-16 md:w-16" />
+            <p className="font-medium text-sm md:text-base">{t('announcement.empty')}</p>
+            <p className="mt-1 text-xs opacity-70 md:text-sm">{t('announcement.emptyHint')}</p>
+          </div>
+        ) : (
+          <div>
+            {announcements.map((announcement, index) => (
+              <TimelineItem
+                key={announcement.id}
+                announcement={announcement}
+                isRead={readIds.has(announcement.id)}
+                isLast={index === announcements.length - 1}
+                nextColor={index < announcements.length - 1 ? getAnnouncementColor(announcements[index + 1]) : undefined}
+              />
+            ))}
+          </div>
         )}
-      </AnimatePresence>
-    </LazyMotionProvider>
+      </div>
+    </ModalLayer>
   );
 }

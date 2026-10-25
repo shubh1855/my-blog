@@ -22,7 +22,7 @@ export default function RelatedPostList({ posts, fallbackPool, fallbackCount, st
     fallbackPool.length <= fallbackCount ? shuffleArray(fallbackPool) : shuffleArray(fallbackPool).slice(0, fallbackCount);
 
   const displayPosts = hasRelatedPosts ? posts : fallbackPosts;
-  const title = hasRelatedPosts ? t('post.relatedPosts') : '';
+  const title = hasRelatedPosts ? t('post.relatedPosts') : t('post.randomPosts');
 
   if (displayPosts.length === 0) {
     return null;
