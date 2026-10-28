@@ -41,3 +41,18 @@ F09–F15: image failure/retry, diagram keyboard controls, clipboard recovery, i
 ## Remaining verification limits
 
 Physical Android/iOS gestures, Safari/WebKit, native browser zoom, and actual screen-reader speech remain manual checks, as previously deferred. Optional integrations are still disabled/unconfigured on this blog; source fixes do not establish live service behavior. Arbitrary Markdown/MDX round-trip fidelity is not guaranteed by the visual CMS: the warning is a data-loss safeguard, not a parser compatibility claim.
+
+## Local main merge check — 28 October 2026
+
+Merged `fix/ui-navigation-accessibility` into local `main` by fast-forward to `d4ee2ab`. Nothing was pushed.
+
+- Public production build: passed, 103 pages. CMS production build: passed, with existing bundle warnings.
+- Astro validation: zero errors and warnings (68 hints, including unrelated untracked CTF JavaScript).
+- Tracked-file Biome check: passed, 519 files. Full `pnpm lint` still fails on the unrelated untracked `kpmg-ctf/` material; it remains untouched.
+- Config tests: 18 passed. Markdown tests: 21 passed. TOC tests: 12 passed. Moments tests: 61 passed after updating the stale assertion that required the removed artificial loading delay.
+- Migration/backup tests: 34 passed, 22 failed. An isolated checkout of pre-merge `main` (`3a55d7d`) reproduced the same 22 failing test names. These failures predate the UI merge; the migration implementation is unchanged by it.
+- Standalone CMS type checking still reports the previously recorded errors outside the changed UI files.
+- Chromium production smoke checks passed: keyboard Posts menu, Search, Settings Auto and associated numeric errors, TOC hash/focus, fullscreen close, About/Friends/categories/tags/archives routes, mobile drawer focus restoration and document bounds. No public-page JavaScript errors were observed in these flows.
+- CMS smoke checks passed against its local server: dashboard/list loading, retained search focus, Create dialog dismissal, and reachable dialog bounds at 640 × 360. No posts were written.
+
+The merge is validated for these checks. The full repository test command is not green because of the pre-existing migration failures. Previously deferred physical-device and screen-reader checks remain deferred.

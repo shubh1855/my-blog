@@ -104,7 +104,7 @@ test('renders loading as an inline timeline placeholder strip and gently reveals
   assert.match(pagination, /tabindex="-1"/);
   assert.match(pagination, /data-state='loading'] \[data-pagination-status\]/);
   assert.match(pagination, /@keyframes moments-status-in/);
-  assert.match(pagination, /MIN_LOADING_INDICATOR_MS/);
+  assert.doesNotMatch(pagination, /MIN_LOADING_INDICATOR_MS|remainingIndicatorMs/);
   assert.match(pagination, /active:scale-\[0\.96\]/);
   assert.doesNotMatch(
     pagination,
@@ -112,7 +112,5 @@ test('renders loading as an inline timeline placeholder strip and gently reveals
   );
   assert.doesNotMatch(pagination, /animation-delay|transition-all/);
 
-  const minimumLoadingWait = pagination.indexOf('const remainingIndicatorMs');
-  const appendBatch = pagination.indexOf('timeline.append(...appendedItems)');
-  assert.ok(minimumLoadingWait >= 0 && minimumLoadingWait < appendBatch);
+  assert.match(pagination, /timeline\.append\(\.\.\.appendedItems\)/);
 });
