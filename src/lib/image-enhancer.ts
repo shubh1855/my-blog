@@ -16,8 +16,8 @@ function createFullscreenButton(): HTMLButtonElement {
   const button = document.createElement('button');
   button.className = 'markdown-image-fullscreen';
   button.setAttribute('type', 'button');
-  button.setAttribute('aria-label', '全屏查看');
-  button.title = '全屏查看';
+  button.setAttribute('aria-label', 'View fullscreen');
+  button.title = 'View fullscreen';
   button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`;
   return button;
 }
@@ -29,7 +29,7 @@ function createErrorPlaceholder(img: HTMLImageElement): HTMLElement {
   const placeholder = document.createElement('div');
   placeholder.className = 'markdown-image-error';
   placeholder.setAttribute('role', 'img');
-  placeholder.setAttribute('aria-label', img.alt ? `图片加载失败: ${img.alt}` : '图片加载失败');
+  placeholder.setAttribute('aria-label', img.alt ? `Image failed to load: ${img.alt}` : 'Image failed to load');
 
   const icon = document.createElement('span');
   icon.className = 'markdown-image-error-icon';
@@ -37,7 +37,7 @@ function createErrorPlaceholder(img: HTMLImageElement): HTMLElement {
 
   const text = document.createElement('span');
   text.className = 'markdown-image-error-text';
-  text.textContent = '图片加载失败';
+  text.textContent = 'Image failed to load';
 
   placeholder.appendChild(icon);
   placeholder.appendChild(text);
@@ -77,10 +77,10 @@ function handleImageClick(e: Event): void {
   // Collect all loaded images from the nearest content container
   const container = img.closest('.custom-content') ?? document.body;
   const allImages = Array.from(container.querySelectorAll<HTMLImageElement>('.markdown-image.loaded'));
-  const images = allImages.map((i) => ({ src: i.src, alt: i.alt || '图片' }));
+  const images = allImages.map((i) => ({ src: i.src, alt: i.alt || 'Image' }));
   const currentIndex = Math.max(0, allImages.indexOf(img));
 
-  openImageLightbox(img.src, img.alt || '图片', images, currentIndex);
+  openImageLightbox(img.src, img.alt || 'Image', images, currentIndex);
 }
 
 export function enhanceImages(container: Element): void {

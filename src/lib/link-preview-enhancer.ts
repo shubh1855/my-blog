@@ -12,7 +12,7 @@ function createErrorPlaceholder(title: string): HTMLElement {
   const placeholder = document.createElement('div');
   placeholder.className = 'link-preview-image-error';
   placeholder.setAttribute('role', 'img');
-  placeholder.setAttribute('aria-label', `预览图片加载失败: ${title}`);
+  placeholder.setAttribute('aria-label', `Preview image failed to load: ${title}`);
 
   // Icon
   const icon = document.createElement('span');
@@ -22,7 +22,7 @@ function createErrorPlaceholder(title: string): HTMLElement {
   // Text
   const text = document.createElement('span');
   text.className = 'link-preview-image-error-text';
-  text.textContent = '图片加载失败';
+  text.textContent = 'Image failed to load';
 
   placeholder.appendChild(icon);
   placeholder.appendChild(text);
@@ -37,7 +37,7 @@ function handleImageError(img: HTMLImageElement): void {
   img.classList.add('error');
 
   // Get fallback title from data attribute
-  const title = img.getAttribute('data-fallback-title') || '预览';
+  const title = img.getAttribute('data-fallback-title') || 'Preview';
 
   // Add error placeholder
   const imageContainer = img.parentElement;
