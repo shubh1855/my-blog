@@ -70,13 +70,17 @@ function listTarEntries(archivePath: string): string[] {
  * Internal implementation note.
  */
 export function tarExtractManifest(archivePath: string): string | null {
-  const result = spawnSync('tar', ['-xzf', archivePath, '-O', 'manifest.json'], {
-    encoding: 'utf-8',
-    cwd: PROJECT_ROOT,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
-  if (result.status === 0 && result.stdout) {
-    return result.stdout;
+  // tarCreate archives '.' and stores './manifest.json'. Historical archives
+  // may use the unprefixed name; tar requires the stored member name to match.
+  for (const member of ['./manifest.json', 'manifest.json']) {
+    const result = spawnSync('tar', ['-xzf', archivePath, '-O', member], {
+      encoding: 'utf-8',
+      cwd: PROJECT_ROOT,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    if (result.status === 0 && result.stdout) {
+      return result.stdout;
+    }
   }
   return null;
 }

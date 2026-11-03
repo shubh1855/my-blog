@@ -55,6 +55,7 @@ categoryMap:
   笔记: note
   Notes: note
   工具: tools
+  Tools: tools
   Linux: linux
   周刊: weekly
   # Secondary categories (for nested paths)
@@ -65,6 +66,8 @@ categoryMap:
   Technovate CTF: technovate-ctf
   "HTB Cyber Apocalypse CTF 2026: The Salt Crown": htb-cyber-apocalypse-2026
   Xploitathon CTF: xploitathon-ctf
+  KPMG CTF 2026: kpmg-ctf-2026
+  BSides Mumbai CTF: bsides-mumbai-2026
   # Add more as needed:
   # 书摘: reading
   # 后端: back-end
@@ -93,6 +96,8 @@ featuredCategories:
     label: Tools
     image: /img/cover/tools.webp
     description: Tools and productivity tips
+    # Show a placeholder until the first Tools post is published; real category content then takes priority.
+    comingSoon: true
   - link: linux
     label: Linux
     image: /img/cover/lelouch-inside-mech.webp

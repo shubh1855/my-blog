@@ -30,7 +30,7 @@ const { post, siderType, isPostPage } = Astro.props;
 
 <div class="flex min-h-screen flex-col text-black dark:text-white">
   <Header isPostPage={isPostPage} tocNumbering={post?.data.tocNumbering ?? true} />
-  <main class="relative flex grow flex-col gap-4">
+  <main class="relative flex grow flex-col gap-4 tablet:pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
     {(<slot />)}
   </main>
   {bgmConfig.enabled && bgmConfig.audio.length > 0 && (
@@ -50,3 +50,15 @@ const { post, siderType, isPostPage } = Astro.props;
   <AnnouncementProvider />
   <CodePenEmbed />
 </div>
+
+<style is:global>
+  @media (max-width: 992px) {
+    html {
+      scroll-padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    }
+
+    :where(a, button, input, select, textarea, [tabindex]) {
+      scroll-margin-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    }
+  }
+</style>

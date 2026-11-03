@@ -68,6 +68,10 @@ export const uiStrings: UIStrings = {
   'post.noPostsFound': '投稿が見つかりません',
 
   // ── カテゴリーとタグ ───────────────────────────────────────
+  'category.comingSoon': '近日公開',
+  'category.comingSoonDescription': 'このカテゴリーにはまだ記事がありません。',
+  'category.backToCategories': 'カテゴリーを見る',
+  'category.comingSoonLabel': '{name} — 近日公開',
   'category.allCategories': 'すべてのカテゴリー',
   'category.postsInCategory': '{name}の投稿',
   'category.totalCategories': '{count}件のカテゴリー',
@@ -206,6 +210,7 @@ export const uiStrings: UIStrings = {
   'floating.scrollToBottom': '下にスクロール',
   'floating.toggleTheme': 'テーマを切り替え',
   'floating.bgm': 'BGM',
+  'floating.pageControls': 'ページ操作',
   'floating.toggleToolbar': 'ツールバーを切り替え',
   'floating.settings': '設定',
 

@@ -68,6 +68,10 @@ export const uiStrings: UIStrings = {
   'post.noPostsFound': 'No posts found',
 
   // ── Categories & Tags ───────────────────────────────────────
+  'category.comingSoon': 'Coming soon',
+  'category.comingSoonDescription': 'No posts have been published here yet.',
+  'category.backToCategories': 'Browse categories',
+  'category.comingSoonLabel': '{name} — Coming soon',
   'category.allCategories': 'All Categories',
   'category.postsInCategory': 'Posts in {name}',
   'category.totalCategories': '{count} categories',
@@ -206,6 +210,7 @@ export const uiStrings: UIStrings = {
   'floating.scrollToBottom': 'Scroll Bottom',
   'floating.toggleTheme': 'Toggle theme',
   'floating.bgm': 'Background music',
+  'floating.pageControls': 'Page controls',
   'floating.toggleToolbar': 'Toggle toolbar',
   'floating.settings': 'Settings',
 

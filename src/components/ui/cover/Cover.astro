@@ -56,17 +56,17 @@ const copyFailedLabel = t(locale, 'common.copyFailed');
       title ? (
         <h1
           class:list={[
-            'shadow-text word-break flex items-center gap-2 text-center font-bold text-balance',
+            'shadow-text word-break flex max-w-full min-w-0 flex-wrap items-center justify-center gap-2 text-center font-bold text-balance tablet:gap-y-1 tablet:text-3xl/[1.15] tablet:tracking-[0.02em]',
             MAX_WIDTH.content,
             compact
               ? 'text-4xl/[1.15] tracking-[0.08em] tablet:text-3xl/[1.15] tablet:tracking-[0.05em]'
               : 'text-5xl/[1.2] tracking-widest',
           ]}
         >
-          {title}
+          <span class="min-w-0 [overflow-wrap:anywhere]">{title}</span>
           <button
             type="button"
-            class="cover-copy-link hover:text-primary inline-flex cursor-pointer items-center rounded-full p-1 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            class="cover-copy-link hover:text-primary inline-flex shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             aria-label={copyLinkLabel}
             title={copyLinkLabel}
             data-copy-label={copyLinkLabel}

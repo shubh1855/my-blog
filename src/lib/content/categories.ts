@@ -5,8 +5,8 @@
 import { categoryMap } from '@lib/config/site';
 import { getContentFeaturedCategoryField, getContentSeriesField } from '@/i18n/content';
 import type { Locale } from '@/i18n/types';
-import { encodeSlug } from '../route';
 import { memoize } from './cache';
+import { getCategoryLinks as buildCategoryLinks } from './category-url';
 import { getSortedPosts } from './posts';
 import type { Category, CategoryListResult } from './types';
 
@@ -99,19 +99,12 @@ export function addCategoryRecursively(rootCategories: Category[], parentNames: 
  * @param parentLink 父分类链接
  * @returns 分类链接
  */
-export function getCategoryLinks(categories?: Category[], parentLink?: string): string[] {
-  if (!categories?.length) return [];
-  const res: string[] = [];
-  categories.forEach((category: Category) => {
-    const link = encodeSlug(categoryMap[category.name]);
-    const fullLink = parentLink ? `${parentLink}/${link}` : link;
-    res.push(fullLink);
-    if (category?.children?.length) {
-      const children = getCategoryLinks(category?.children, fullLink);
-      res.push(...children);
-    }
-  });
-  return res;
+export function getCategoryLinks(
+  categories?: Category[],
+  parentLink?: string,
+  mapping: Record<string, string> = categoryMap,
+): string[] {
+  return buildCategoryLinks(categories, parentLink, mapping);
 }
 
 /**

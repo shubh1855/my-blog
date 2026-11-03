@@ -1,4 +1,5 @@
 ---
+import type { FeaturedCategory } from '@lib/config/types';
 import type { Category } from '@lib/content';
 import { categoryRoute } from '../../_shared/routes';
 import CategoryPage from '../../categories/[...slug].astro';
@@ -8,8 +9,9 @@ export const getStaticPaths = categoryRoute.mirror;
 interface Props {
   category: Category | null;
   locale: string;
+  placeholderCategory?: FeaturedCategory | null;
 }
 
-const { category, locale } = Astro.props;
+const { category, locale, placeholderCategory } = Astro.props;
 ---
-<CategoryPage category={category} locale={locale} />
+<CategoryPage category={category} locale={locale} placeholderCategory={placeholderCategory} />

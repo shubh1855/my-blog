@@ -40,6 +40,8 @@ export interface FeaturedCategory {
   image: string;
   label?: string;
   description?: string;
+  /** Publish a placeholder route until this category has content. */
+  comingSoon?: boolean;
 }
 
 export interface FeaturedSeriesLinks {

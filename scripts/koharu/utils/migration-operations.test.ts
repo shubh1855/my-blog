@@ -196,7 +196,7 @@ test('generated links preserve the legacy optional slug transliteration', () => 
   try {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
-    writePost(contentDir, 'note/chinese_post.md', '');
+    writePost(contentDir, '笔记/中文文章.md', '');
 
     const plan = planContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -213,7 +213,7 @@ test('legacy slug fields preserve their pre-migration public URLs', () => {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
     writePost(contentDir, 'localized.md', 'slug: en/custom-path\n');
-    writePost(contentDir, 'translated.md', 'slug: chinese path\n');
+    writePost(contentDir, 'translated.md', 'slug: 中文路径\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -232,7 +232,7 @@ test('frontmatter block scalars may contain indented delimiter text', () => {
     const configPath = writeSiteConfig(root, true);
     const contentDir = path.join(root, 'src/content/blog');
     const preferredFile = writePost(contentDir, 'preferred.md', 'link: kept\nslug: |\n  ignored\n  ---\n');
-    const transliteratedFile = writePost(contentDir, 'transliterated.md', 'slug: |\n  zh\n  ---\n');
+    const transliteratedFile = writePost(contentDir, 'transliterated.md', 'slug: |\n  中\n  ---\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
 
@@ -262,7 +262,7 @@ test('multi-line flow scalar slug fails safely instead of corrupting frontmatter
 
     assert.equal(plan.changes.length, 0);
     assert.equal(plan.errors.length, 2);
-    for (const issue of plan.errors) assert.match(issue.message, /无法安全改写 slug 字段/);
+    for (const issue of plan.errors) assert.match(issue.message, /Cannot safely rewrite slug field/);
     assert.equal(fs.readFileSync(renameFile, 'utf8'), renameOriginal);
     assert.equal(fs.readFileSync(removeFile, 'utf8'), removeOriginal);
   } finally {
@@ -277,7 +277,7 @@ test('frontmatter delimiters allow trailing whitespace but must start in column 
     const contentDir = path.join(root, 'src/content/blog');
     const filePath = path.join(contentDir, 'trailing-space.md');
     fs.mkdirSync(contentDir, { recursive: true });
-    fs.writeFileSync(filePath, '---\nslug: |\n  zh\n  ---\ntitle: test\ndate: 2026-01-01\n---   \nbody\n');
+    fs.writeFileSync(filePath, '---\nslug: |\n  中\n  ---\ntitle: test\ndate: 2026-01-01\n---   \nbody\n');
 
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
     const migrated = fs.readFileSync(filePath, 'utf8');
@@ -328,7 +328,7 @@ test('content migration rejects symlinks without writing their external targets'
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
 
     assert.equal(plan.errors.length, 1);
-    assert.match(plan.errors[0].message, /不能是符号链接/);
+    assert.match(plan.errors[0].message, /cannot be a symlink/);
     assert.equal(fs.readFileSync(pendingFile, 'utf8'), pendingOriginal);
     assert.equal(fs.readFileSync(externalFile, 'utf8'), externalOriginal);
   } finally {
@@ -375,7 +375,7 @@ test('invalid slug values block every write even when link exists', () => {
     const plan = runContentMigration({ contentDir, siteConfigPath: configPath });
     assert.equal(plan.errors.length, 3);
     assert.equal(plan.changes.length, 1);
-    for (const issue of plan.errors) assert.match(issue.message, /slug 必须是非空字符串/);
+    for (const issue of plan.errors) assert.match(issue.message, /slug must be non-empty string/);
     for (const file of files) assert.equal(fs.readFileSync(file, 'utf8'), originals.get(file));
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -411,7 +411,7 @@ test('apply rejects changes to previously unchanged inputs', () => {
 
     fs.writeFileSync(stableFile, fs.readFileSync(stableFile, 'utf8').replace('link: stable', 'link: pending'));
 
-    assert.throws(() => applyContentMigration(plan), /在扫描后发生变化/);
+    assert.throws(() => applyContentMigration(plan), /changed after scanning/);
     assert.equal(fs.readFileSync(pendingFile, 'utf8'), pendingOriginal);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -429,7 +429,7 @@ test('apply rejects new content files added after planning', () => {
 
     writePost(contentDir, 'new.md', 'link: pending\n');
 
-    assert.throws(() => applyContentMigration(plan), /文件集合在扫描后发生变化/);
+    assert.throws(() => applyContentMigration(plan), /file set changed after scanning/);
     assert.equal(fs.readFileSync(pendingFile, 'utf8'), pendingOriginal);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -459,7 +459,7 @@ test('apply rechecks content immediately before installing an atomic write', (co
       },
     );
 
-    assert.throws(() => applyContentMigration(plan), /在写入前发生变化/);
+    assert.throws(() => applyContentMigration(plan), /changed before writing/);
     assert.equal(injected, true);
     assert.equal(fs.readFileSync(pendingFile, 'utf8'), concurrent);
     assert.equal(
@@ -659,7 +659,7 @@ test('restore previews report the migration errors that fail a non-interactive r
 
     assert.equal(preview.migration?.errors.length, 2);
     assert.equal(preview.migration?.changes.length, 0);
-    assert.throws(() => restoreBackup(archive, { workspace }), /内容迁移存在 2 个错误/);
+    assert.throws(() => restoreBackup(archive, { workspace }), /content migration has 2 errors/);
   } finally {
     fs.rmSync(stage, { recursive: true, force: true });
     fs.rmSync(workspace.root, { recursive: true, force: true });
@@ -681,8 +681,8 @@ test('restore rejects symlinked targets without deleting external files', () => 
     writeBackupManifest(stage, ['pages']);
     const archive = createArchive(workspace, stage, 'backup-symlink-test');
 
-    assert.throws(() => getRestorePreview(archive, { workspace }), /包含符号链接/);
-    assert.throws(() => restoreBackup(archive, { workspace }), /包含符号链接/);
+    assert.throws(() => getRestorePreview(archive, { workspace }), /contains symlink/);
+    assert.throws(() => restoreBackup(archive, { workspace }), /contains symlink/);
     assert.equal(fs.readFileSync(path.join(external, 'private.md'), 'utf8'), 'do not delete');
     assert.equal(fs.existsSync(path.join(external, 'restored.md')), false);
   } finally {

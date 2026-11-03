@@ -356,7 +356,7 @@ test('content migration errors leave every existing restore target unchanged', (
     writeBasicManifest(stage, ['content/blog']);
     const archive = createArchive(workspace, stage);
 
-    assert.throws(() => restoreBackup(archive, { workspace }), /Content migration has 2 errors/);
+    assert.throws(() => restoreBackup(archive, { workspace }), /Restore content migration has 2 errors/);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/old.md')), true);
     assert.equal(fs.existsSync(path.join(workspace.root, 'src/content/blog/first.md')), false);
     assert.equal(

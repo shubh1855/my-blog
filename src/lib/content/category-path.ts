@@ -4,7 +4,7 @@
  */
 
 import { categoryMap } from '@lib/config/site';
-import { encodeSlug } from '../route';
+import { getCategorySlug as resolveCategorySlug } from './category-url';
 
 /**
  * Build category path from category names
@@ -17,7 +17,7 @@ export function buildCategoryPath(categoryNames: string | string[]): string {
   const names = Array.isArray(categoryNames) ? categoryNames : [categoryNames];
   if (names.length === 0) return '';
 
-  const slugs = names.map((name) => encodeSlug(categoryMap[name]));
+  const slugs = names.map((name) => resolveCategorySlug(name, categoryMap));
   return `/categories/${slugs.join('/')}`;
 }
 

@@ -5,8 +5,9 @@ import Cover from '@components/ui/cover/Cover.astro';
 import { seoConfig } from '@constants/site-config';
 import Layout from '@layouts/Layout.astro';
 import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
+import type { FeaturedCategory } from '@lib/config/types';
 import { type Category, getCategoryList, translateCategoryName } from '@lib/content';
-import { t } from '@/i18n';
+import { localizedPath, t } from '@/i18n';
 import { categoryRoute } from '../_shared/routes';
 
 export const getStaticPaths = categoryRoute.root;
@@ -14,19 +15,34 @@ export const getStaticPaths = categoryRoute.root;
 interface Props {
   category: Category | null;
   locale: string;
+  placeholderCategory?: FeaturedCategory | null;
 }
 
-const { category, locale } = Astro.props;
+const { category, locale, placeholderCategory } = Astro.props;
 const { categories: allCategories, countMap } = await getCategoryList(locale);
+const isComingSoon = !category && !!placeholderCategory;
+const title = isComingSoon
+  ? (placeholderCategory.label ?? placeholderCategory.link)
+  : t(locale, 'category.postsInCategory', { name: translateCategoryName(category?.name ?? '', locale) });
 
 // 如果是子分类，只展示当前分类的内容
 const displayCategories = category ? [category] : allCategories;
 ---
 
-<Layout locale={locale} title={`${t(locale, 'category.postsInCategory', { name: translateCategoryName(category?.name ?? '', locale) })} | ${seoConfig.title}`}>
+<Layout locale={locale} title={`${title} | ${seoConfig.title}`}>
   <TwoColumnLayout>
-    <Cover slot="cover" title={t(locale, 'category.postsInCategory', { name: translateCategoryName(category?.name ?? '', locale) })} />
+    <Cover slot="cover" title={title} />
     <HomeSider slot="sider" />
-    <CategoryPostList rootCategory={category} categories={displayCategories} countMap={countMap} />
+    {isComingSoon ? (
+      <section class="shadow-box bg-gradient-start flex w-full flex-col items-start gap-5 px-8 py-12 md:px-12 md:py-16" aria-labelledby="coming-soon-title">
+        <h2 id="coming-soon-title" class="text-primary text-3xl font-bold">{t(locale, 'category.comingSoon')}</h2>
+        <p class="text-muted-foreground max-w-prose text-base leading-relaxed">{t(locale, 'category.comingSoonDescription')}</p>
+        <a href={localizedPath('/categories', locale)} class="text-primary hover:text-blue dashed-border focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+          {t(locale, 'category.backToCategories')}
+        </a>
+      </section>
+    ) : (
+      <CategoryPostList rootCategory={category} categories={displayCategories} countMap={countMap} />
+    )}
   </TwoColumnLayout>
 </Layout>

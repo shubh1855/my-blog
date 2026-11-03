@@ -67,6 +67,10 @@ export const uiStrings = {
   'post.noPostsFound': '暂无文章',
 
   // ── Categories & Tags ───────────────────────────────────────
+  'category.comingSoon': '即将推出',
+  'category.comingSoonDescription': '此分类暂未发布文章。',
+  'category.backToCategories': '浏览分类',
+  'category.comingSoonLabel': '{name} — 即将推出',
   'category.allCategories': '所有分类',
   'category.postsInCategory': '{name} 分类下的文章',
   'category.totalCategories': '共 {count} 个分类',
@@ -205,6 +209,7 @@ export const uiStrings = {
   'floating.scrollToBottom': '滚到底部',
   'floating.toggleTheme': '切换主题',
   'floating.bgm': '背景音乐',
+  'floating.pageControls': '页面控制',
   'floating.toggleToolbar': '展开/收起工具栏',
   'floating.settings': '设置',
 

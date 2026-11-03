@@ -1,10 +1,10 @@
 ---
 import { Badge } from '@components/ui/badge';
 import { buttonVariants } from '@components/ui/button';
-import { categoryMap } from '@constants/category';
 import { Routes } from '@constants/router';
 import { siteConfig } from '@constants/site-config';
 import {
+  buildCategoryPath,
   type Category,
   getCategoryByLink,
   getCategoryList,
@@ -28,6 +28,7 @@ interface CategoryWithPosts {
   posts: PostRef[];
   category: Category | null;
   parentCategory: Category | null;
+  comingSoon: boolean;
 }
 
 const locale = getLocaleFromUrl(Astro.url.pathname);
@@ -36,7 +37,8 @@ const { categories } = await getCategoryList(locale);
 const categoryPosts: CategoryWithPosts[] = await Promise.all(
   siteConfig.featuredCategories?.map(async (category) => {
     const categoryInfo = getCategoryByLink(categories, category?.link);
-    const posts = await getPostsByCategory(categoryInfo?.name ?? '', locale);
+    const comingSoon = !!category.comingSoon && !categoryInfo;
+    const posts = comingSoon ? [] : await getPostsByCategory(categoryInfo?.name ?? '', locale);
     return {
       link: category.link,
       label: category?.label,
@@ -44,6 +46,7 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
       category: categoryInfo,
       parentCategory: getParentCategory(categoryInfo, categories),
       posts: toPostRefs(posts),
+      comingSoon,
     };
   }) || [],
 );
@@ -63,7 +66,7 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
       const displayName = translateCategoryName(category?.label ?? categoryInfo?.name ?? '', locale);
       return (
         <FlippedCard>
-          <a slot="front" href={categoryLink} aria-label={t(locale, 'category.postsInCategory', { name: displayName })} class="flex-center relative h-full rounded-md px-2 py-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+          <a slot="front" href={categoryLink} aria-label={category.comingSoon ? t(locale, 'category.comingSoonLabel', { name: displayName }) : t(locale, 'category.postsInCategory', { name: displayName })} class="flex-center relative h-full rounded-md px-2 py-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
             <img
               style={getLqipStyle(category.image)}
               src={category.image}
@@ -88,6 +91,11 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                 {translateCategoryName(parentCategory.name, locale)}
               </Badge>
             ) : null}
+            {category.comingSoon ? (
+              <Badge variant="shoka-tag" className="absolute bottom-3 left-3 text-xs text-white shadow-sm">
+                {t(locale, 'category.comingSoon')}
+              </Badge>
+            ) : null}
           </a>
           <div slot="back" class="bg-card relative h-full flex-col rounded-md px-6 pt-16 pb-4">
             <div
@@ -101,11 +109,14 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                 {displayName}
               </a>
             </div>
+            {category.comingSoon ? (
+              <p class="text-muted-foreground max-w-prose text-sm leading-relaxed">{t(locale, 'category.comingSoonDescription')}</p>
+            ) : (
             <div class="grid max-h-24 grid-cols-2 gap-x-5 gap-y-3 overflow-auto">
               {categoryInfo?.children?.length
                 ? categoryInfo.children.map((child) => (
                     <a
-                      href={`${categoryLink}/${categoryMap[child?.name]}`}
+                      href={localizedPath(`${Routes.Categories}/${category.link}${buildCategoryPath(child.name).slice(Routes.Categories.length)}`, locale)}
                       class="text-primary hover:text-blue truncate text-left transition-colors duration-300"
                     >
                       {translateCategoryName(child.name, locale)}
@@ -121,7 +132,8 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                 </a>
               ))}
             </div>
-            <p class="text-muted-foreground absolute bottom-4 left-6 flex items-center text-sm">
+            )}
+            {!category.comingSoon ? <p class="text-muted-foreground absolute bottom-4 left-6 flex items-center text-sm">
               {parentCategory?.name ? (
                 <a
                   href={parentCategoryLink}
@@ -138,11 +150,11 @@ const categoryPosts: CategoryWithPosts[] = await Promise.all(
                   : ''}
                 {t(locale, 'category.postCount', { count: category.posts?.length ?? 0 })}
               </Fragment>
-            </p>
-            <a href={categoryLink} aria-label={t(locale, 'category.postsInCategory', { name: displayName })} class={cn('absolute right-0 bottom-0', buttonVariants(),
+            </p> : null}
+            <a href={categoryLink} aria-label={category.comingSoon ? t(locale, 'category.comingSoonLabel', { name: displayName }) : t(locale, 'category.postsInCategory', { name: displayName })} class={cn('absolute right-0 bottom-0', buttonVariants(),
                   'bg-gradient-shoka-button rounded-2xl rounded-se-none rounded-es-none transition-all hover:translate-x-1 hover:translate-y-1 hover:scale-105 md:h-7 md:px-2 md:py-1 md:text-xs',
                 )}>
-                more...
+                {category.comingSoon ? t(locale, 'category.comingSoon') : 'more...'}
             </a>
           </div>
         </FlippedCard>
