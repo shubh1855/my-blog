@@ -1,11 +1,13 @@
 ---
+import ListFilter from '@components/common/ListFilter.astro';
 import HomeSider from '@components/layout/HomeSider.astro';
 import Cover from '@components/ui/cover/Cover.astro';
 import { CONTENT_PADDING } from '@constants/layout';
 import { siteConfig } from '@constants/site-config';
 import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
-import { getPostSlug, getSortedPosts } from '@lib/content';
+import { getPostLastCategory, getPostSlug, getSortedPosts, translateCategoryName } from '@lib/content';
 import { displayDate } from '@lib/date';
+import { buildFilterText } from '@lib/list-filter';
 import { encodeSlug } from '@lib/route';
 import { defaultLocale, localizedPath, t } from '@/i18n';
 import Layout from '../layouts/Layout.astro';
@@ -18,7 +20,7 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 const posts = await getSortedPosts(locale);
 
-// 按年份对文章进行分组
+// Group posts by year
 const postsByYear = posts.reduce(
   (acc, post) => {
     const year = new Date(post.data.date).getFullYear();
@@ -38,23 +40,33 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
   <TwoColumnLayout>
     <Cover slot="cover" title={t(locale, 'archives.title')} />
     <HomeSider slot="sider" />
-    <div class={`shadow-box bg-gradient-start mx-0 flex w-full flex-col ${CONTENT_PADDING.standard}`}>
+    <div class={`shadow-box bg-gradient-start mx-0 flex w-full flex-col ${CONTENT_PADDING.standard}`} data-filter-scope>
       <h2 class="shoka-decoration-circle group relative h-19 px-6 py-5 text-2xl/9 font-bold md:text-xl/9">
         <a href={localizedPath('/', locale)} class="dashed-border text-muted-foreground group-hover:border-blue group-hover:text-blue border-b">{t(locale, 'nav.home')}</a>
         <span class="text-muted-foreground text-lg md:text-base"> / </span>
         {t(locale, 'post.totalPosts', { count: posts.length })}
       </h2>
+      <ListFilter />
       <div class="flex flex-col gap-4 md:gap-5">
         {
           years.map((year) => (
-            <div>
+            <div data-filter-group>
               <h3 class="text-xl font-bold md:text-base">
                 {year}
-                <span class="text-muted-foreground ml-2 text-base md:text-sm">{t(locale, 'post.yearPosts', { count: postsByYear[Number(year)].length })}</span>
+                <span
+                  class="text-muted-foreground ml-2 text-base md:text-sm"
+                  data-filter-count={t(locale, 'post.yearPosts', { count: '{count}' })}
+                >
+                  {t(locale, 'post.yearPosts', { count: postsByYear[Number(year)].length })}
+                </span>
               </h3>
               <div class="mt-2">
                 {postsByYear[Number(year)].map((post) => (
-                  <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9 md:flex md:flex-col md:items-stretch md:text-sm/9">
+                  <p
+                    class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9 md:flex md:flex-col md:items-stretch md:text-sm/9"
+                    data-filter-item
+                    data-filter-text={buildFilterText(post.data.title, post.data.tags, translateCategoryName(getPostLastCategory(post).name, locale))}
+                  >
                     <span class="text-muted-foreground mr-2 text-xs">
                       {displayDate.date(post.data.date)}
                     </span>

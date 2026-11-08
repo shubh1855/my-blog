@@ -1,0 +1,182 @@
+---
+/**
+ * In-page title/tag filter for long timeline lists (archives, categories, tags).
+ *
+ * DOM contract inside the nearest `[data-filter-scope]` ancestor:
+ * - `[data-filter-item]` rows are shown/hidden; match text comes from `data-filter-text`
+ *   (falls back to textContent) plus the `data-filter-text` of every enclosing group.
+ * - `[data-filter-group]` sections are hidden when none of their items match.
+ *
+ * Progressive enhancement: the control is `hidden` until the script runs, so without
+ * JavaScript readers get the plain, complete list. The query is mirrored to `?filter=`.
+ */
+import { getLocaleFromUrl, t } from '@/i18n';
+
+const locale = getLocaleFromUrl(Astro.url.pathname);
+const label = t(locale, 'listFilter.label');
+---
+
+<div
+  class="list-filter mb-3 px-6 md:px-0"
+  data-list-filter
+  data-results-label={t(locale, 'listFilter.results', { shown: '{shown}', total: '{total}' })}
+  data-empty-label={t(locale, 'listFilter.empty', { query: '{query}' })}
+  hidden
+>
+  <div class="relative flex items-center">
+    <svg
+      class="text-muted-foreground pointer-events-none absolute left-3 size-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <label for="list-filter-input" class="sr-only">{label}</label>
+    <input
+      id="list-filter-input"
+      type="search"
+      autocomplete="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      placeholder={label}
+      aria-describedby="list-filter-status"
+      class="border-border bg-background/60 text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/30 w-full rounded-lg border py-2 pr-10 pl-9 text-sm transition-colors outline-none focus-visible:ring-2 [&::-webkit-search-cancel-button]:appearance-none"
+    />
+    <button
+      type="button"
+      class="text-muted-foreground hover:text-primary focus-visible:outline-ring absolute right-1.5 inline-flex size-7 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-2"
+      data-list-filter-clear
+      aria-label={t(locale, 'listFilter.clear')}
+      title={t(locale, 'listFilter.clear')}
+      hidden
+    >
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <p id="list-filter-status" class="text-muted-foreground mt-1.5 min-h-4 text-xs" aria-live="polite" data-list-filter-status></p>
+</div>
+
+<script>
+  import { matchesFilterTokens, tokenizeFilterQuery } from '@lib/list-filter';
+
+  const URL_PARAM = 'filter';
+
+  const fill = (template: string, params: Record<string, string | number>) =>
+    template.replace(/\{(\w+)\}/g, (_, key: string) => String(params[key] ?? ''));
+
+  /** Text of every `[data-filter-group]` enclosing `el` inside `scope`, so a category name matches its posts. */
+  function groupContext(el: HTMLElement, scope: Element): string {
+    const parts: string[] = [];
+    let group = el.parentElement?.closest<HTMLElement>('[data-filter-group]');
+    while (group && scope.contains(group)) {
+      parts.push(group.dataset.filterText ?? '');
+      group = group.parentElement?.closest<HTMLElement>('[data-filter-group]');
+    }
+    return parts.join(' ');
+  }
+
+  function setup(root: HTMLElement) {
+    root.dataset.ready = 'true';
+    const maybeScope = root.closest('[data-filter-scope]') ?? root.parentElement;
+    const maybeInput = root.querySelector<HTMLInputElement>('input');
+    const maybeClear = root.querySelector<HTMLButtonElement>('[data-list-filter-clear]');
+    const maybeStatus = root.querySelector<HTMLElement>('[data-list-filter-status]');
+    if (!maybeScope || !maybeInput || !maybeClear || !maybeStatus) return;
+    const scope: Element = maybeScope;
+    const input: HTMLInputElement = maybeInput;
+    const clear: HTMLButtonElement = maybeClear;
+    const status: HTMLElement = maybeStatus;
+
+    const items = [...scope.querySelectorAll<HTMLElement>('[data-filter-item]')];
+    const groups = [...scope.querySelectorAll<HTMLElement>('[data-filter-group]')];
+    if (items.length === 0) return;
+    const texts = items.map((el) => `${el.dataset.filterText ?? el.textContent ?? ''} ${groupContext(el, scope)}`);
+    const resultsLabel = root.dataset.resultsLabel ?? '';
+    const emptyLabel = root.dataset.emptyLabel ?? '';
+
+    function apply(query: string) {
+      const tokens = tokenizeFilterQuery(query);
+      let shown = 0;
+      items.forEach((el, i) => {
+        const match = matchesFilterTokens(texts[i], tokens);
+        el.hidden = !match;
+        if (match) shown += 1;
+      });
+      for (const group of groups) {
+        // A group that is itself an item (e.g. a category with no children) was already decided above.
+        if (group.hasAttribute('data-filter-item')) continue;
+        group.hidden = !group.querySelector('[data-filter-item]:not([hidden])');
+        // Keep per-group counts (e.g. "12 posts" next to a year) in sync with what is shown.
+        const counter = group.querySelector<HTMLElement>('[data-filter-count]');
+        if (counter) {
+          const visible = group.querySelectorAll('[data-filter-item]:not([hidden])').length;
+          counter.textContent = fill(counter.dataset.filterCount ?? '{count}', { count: visible });
+        }
+      }
+
+      // The timeline connector hides on :last-child; hidden rows break that, so mark the last visible row.
+      for (const el of scope.querySelectorAll('[data-filter-last]')) el.removeAttribute('data-filter-last');
+      if (tokens.length > 0) {
+        const parents = new Set(items.map((el) => el.parentElement));
+        for (const parent of parents) {
+          const visible = [...(parent?.children ?? [])].filter((el) => el.matches('[data-filter-item]:not([hidden])'));
+          visible.at(-1)?.setAttribute('data-filter-last', '');
+        }
+      }
+
+      clear.hidden = query.length === 0;
+      status.textContent =
+        tokens.length === 0 ? '' : shown === 0 ? fill(emptyLabel, { query: query.trim() }) : fill(resultsLabel, { shown, total: items.length });
+    }
+
+    function syncUrl(query: string) {
+      const url = new URL(window.location.href);
+      if (query.trim()) url.searchParams.set(URL_PARAM, query.trim());
+      else url.searchParams.delete(URL_PARAM);
+      // Keep history.state intact: Astro's client router stores its scroll/index data there.
+      window.history.replaceState(window.history.state, '', url);
+    }
+
+    function reset() {
+      input.value = '';
+      apply('');
+      syncUrl('');
+      input.focus();
+    }
+
+    input.addEventListener('input', () => {
+      apply(input.value);
+      syncUrl(input.value);
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && input.value) {
+        event.preventDefault();
+        event.stopPropagation();
+        reset();
+      }
+    });
+    clear.addEventListener('click', reset);
+
+    const initial = new URL(window.location.href).searchParams.get(URL_PARAM) ?? '';
+    root.hidden = false;
+    if (initial) {
+      input.value = initial;
+      apply(initial);
+    }
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLElement>('[data-list-filter]:not([data-ready])').forEach(setup);
+  }
+
+  if (document.readyState !== 'loading') init();
+  document.addEventListener('astro:page-load', init);
+</script>

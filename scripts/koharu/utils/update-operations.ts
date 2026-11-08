@@ -106,7 +106,7 @@ export function checkGitStatus(): GitStatusInfo {
   };
 }
 
-export function hasUpstreamRemote(): boolean {
+function hasUpstreamRemote(): boolean {
   return Boolean(getRemoteUrl(UPSTREAM_REMOTE));
 }
 
@@ -114,11 +114,11 @@ export function hasUpstreamTrackingRef(): boolean {
   return hasRef(`refs/remotes/${UPSTREAM_REMOTE}/${MAIN_BRANCH}`);
 }
 
-export function getUpstreamRemoteUrl(): string | null {
+function getUpstreamRemoteUrl(): string | null {
   return getRemoteUrl(UPSTREAM_REMOTE);
 }
 
-export function addUpstreamRemote(): boolean {
+function addUpstreamRemote(): boolean {
   return addRemote(UPSTREAM_REMOTE, UPSTREAM_URL);
 }
 

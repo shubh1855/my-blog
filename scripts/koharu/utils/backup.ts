@@ -21,7 +21,7 @@ export interface BackupInfo {
 /**
  * Parse backup manifest
  */
-export function parseBackupManifest(manifest: string): { type: string; timestamp: string } {
+function parseBackupManifest(manifest: string): { type: string; timestamp: string } {
   try {
     const data = JSON.parse(manifest);
     return {

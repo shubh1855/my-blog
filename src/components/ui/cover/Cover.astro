@@ -1,6 +1,7 @@
 ---
 import { Routes } from '@constants/router';
 import { createArticleStatsConfig, siteConfig } from '@constants/site-config';
+import { getPostSlug } from '@lib/content/locale';
 import { getPostReadingTime } from '@lib/content/posts';
 import { displayDate } from '@lib/date';
 import { getLqipStyle } from '@lib/lqip';
@@ -31,7 +32,7 @@ const bannerLqipStyle = compact ? undefined : getLqipStyle('/img/site_header_192
 
 const locale = getLocaleFromUrl(Astro.url.pathname);
 
-const href = data && localizedPath(routeBuilder(Routes.Post, data), locale);
+const href = data && localizedPath(routeBuilder(Routes.Post, { slug: getPostSlug(data), title: data.data.title }), locale);
 
 const pageStatsConfig = href ? createArticleStatsConfig(href) : null;
 const copyLinkLabel = t(locale, 'cover.copyLink');

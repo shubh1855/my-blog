@@ -78,11 +78,6 @@ export interface FeaturedSeriesItem {
 }
 
 /**
- * @deprecated Use FeaturedSeriesItem instead
- */
-export type FeaturedSeries = FeaturedSeriesItem;
-
-/**
  * Runtime site configuration: {@link SiteBasicConfig} with `url` renamed to
  * `site` and featured content normalized.
  */
@@ -324,9 +319,8 @@ export interface WalineConfig {
   serverURL: string;
 
   /**
-   * 显示语言
    * Display language
-   * @default 'zh-CN'
+   * @default the page locale
    */
   lang?: string;
 
@@ -609,7 +603,7 @@ export interface BangumiConfig {
 // =============================================================================
 
 export interface LocaleConfig {
-  /** Locale code (BCP 47 short format, e.g., 'zh', 'en', 'ja') */
+  /** Locale code (BCP 47 short format, e.g., 'en', 'ja') */
   code: string;
   /** Display label for the locale (e.g., '中文', 'English') */
   label?: string;
@@ -628,6 +622,7 @@ export interface I18nConfig {
 // Root Configuration Type
 // =============================================================================
 
+/** Shape of config/site.yaml; consumed by the ambient module in src/types/yaml.d.ts. @lintignore */
 export interface SiteYamlConfig {
   site: SiteBasicConfig;
   featuredCategories?: FeaturedCategory[];

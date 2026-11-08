@@ -1,4 +1,5 @@
 ---
+import ListFilter from '@components/common/ListFilter.astro';
 import HomeSider from '@components/layout/HomeSider.astro';
 import Cover from '@components/ui/cover/Cover.astro';
 import { CONTENT_PADDING } from '@constants/layout';
@@ -7,6 +8,7 @@ import Layout from '@layouts/Layout.astro';
 import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
 import { getPostLastCategory, getPostSlug, getSortedPosts, normalizeTag, translateCategoryName } from '@lib/content';
 import { displayDate } from '@lib/date';
+import { buildFilterText } from '@lib/list-filter';
 import { encodeSlug } from '@lib/route';
 import { localizedPath, t } from '@/i18n';
 import { tagRoute } from '../_shared/routes';
@@ -27,7 +29,7 @@ const posts = allPosts.filter((post) => post.data.tags?.some((tg) => normalizeTa
   <TwoColumnLayout>
     <Cover slot="cover" title={t(locale, 'tag.postsWithTag', { name: tag })} />
     <HomeSider slot="sider" />
-    <div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.standard}`}>
+    <div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.standard}`} data-filter-scope>
       <h2 class="shoka-decoration-circle has-children group relative h-19 px-6 py-5 text-2xl/9 font-bold">
         <a
           href={localizedPath('/tags', locale)}
@@ -37,13 +39,18 @@ const posts = allPosts.filter((post) => post.data.tags?.some((tg) => normalizeTa
         <span class="text-muted-foreground">{tag}</span>
         <span class="text-muted-foreground text-lg">({t(locale, 'tag.postCount', { count: posts.length })})</span>
       </h2>
+      {posts.length > 4 && <ListFilter />}
       {
         posts?.length && (
           <div class="category-second-level-container flex flex-col">
             {posts.map((post) => {
               const { link, name } = getPostLastCategory(post);
               return (
-                <p class="shoka-decoration-circle group text-primary relative px-6 py-2 text-base/9 md:overflow-visible">
+                <p
+                  class="shoka-decoration-circle group text-primary relative px-6 py-2 text-base/9 md:overflow-visible"
+                  data-filter-item
+                  data-filter-text={buildFilterText(post.data.title, post.data.tags, translateCategoryName(name, locale))}
+                >
                   <span class="text-muted-foreground inline-block w-15 text-xs md:relative md:-top-1">
                     {displayDate.shortDate(post.data.date)}
                   </span>

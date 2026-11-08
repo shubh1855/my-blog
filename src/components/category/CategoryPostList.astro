@@ -1,7 +1,9 @@
 ---
+import ListFilter from '@components/common/ListFilter.astro';
 import { CONTENT_PADDING } from '@constants/layout';
 import { type Category, getPostSlug, getPostsByCategory, translateCategoryName } from '@lib/content';
 import { displayDate } from '@lib/date';
+import { buildFilterText } from '@lib/list-filter';
 import { encodeSlug } from '@lib/route';
 import { cn } from '@lib/utils';
 import { getLocaleFromUrl, localizedPath, t } from '@/i18n';
@@ -30,7 +32,7 @@ const posts = hasChildren
   : allPosts;
 ---
 
-<div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.normal}`}>
+<div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.normal}`} data-filter-scope>
   <h2
     class={cn('shoka-decoration-circle px-6 group relative py-5 text-2xl/9 font-bold', {
       'has-children': posts?.length || rootCategory?.children?.length,
@@ -41,6 +43,8 @@ const posts = hasChildren
     <span class="text-muted-foreground">{rootCategory ? translateCategoryName(rootCategory.name, locale) : ''}</span>
     <span class="text-muted-foreground mx-2 text-xl">{t(locale, 'category.categoryLabel')}</span>
   </h2>
+
+  <ListFilter />
 
   <div class="flex w-full flex-col">
     {
@@ -60,7 +64,7 @@ const posts = hasChildren
       (posts?.length ?? 0) > 0 && (
         <div class="category-second-level-container flex flex-col">
           {posts.map((post) => (
-            <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9">
+            <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9" data-filter-item data-filter-text={buildFilterText(post.data.title, post.data.tags)}>
               <span class="text-muted-foreground mr-2 text-xs">{displayDate.shortDate(post.data.date)}</span>
               <a href={localizedPath(`/post/${encodeSlug(getPostSlug(post))}`, locale)} class="dashed-border">
                 {post?.data?.title}

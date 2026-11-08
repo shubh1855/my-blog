@@ -151,7 +151,7 @@ pages/ → components/ → hooks/ → lib/ → constants/
 **Theme System**: Dark/light toggle with localStorage, inline check in `<head>` prevents FOUC.
 
 **i18n System**: Two-layer translation architecture with locale-aware routing.
-- **UI strings** (`src/i18n/translations/`): TypeScript dictionaries with `t(locale, key, params?)` function. Keys defined in `zh.ts` (source-of-truth), other locales are partial overrides. ~170 keys.
+- **UI strings** (`src/i18n/translations/`): TypeScript dictionaries with `t(locale, key, params?)` function. Keys defined in `en.ts` (source-of-truth), other locales are partial overrides. ~170 keys.
 - **Content strings** (`config/i18n-content.yaml`): YAML-based translations for category names, series fields, featured category labels. Accessed via `getContentCategoryName()` / `getContentSeriesField()` / `getContentFeaturedCategoryField()` (internal to `src/lib/content/categories.ts`).
 - **Routing**: Default locale has no URL prefix; other locales use `/<locale>/` prefix. Static pages in `src/pages/[lang]/` are thin wrappers using `getLocaleStaticPaths()`. Dynamic routes declare their param space once in `src/pages/_shared/routes.ts`; root/mirror pages share it via `localePaths(enumerate)` from `src/pages/_shared/utils.ts`, which injects `locale` into props — pages pass it explicitly to `<Layout locale={...}>`. `assertLocaleMirrorsComplete()` fails the build if a root page lacks its `[lang]/` mirror (exemptions in `MIRROR_EXEMPT`).
 - **React hook**: `useTranslation()` reads from `$locale` nanostore (synced via `astro:page-load` event). Returns `{ t, locale }`.

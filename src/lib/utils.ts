@@ -28,7 +28,7 @@ export function formatCompactNumber(num: number): string {
  * @example normalizeNavSlug('/weekly') => 'weekly'
  * @example normalizeNavSlug('/posts/1') => null (has nested path)
  */
-export function normalizeNavSlug(path: string): string | null {
+function normalizeNavSlug(path: string): string | null {
   const trimmed = path.trim();
   if (!trimmed.startsWith('/')) return null;
 

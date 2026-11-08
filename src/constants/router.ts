@@ -16,15 +16,6 @@ export enum Routes {
   Bangumi = '/bangumi',
 }
 
-/**
- * Get the URL path for a featured series
- * @param slug - The series slug (e.g., 'weekly')
- * @returns The full path (e.g., '/weekly')
- */
-export function getSeriesPath(slug: string): string {
-  return `/${slug}`;
-}
-
 /** Fallback navigation used when `config/site.yaml` does not define `navigation`. */
 export const DEFAULT_ROUTERS: Router[] = [
   { name: 'Home', path: Routes.Home, icon: 'fa6-solid:house-chimney' },

@@ -78,7 +78,8 @@ p.shoka-decoration-circle {
   }
 }
 
-p.shoka-decoration-circle:last-child {
+p.shoka-decoration-circle:last-child,
+p.shoka-decoration-circle[data-filter-last] {
   &::after {
     @apply hidden;
   }

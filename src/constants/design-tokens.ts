@@ -238,19 +238,3 @@ export const animation = {
     slow: `all ${350}ms cubic-bezier(0.4, 0, 0.2, 1)`,
   },
 } as const;
-
-/**
- * Z-Index Scale
- *
- * Consistent layering for stacking contexts.
- */
-export const zIndex = {
-  base: 0,
-  dropdown: 1000,
-  sticky: 1020,
-  fixed: 1030,
-  modalBackdrop: 1040,
-  modal: 1050,
-  popover: 1060,
-  tooltip: 1070,
-} as const;

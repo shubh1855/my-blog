@@ -54,7 +54,7 @@ export interface ModalState {
 /**
  * Single source of truth for modal state
  */
-export const $activeModal = atom<ModalState>({ type: null });
+const $activeModal = atom<ModalState>({ type: null });
 
 // Computed helpers for convenience
 export const $isDrawerOpen = computed($activeModal, (m) => m.type === 'drawer');
@@ -104,7 +104,7 @@ export function closeModal(): void {
 /**
  * Toggle a modal (open if closed, close if open)
  */
-export function toggleModal(type: ModalType): void {
+function toggleModal(type: ModalType): void {
   if ($activeModal.get().type === type) {
     closeModal();
   } else {
@@ -113,24 +113,10 @@ export function toggleModal(type: ModalType): void {
 }
 
 // Convenience functions for specific modals
-/** @deprecated Use `openModal('drawer')`. */
-export const openDrawer = () => openModal('drawer');
 export const closeDrawer = () => closeModal();
 export const toggleDrawer = () => toggleModal('drawer');
 
-/** @deprecated Use `openModal('search')`. */
-export const openSearch = () => openModal('search');
-/** @deprecated Use `closeModal()`. */
-export const closeSearch = () => closeModal();
-/** @deprecated Use `toggleModal('search')`. */
-export const toggleSearch = () => toggleModal('search');
-
 export const toggleSettings = () => toggleModal('settings');
-
-/** @deprecated Use `openModal('codeFullscreen', data)`. */
-export const openCodeFullscreen = (data: CodeBlockData) => openModal('codeFullscreen', data);
-/** @deprecated Use `closeModal()`. */
-export const closeCodeFullscreen = () => closeModal();
 
 /**
  * Navigate between images in the lightbox without re-triggering scroll lock.

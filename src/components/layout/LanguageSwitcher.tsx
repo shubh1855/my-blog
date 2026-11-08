@@ -30,7 +30,7 @@ function getServerPathname() {
 }
 
 interface LanguageSwitcherProps {
-  /** Initial locale code from SSR (e.g., 'zh', 'en') */
+  /** Initial locale code from SSR (e.g., 'en', 'ja') */
   locale: string;
   className?: string;
 }

@@ -1,4 +1,4 @@
-import { createKoharuClient, isKoharuError, type KoharuClient, type KoharuError } from '@coszone/koharu-astro';
+import { createKoharuClient, isKoharuError, type KoharuClient } from '@coszone/koharu-astro';
 
 const DEFAULT_TIMEOUT_MS = 8_000;
 const SLOW_REQUEST_MS = 2_000;
@@ -73,8 +73,4 @@ export function toMomentsHttpError(error: unknown): MomentsHttpError {
     };
   }
   return { status: 503, type: 'unavailable' };
-}
-
-export function isKoharuNotFound(error: unknown): error is KoharuError {
-  return isKoharuError(error) && error.status === 404;
 }

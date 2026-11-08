@@ -1,7 +1,7 @@
 import type { BangumiCollectionResponse, BangumiSubjectType } from '@/types/bangumi';
 import { API_PAGE_SIZE, BANGUMI_API_BASE, MAX_API_PAGES } from './constants';
 
-export async function fetchUserCollections(
+async function fetchUserCollections(
   userId: string,
   subjectType: BangumiSubjectType,
   limit = API_PAGE_SIZE,

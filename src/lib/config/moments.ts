@@ -1,8 +1,8 @@
 import type { MomentsChannelConfig, MomentsConfig, RouterItem } from './types';
 
 const DEFAULT_PATH = 'moments';
-const DEFAULT_TITLE = '碎碎念';
-const DEFAULT_DESCRIPTION = '记录频道中的日常消息';
+const DEFAULT_TITLE = 'Moments';
+const DEFAULT_DESCRIPTION = 'Everyday notes from the channel';
 const DEFAULT_ICON = 'ri:chat-smile-3-fill';
 const INTERNAL_CHANNEL_SLUGS = new Set(['search', 'rss.xml']);
 const SAFE_SEGMENT = /^[a-z0-9][a-z0-9_-]*$/i;

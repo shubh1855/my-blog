@@ -84,5 +84,3 @@ export const Segmented = <T extends string | number = string | number>({
     </div>
   );
 };
-
-export default React.memo(Segmented);

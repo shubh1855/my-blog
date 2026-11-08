@@ -27,8 +27,8 @@ export const featuredSeriesList = normalizeFeaturedSeries(yamlConfig.featuredSer
 export const enabledSeriesSlugList = enabledFeaturedSeriesSlugs(featuredSeriesList);
 
 export const i18nConfig: I18nConfig = yamlConfig.i18n ?? {
-  defaultLocale: 'zh',
-  locales: [{ code: 'zh', label: '中文' }],
+  defaultLocale: 'en',
+  locales: [{ code: 'en', label: 'English' }],
 };
 
 /** Locale codes that are not disabled — used to reserve their URL prefixes. */

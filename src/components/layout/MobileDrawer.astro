@@ -119,7 +119,7 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
       return Object.entries(this.elements).every(([key, element]) => {
         const exists = !!element;
         if (!exists) {
-          console.error(`抽屉元素未找到: ${key}`);
+          console.error(`Drawer element not found: ${key}`);
         }
         return exists;
       });

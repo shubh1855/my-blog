@@ -1,6 +1,8 @@
 ---
+import ListFilter from '@components/common/ListFilter.astro';
 import { CONTENT_PADDING } from '@constants/layout';
 import { buildCategoryPath, type Category, translateCategoryName } from '@lib/content';
+import { buildFilterText } from '@lib/list-filter';
 import { getLocaleFromUrl, localizedPath, t } from '@/i18n';
 import CategoryTitle from './CategoryTitle.astro';
 import SubCategory from './SubCategory.astro';
@@ -14,16 +16,23 @@ const { categories, countMap, totalCount } = Astro.props;
 const locale = getLocaleFromUrl(Astro.url.pathname);
 ---
 
-<div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.standard}`}>
+<div class={`shadow-box mx-0 flex w-full flex-col bg-gradient-start ${CONTENT_PADDING.standard}`} data-filter-scope>
   <h2 class="shoka-decoration-circle group relative px-6 py-5 text-2xl/9 font-bold md:text-xl/9">
     <a href={localizedPath('/', locale)} class="dashed-border text-muted-foreground group-hover:border-blue group-hover:text-blue border-b"> {t(locale, 'nav.home')} </a>
     <span class="text-muted-foreground text-xl md:text-base">/</span> {t(locale, 'category.totalCategories', { count: totalCount })}
   </h2>
 
+  <ListFilter />
+
   <div class="flex w-full flex-col">
     {
       categories.map((category) => (
-        <>
+        <div
+          class="contents"
+          data-filter-group
+          data-filter-text={buildFilterText(translateCategoryName(category.name, locale))}
+          {...(category?.children?.length ? {} : { 'data-filter-item': '' })}
+        >
           <CategoryTitle
             title={translateCategoryName(category.name, locale)}
             count={countMap[category.name]}
@@ -38,7 +47,7 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
                 ))}
             </div>
           )}
-        </>
+        </div>
       ))
     }
   </div>

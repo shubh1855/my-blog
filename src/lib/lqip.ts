@@ -28,7 +28,7 @@ function imagePathToKey(imagePath: string): string {
  * @param imagePath Image path (e.g., /img/cover/1.webp)
  * @returns CSS gradient string or undefined if not found
  */
-export function getLqipGradient(imagePath: string): string | undefined {
+function getLqipGradient(imagePath: string): string | undefined {
   const key = imagePathToKey(imagePath);
   const compact = lqips[key];
   if (compact?.length !== 18) return undefined;
@@ -44,7 +44,7 @@ export function getLqipGradient(imagePath: string): string | undefined {
 /**
  * Check if an image path is external (starts with http)
  */
-export function isExternalImage(imagePath: string): boolean {
+function isExternalImage(imagePath: string): boolean {
   return imagePath.startsWith('http://') || imagePath.startsWith('https://');
 }
 

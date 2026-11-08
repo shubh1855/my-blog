@@ -2,7 +2,7 @@
 export { type ParsedArgs, parseArgs } from './args';
 
 // Backup utilities
-export { type BackupInfo, getBackupList, getRestorableBackupList, parseBackupManifest } from './backup';
+export { type BackupInfo, getBackupList, getRestorableBackupList } from './backup';
 
 // Backup operations
 export { type BackupOutput, type BackupResult, runBackup } from './backup-operations';
@@ -20,25 +20,13 @@ export {
   type RunScriptResult,
   runGenerate,
   runGenerateAll,
-  runScript,
 } from './generate-operations';
 // Git porcelain
 export { abortMerge, abortRebase } from './git-porcelain';
 // Migration operations
 export { applyContentMigration, type ContentMigrationPlan, planContentMigration } from './migration-operations';
 // New operations
-export {
-  appendFriend,
-  createPost,
-  formatDate,
-  generatePostFrontmatter,
-  generateSlug,
-  getCategoryMap,
-  getCategoryTree,
-  isValidUrl,
-  loadSiteConfig,
-  postExists,
-} from './new-operations';
+
 // Release feed
 export { buildReleaseUrl, extractReleaseSummary, fetchReleaseInfo } from './release-feed';
 // Restore operations
@@ -51,30 +39,12 @@ export {
   restoreBackup,
 } from './restore-operations';
 // Tar utilities
-export { tarCreate, tarExtract, tarExtractManifest, tarList } from './tar';
+export { tarExtractManifest } from './tar';
 // Update state machine
 export { statusEffects } from './update-effects';
 // Update operations
-export {
-  addUpstreamRemote,
-  checkGitStatus,
-  ensureUpstreamRemote,
-  fetchUpstream,
-  getUpdateInfo,
-  hasUpstreamMergeHistory,
-  hasUpstreamRemote,
-  installDeps,
-  mergeUpstream,
-} from './update-operations';
+
 export { createInitialState, selectUpdatePresentation, type UpdatePresentation, updateReducer } from './update-reducer';
 // Validation utilities
-export {
-  isPathWithinBackupDir,
-  isPathWithinDir,
-  isValidBackupFile,
-  validateBackupArchive,
-  validateBackupFilePath,
-  validatePathInBackupDir,
-} from './validation';
+export { validateBackupFilePath } from './validation';
 // Version utilities
-export { getVersion } from './version';

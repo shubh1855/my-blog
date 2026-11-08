@@ -3,7 +3,7 @@
  */
 
 import { categoryMap } from '@lib/config/site';
-import { getContentFeaturedCategoryField, getContentSeriesField } from '@/i18n/content';
+import { getContentSeriesField } from '@/i18n/content';
 import type { Locale } from '@/i18n/types';
 import { memoize } from './cache';
 import { getCategoryLinks as buildCategoryLinks } from './category-url';
@@ -71,7 +71,7 @@ export async function getCategoryList(locale?: string): Promise<CategoryListResu
  * @param parentNames 父分类名 ['分类1', '分类2']
  * @param name 子分类名 '分类3'
  */
-export function addCategoryRecursively(rootCategories: Category[], parentNames: string[], name: string) {
+function addCategoryRecursively(rootCategories: Category[], parentNames: string[], name: string) {
   if (parentNames.length === 0) {
     const index = rootCategories.findIndex((c) => c.name === name); // 如果当前分类已存在，则直接返回
     if (index === -1) rootCategories.push({ name });
@@ -112,7 +112,7 @@ export function getCategoryLinks(
  * @param link categories/xxx/front-end
  * @returns 前端
  */
-export function getCategoryNameByLink(link: string): string {
+function getCategoryNameByLink(link: string): string {
   if (!link) return '';
 
   // Remove leading/trailing slashes and split
@@ -177,20 +177,4 @@ export function getParentCategory(category: Category | null, categories: Categor
 export function translateSeriesField(slug: string, field: string, fallback: string | undefined, locale: Locale): string {
   if (!fallback) return '';
   return getContentSeriesField(locale, slug, field) ?? fallback;
-}
-
-/**
- * Translate a featured category field (label, description) based on locale.
- *
- * The `link` parameter matches the `link` field in featuredCategories config
- * (e.g. 'life', 'note/front-end').
- */
-export function translateFeaturedCategoryField(
-  link: string,
-  field: string,
-  fallback: string | undefined,
-  locale: Locale,
-): string {
-  if (!fallback) return '';
-  return getContentFeaturedCategoryField(locale, link, field) ?? fallback;
 }

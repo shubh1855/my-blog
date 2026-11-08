@@ -68,14 +68,8 @@ function Dialog({ children, open, onOpenChange, ...props }: DialogProps) {
 
 Dialog.displayName = 'Dialog';
 
-// Trigger
-const DialogTrigger = DialogPrimitive.Trigger;
-
 // Portal
 const DialogPortal = DialogPrimitive.Portal;
-
-// Close button
-const DialogClose = DialogPrimitive.Close;
 
 // Overlay with animation
 const DialogOverlay = forwardRef<
@@ -196,15 +190,4 @@ const DialogDescription = forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-export {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-};
+export { Dialog, DialogPortal, DialogContent, DialogHeader, DialogTitle, DialogDescription };

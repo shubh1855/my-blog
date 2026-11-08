@@ -37,7 +37,7 @@ export interface ValidatedBackupArchive {
  * @param allowedDir allowed directory
  * @returns is in the allowed directory
  */
-export function isPathWithinDir(targetPath: string, allowedDir: string): boolean {
+function isPathWithinDir(targetPath: string, allowedDir: string): boolean {
   const resolvedTarget = path.resolve(targetPath);
   const resolvedDir = path.resolve(allowedDir);
   return resolvedTarget.startsWith(`${resolvedDir}${path.sep}`) || resolvedTarget === resolvedDir;
@@ -46,7 +46,7 @@ export function isPathWithinDir(targetPath: string, allowedDir: string): boolean
 /**
  * Verify that the path is within the backup directory
  */
-export function isPathWithinBackupDir(targetPath: string, backupDir = DEFAULT_WORKSPACE.backupDir): boolean {
+function isPathWithinBackupDir(targetPath: string, backupDir = DEFAULT_WORKSPACE.backupDir): boolean {
   return isPathWithinDir(targetPath, backupDir);
 }
 

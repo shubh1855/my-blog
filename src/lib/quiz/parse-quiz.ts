@@ -21,7 +21,7 @@ function sanitizeHtml(html: string): string {
 }
 
 /** Detect quiz type from the element's classList and source content */
-export function detectQuizType(el: HTMLElement, source: HTMLElement): QuizType {
+function detectQuizType(el: HTMLElement, source: HTMLElement): QuizType {
   if (el.classList.contains('fill')) return 'fill';
   if (el.classList.contains('multi')) return 'multi';
 
@@ -33,7 +33,7 @@ export function detectQuizType(el: HTMLElement, source: HTMLElement): QuizType {
 }
 
 /** Extract question HTML by cloning the element and removing <ul> and <blockquote> children */
-export function extractQuestionHtml(el: HTMLElement): string {
+function extractQuestionHtml(el: HTMLElement): string {
   const clone = el.cloneNode(true) as HTMLElement;
   // Remove option lists and explanation blockquotes from the clone
   for (const child of Array.from(clone.children)) {
@@ -45,7 +45,7 @@ export function extractQuestionHtml(el: HTMLElement): string {
 }
 
 /** Extract options from child <ul> list items */
-export function extractOptions(el: HTMLElement): QuizOption[] {
+function extractOptions(el: HTMLElement): QuizOption[] {
   const ul = el.querySelector(':scope > ul');
   if (!ul) return [];
 
@@ -56,7 +56,7 @@ export function extractOptions(el: HTMLElement): QuizOption[] {
 }
 
 /** Extract explanation HTML from child <blockquote> */
-export function extractExplanation(el: HTMLElement): string | null {
+function extractExplanation(el: HTMLElement): string | null {
   const blockquote = el.querySelector(':scope > blockquote');
   return blockquote ? sanitizeHtml(blockquote.innerHTML) : null;
 }
@@ -68,7 +68,7 @@ export function extractExplanation(el: HTMLElement): string | null {
  * then splits the resulting HTML to produce an interleaved array of HTML fragments
  * and gap placeholders. This avoids fragile regex matching against raw innerHTML.
  */
-export function extractQuestionParts(el: HTMLElement): QuestionPart[] {
+function extractQuestionParts(el: HTMLElement): QuestionPart[] {
   const clone = el.cloneNode(true) as HTMLElement;
   // Remove <ul>, <ol>, <blockquote> from clone (same as extractQuestionHtml)
   for (const child of Array.from(clone.children)) {
@@ -105,7 +105,7 @@ export function extractQuestionParts(el: HTMLElement): QuestionPart[] {
 }
 
 /** Extract mistake items from blockquote span.mistake elements */
-export function extractMistakes(el: HTMLElement): string[] {
+function extractMistakes(el: HTMLElement): string[] {
   const blockquote = el.querySelector(':scope > blockquote');
   if (!blockquote) return [];
   return Array.from(blockquote.querySelectorAll('span.mistake')).map((span) => span.textContent || '');

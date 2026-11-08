@@ -15,7 +15,7 @@ type HomeSiderSegmentedProps = {
   value?: HomeSiderSegmentType; // 受控
 };
 
-export const HomeSiderSegmented = ({ className, ...props }: HomeSiderSegmentedProps) => {
+const HomeSiderSegmented = ({ className, ...props }: HomeSiderSegmentedProps) => {
   const { t } = useTranslation();
 
   const options: OptionType<HomeSiderSegmentType>[] = [

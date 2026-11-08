@@ -33,12 +33,12 @@ site:
     # enableSlugTransliteration: true
     # =============================================================================
     # Internationalization (i18n)
-    # 国际化配置 - 控制多语言支持
+    # Internationalization - controls multi-language support
     # =============================================================================
-    # defaultLocale: 默认语言代码（URL 不带前缀）
-    # locales: 支持的语言列表
-    #   - code: 语言代码（BCP 47 短格式，如 'zh', 'en', 'ja'）
-    #   - label: 语言显示名称（如 '中文', 'English'）
+    # defaultLocale: default locale code (no URL prefix)
+    # locales: list of supported locales
+    #   - code: locale code (BCP 47 short form, e.g. 'en', 'ja')
+    #   - label: locale display name (e.g. 'English', '日本語')
     # -----------------------------------------------------------------------------
 i18n:
   defaultLocale: en
@@ -47,19 +47,17 @@ i18n:
       label: English
 # =============================================================================
 # Category Map
-# Maps Chinese category names to URL-friendly English slugs
-# Example: '随笔' category URL becomes /categories/life
+# Maps category names to URL-friendly slugs
+# Example: 'Life' category URL becomes /categories/life
 # =============================================================================
 categoryMap:
   # Primary categories
-  笔记: note
   Notes: note
-  工具: tools
   Tools: tools
   Linux: linux
-  周刊: weekly
+  Weekly: weekly
   # Secondary categories (for nested paths)
-  前端: front-end
+  Frontend: front-end
   Writeups: writeups
   # CTF groups
   RAIT-CTF 2026 Finals: rait-ctf-2026-finals
@@ -69,19 +67,19 @@ categoryMap:
   KPMG CTF 2026: kpmg-ctf-2026
   BSides Mumbai CTF: bsides-mumbai-2026
   # Add more as needed:
-  # 书摘: reading
-  # 后端: back-end
-  # 算法: algorithm
-  # 项目: project
+  # Reading: reading
+  # Backend: back-end
+  # Algorithms: algorithm
+  # Projects: project
   # =============================================================================
   # Featured Categories (Homepage)
-  # 首页精选分类 - 在首页以卡片形式展示的分类入口
+  # Featured categories - category entries shown as cards on the home page
   # =============================================================================
-  # 字段说明：
-  #   link: 分类链接路径，对应 categoryMap 中的英文 slug
-  #   label: 卡片上显示的分类名称
-  #   image: 封面图片路径（相对于 public 目录）
-  #   description: 分类描述文字，显示在卡片上
+  # Fields:
+  #   link: category link path, matching an English slug in categoryMap
+  #   label: category name shown on the card
+  #   image: cover image path (relative to public/)
+  #   description: category description shown on the card
   # -----------------------------------------------------------------------------
 featuredCategories:
   - link: note
@@ -104,24 +102,24 @@ featuredCategories:
     description: Linux internals and administration
 # =============================================================================
 # Featured Series
-# 精选系列功能 - 用于展示定期更新的系列内容（支持多个系列）
+# Featured series - showcases regularly updated series content (multiple series supported)
 # =============================================================================
-# 字段说明：
-#   slug: URL 路径（必填），如 'weekly' 对应 /weekly 路径
-#         注意：不能与保留路由冲突，包括：about, categories, tags, friends, posts, archives, api, _astro, rss.xml, sitemap.xml, robots.txt, favicon.ico 等
-#   categoryName: 对应的分类名称（必填，需在 categoryMap 中存在）
-#   label: 侧边栏/导航中显示的简短名称（可选）
-#   fullName: 系列页面标题显示的完整名称（可选）
-#   description: 系列介绍文字，支持多行 Markdown（可选）
-#   cover: 系列页面头图路径，相对于 public 目录（可选）
-#   enabled: 是否启用此系列，设为 false 可关闭（可选，默认 true）
-#   icon: 导航图标，Iconify 格式如 'ri:newspaper-line'（可选）
-#   highlightOnHome: 是否在首页高亮显示最新文章（可选，默认 true，显式设为 false 可禁用）
-#   links: 相关链接配置（可选）
+# Fields:
+#   slug: URL path (required), e.g. 'weekly' maps to /weekly
+#         Note: must not conflict with reserved routes, including: about, categories, tags, friends, posts, archives, api, _astro, rss.xml, sitemap.xml, robots.txt, favicon.ico, etc.
+#   categoryName: matching category name (required, must exist in categoryMap)
+#   label: short name shown in the sidebar/navigation (optional)
+#   fullName: full name shown as the series page title (optional)
+#   description: series introduction, supports multi-line Markdown (optional)
+#   cover: series page header image, relative to public/ (optional)
+#   enabled: whether the series is enabled; set false to turn it off (optional, default true)
+#   icon: navigation icon in Iconify format, e.g. 'ri:newspaper-line' (optional)
+#   highlightOnHome: highlight the latest post on the home page (optional, default true; set false to disable)
+#   links: related links (optional)
 # -----------------------------------------------------------------------------
 featuredSeries:
   - slug: weekly
-    categoryName: 周刊
+    categoryName: Weekly
     label: Weekly
     fullName: Tech Weekly
     description: |
@@ -135,15 +133,15 @@ featuredSeries:
       rss: /rss.xml
 # =============================================================================
 # Social Links
-# 社交链接 - 显示在页脚和个人信息区域
+# Social links - shown in the footer and profile area
 # =============================================================================
-# 字段说明：
-#   url: 链接地址（邮箱需加 mailto: 前缀）
-#   icon: Iconify 图标标识，格式为 "集合:图标名"
-#         图标查询：https://icon-sets.iconify.design/ri/
-#   color: (可选) 图标颜色，十六进制格式如 '#191717'
+# Fields:
+#   url: link address (emails need the mailto: prefix)
+#   icon: Iconify icon id, in the form "collection:icon-name"
+#         Icon search: https://icon-sets.iconify.design/ri/
+#   color: (optional) icon colour, hex format e.g. '#191717'
 # -----------------------------------------------------------------------------
-# 添加新平台：复制现有配置块，修改键名和各字段值即可
+# Add a platform: copy an existing block and change the key name and field values
 # -----------------------------------------------------------------------------
 social:
   github:
@@ -163,7 +161,7 @@ social:
     icon: ri:rss-line
     color: '#ff6600'
     # -------------------------------------------------------------------------
-    # 以下是更多可选的社交平台配置示例，取消注释并修改即可启用：
+    # More optional social platform examples below; uncomment and edit to enable:
     # -------------------------------------------------------------------------
     # twitter:
     #   url: https://x.com/your-handle
@@ -183,21 +181,21 @@ social:
     #   color: '#e60026'
     # =============================================================================
     # Friends Links
-    # 友情链接页面配置 - 展示友链列表和申请说明
+    # Friends page - shows the friend link list and how to apply
     # =============================================================================
-    # intro: 页面介绍文字配置
-    #   title: 页面标题
-    #   subtitle: 页面副标题
-    #   applyTitle: 申请区块标题
-    #   applyDesc: 申请说明文字
-    #   exampleYaml: 申请格式示例（YAML 格式）
-    # data: 友链列表数组
-    #   - site: 站点名称
-    #   - url: 站点地址
-    #   - owner: 站长昵称
-    #   - desc: 站点描述/简介
-    #   - image: 头像图片 URL
-    #   - color: (可选) 卡片背景色，十六进制格式
+    # intro: page intro text
+    #   title: page title
+    #   subtitle: page subtitle
+    #   applyTitle: application section title
+    #   applyDesc: application instructions
+    #   exampleYaml: example application (YAML format)
+    # data: friend link list
+    #   - site: site name
+    #   - url: site address
+    #   - owner: site owner nickname
+    #   - desc: site description
+    #   - image: avatar image URL
+    #   - color: (optional) card background colour, hex format
     # -----------------------------------------------------------------------------
 friends:
   intro:
@@ -244,49 +242,49 @@ friends:
       color: "#191c19"
 # =============================================================================
 # Announcements
-# 公告系统 - 在页面顶部显示重要通知
+# Announcements - shows important notices at the top of the page
 # =============================================================================
-# 字段说明：
-#   id: 唯一标识符，用于记录用户已读状态（localStorage）
-#   title: 公告标题
-#   content: 公告内容文字
-#   type: 类型，影响样式颜色 (info/success/warning/error)
-#   priority: 优先级数字，数值越大排序越靠前
-#   color: (可选) 自定义颜色，覆盖 type 默认色
-#   publishDate: 发布日期，格式 'YYYY-MM-DD'
-#   startDate: (可选) 开始显示时间，ISO 8601 格式
-#   endDate: (可选) 结束显示时间，过期后自动隐藏
-#   link: (可选) 相关链接
-#     url: 链接地址
-#     text: 链接文字
-#     external: 是否在新窗口打开 (true/false)
+# Fields:
+#   id: unique identifier, used to remember read state (localStorage)
+#   title: announcement title
+#   content: announcement text
+#   type: type, sets the colour style (info/success/warning/error)
+#   priority: priority number; higher sorts first
+#   color: (optional) custom colour, overrides the type default
+#   publishDate: publish date, format 'YYYY-MM-DD'
+#   startDate: (optional) start showing at, ISO 8601 format
+#   endDate: (optional) stop showing at; hidden automatically after expiry
+#   link: (optional) related link
+#     url: link address
+#     text: link text
+#     external: open in a new window (true/false)
 # -----------------------------------------------------------------------------
-# 取消下方注释即可启用公告示例：
+# Uncomment below to enable the example announcements:
 # -----------------------------------------------------------------------------
 announcements:
-# - id: welcome-2026 # 唯一标识符
-#   title: 2026 年新年快乐! # 公告标题
+# - id: welcome-2026 # unique identifier
+#   title: Happy New Year 2026! # announcement title
 
-#   content: 新年快乐! 感谢大家一直以来的支持~ # 公告内容
-#   type: success # 类型: info/success/warning/error
-#   priority: 10 # 优先级，数值越大越靠前
-#   color: '#FF6B6B' # (可选) 自定义颜色
-#   publishDate: '2026-01-01' # 发布日期
-#   startDate: '2025-12-31T00:00:00+08:00' # (可选) 开始显示时间
-#   endDate: '2026-01-15T23:59:59+08:00' # (可选) 结束显示时间
-#   link: # (可选) 相关链接
+#   content: Happy New Year! Thanks for all your support~ # announcement text
+#   type: success # type: info/success/warning/error
+#   priority: 10 # priority; higher sorts first
+#   color: '#FF6B6B' # (optional) custom colour
+#   publishDate: '2026-01-01' # publish date
+#   startDate: '2025-12-31T00:00:00+08:00' # (optional) start showing at
+#   endDate: '2026-01-15T23:59:59+08:00' # (optional) stop showing at
+#   link: # (optional) related link
 #     url: https://example.com
-#     text: 了解更多
-#     external: true # 新窗口打开
+#     text: Learn more
+#     external: true # open in a new window
 # - id: maintenance-notice
-#   title: 系统维护通知
-#   content: 计划于本周末进行系统维护，届时可能短暂无法访问。
+#   title: Scheduled maintenance
+#   content: Maintenance is planned for this weekend; the site may be briefly unavailable.
 #   type: warning
 #   priority: 8
 #   publishDate: '2025-12-28'
 # - id: site-update
-#   title: 站点更新公告
-#   content: 公告系统已升级，现支持多条公告同时显示！
+#   title: Site update
+#   content: The announcement system now supports showing several announcements at once!
 #   type: info
 #   priority: 5
 #   color: '#6366F1'
@@ -294,8 +292,8 @@ announcements:
 
 # =============================================================================
 # Default Cover List
-# 默认封面列表 - 文章没有指定封面时将随机从列表中选择一张作为封面
-# 不设置则使用内置的 21 张默认封面 (/img/cover/1~21.webp)
+# Default covers - posts without a cover pick one at random from this list
+# If unset, the 21 built-in default covers are used (/img/cover/1~21.webp)
 # =============================================================================
 defaultCoverList:
   - /img/cover/kallen-mech.webp
@@ -310,234 +308,234 @@ defaultCoverList:
   - /img/cover/suzaku-dejected.webp
 # =============================================================================
 # Content Processing Options
-# 内容处理选项 - 控制文章渲染和交互行为
+# Content processing options - control post rendering and interaction
 # =============================================================================
-# 字段说明：
-#   addBlankTarget: 外部链接在新窗口打开
-#   smoothScroll: 启用平滑滚动动画
-#   addHeadingLevel: 自动为标题添加层级锚点
-#   enhanceCodeBlock: 增强代码块样式（行号、语言标签等）
-#   enableCodeCopy: 显示代码块复制按钮
-#   enableCodeFullscreen: 显示代码块全屏按钮
-#   enableLinkEmbed: 启用链接卡片预览（解析 OG 信息）
-#   enableTweetEmbed: 启用推文嵌入展示
-#   enableOGPreview: 启用 Open Graph 预览卡片
-#   previewCacheTime: 预览信息缓存时间（天）
-#   lazyLoadEmbeds: 延迟加载嵌入内容（提升性能）
-#   postCardImagePosition: 文章卡片封面图位置 (alternating/left/right)
+# Fields:
+#   addBlankTarget: open external links in a new window
+#   smoothScroll: enable smooth scroll animation
+#   addHeadingLevel: add level anchors to headings automatically
+#   enhanceCodeBlock: enhanced code block styling (line numbers, language label, etc.)
+#   enableCodeCopy: show the code block copy button
+#   enableCodeFullscreen: show the code block full-screen button
+#   enableLinkEmbed: enable link card previews (parses OG info)
+#   enableTweetEmbed: enable tweet embeds
+#   enableOGPreview: enable Open Graph preview cards
+#   previewCacheTime: preview info cache time (days)
+#   lazyLoadEmbeds: lazy-load embedded content (better performance)
+#   postCardImagePosition: post card cover position (alternating/left/right)
 # -----------------------------------------------------------------------------
 content:
-  addBlankTarget: true # 外部链接新窗口打开
-  smoothScroll: true # 平滑滚动
-  addHeadingLevel: true # 标题锚点
-  enhanceCodeBlock: true # 增强代码块
-  enableCodeCopy: true # 代码复制按钮
-  enableCodeFullscreen: true # 代码全屏按钮
-  enableLinkEmbed: true # 链接卡片预览
-  enableCodePenEmbed: true # CodePen 嵌入
-  enableTweetEmbed: true # 推文嵌入
-  enableOGPreview: true # OG 预览卡片
-  previewCacheTime: 30 # 预览缓存时间(天)
-  lazyLoadEmbeds: true # 延迟加载嵌入
-  postCardImagePosition: alternating # 文章卡片封面图位置在首页的显示控制 alternating 默认交替显示 left 封面图始终在左侧 right 封面图始终在右侧
-  # Shoka 兼容功能（默认全部启用，设为 false 可关闭）
-  enableShokaContainers: true # :::提醒块 ;;;标签卡 +++折叠块
-  enableShokaAttrs: true # [text]{.class} 属性语法
-  enableShokaEffects: true # ++下划线++ ==高亮== ~下标~ ^上标^
-  enableShokaSpoiler: true # !!隐藏文字!!
-  enableShokaRuby: true # {文字^注音} 注音标注
-  enableShokaHexoTags: true # {% links %} {% media %} Hexo标签
-  enableMath: true # $数学公式$ KaTeX渲染
-  enableCodeMeta: true # 代码块增强 (title, mark, command)
-  enableQuiz: true # 练习题交互功能
-  enableEncryptedBlock: true # :::encrypted{password="..."} 加密内容块
+  addBlankTarget: true # open external links in a new window
+  smoothScroll: true # smooth scrolling
+  addHeadingLevel: true # heading anchors
+  enhanceCodeBlock: true # enhanced code blocks
+  enableCodeCopy: true # code copy button
+  enableCodeFullscreen: true # code full-screen button
+  enableLinkEmbed: true # link card previews
+  enableCodePenEmbed: true # CodePen embeds
+  enableTweetEmbed: true # tweet embeds
+  enableOGPreview: true # OG preview cards
+  previewCacheTime: 30 # preview cache time (days)
+  lazyLoadEmbeds: true # lazy-load embeds
+  postCardImagePosition: alternating # home page cover position: alternating (default) alternates, left keeps covers on the left, right keeps them on the right
+  # Shoka-compatible features (all on by default; set false to disable)
+  enableShokaContainers: true # :::note blocks ;;;tab cards +++collapsible blocks
+  enableShokaAttrs: true # [text]{.class} attribute syntax
+  enableShokaEffects: true # ++underline++ ==highlight== ~subscript~ ^superscript^
+  enableShokaSpoiler: true # !!hidden text!!
+  enableShokaRuby: true # {text^ruby} ruby annotations
+  enableShokaHexoTags: true # {% links %} {% media %} Hexo tags
+  enableMath: true # $math$ KaTeX rendering
+  enableCodeMeta: true # code block extras (title, mark, command)
+  enableQuiz: true # interactive quiz questions
+  enableEncryptedBlock: true # :::encrypted{password="..."} encrypted content blocks
 # =============================================================================
 # Navigation Routes
-# 导航菜单配置 - 定义顶部导航栏的菜单项
+# Navigation menu - defines the top navigation bar items
 # =============================================================================
-# 字段说明：
-#   name: 菜单项显示名称
-#   path: 链接路径（有 children 时可省略，点击展开子菜单）
-#   icon: Iconify 图标标识，格式 "集合:图标名"
-#   children: (可选) 子菜单列表，结构与父级相同
+# Fields:
+#   name: menu item display name
+#   path: link path (can be omitted when children exist; clicking expands the submenu)
+#   icon: Iconify icon id, format "collection:icon-name"
+#   children: (optional) submenu list, same structure as the parent
 # -----------------------------------------------------------------------------
-# 图标参考：
+# Icon references:
 #   - Font Awesome 6: https://icon-sets.iconify.design/fa6-solid/
 #   - Remix Icon: https://icon-sets.iconify.design/ri/
 # -----------------------------------------------------------------------------
 navigation:
-  - name: 首页 # 菜单显示名称（nameKey 不存在时的回退文本）
-    nameKey: nav.home # i18n 翻译 key
-    path: / # 链接路径
-    icon: ri:home-heart-fill # 图标
-  # - name: 书摘
+  - name: Home # display name (fallback text when nameKey is missing)
+    nameKey: nav.home # i18n translation key
+    path: / # link path
+    icon: ri:home-heart-fill # icon
+  # - name: Reading
   #   path: /reading
-  - name: 周刊
+  - name: Weekly
     nameKey: nav.weekly
     path: /weekly
     icon: ri:newspaper-line
   - name: Writeups
     path: /categories/writeups
     icon: ri:shield-keyhole-fill
-  - name: 文章 # 有子菜单时，path 可省略
+  - name: Posts # path can be omitted when there is a submenu
     nameKey: nav.posts
     icon: ri:quill-pen-ai-fill
     children:
-      # 子菜单列表
-      - name: 分类
+      # submenu list
+      - name: Categories
         nameKey: nav.categories
         path: /categories
         icon: ri:grid-fill
-      - name: 标签
+      - name: Tags
         nameKey: nav.tags
         path: /tags
         icon: fa6-solid:tags
-      - name: 归档
+      - name: Archives
         nameKey: nav.archives
         path: /archives
         icon: ri:archive-2-fill
-  - name: 友链
+  - name: Friends
     nameKey: nav.friends
     path: /friends
     icon: ri:links-line
-  - name: 关于
+  - name: About
     nameKey: nav.about
     path: /about
     icon: fa6-regular:circle-user
-  - name: 歌单
+  - name: Playlist
     nameKey: nav.music
     path: /music
     icon: ri:music-2-fill
     # =============================================================================
     # Comment System
     # =============================================================================
-    # provider: 评论系统提供商 ('remark42' | 'giscus' | 'waline' | 'twikoo' | 'none')
-    #           设为 'none' 或不设置时禁用评论系统
-    # 各提供商配置：
+    # provider: comment system provider ('remark42' | 'giscus' | 'waline' | 'twikoo' | 'none')
+    #           set to 'none' or leave unset to disable comments
+    # Provider settings:
     # -----------------------------------------------------------------------------
-    #   remark42: 自托管轻量级评论系统 (https://remark42.com/docs/getting-started/installation/)
-    #     host: https://comment.example.com/ # Remark42 服务器地址
-    #     siteId: your-site-id # 站点 ID
-    #   giscus: 基于 GitHub Discussions 的评论系统 (https://giscus.app)（介绍文章 https://zhuanlan.zhihu.com/p/693434928）
-    #     repo: GitHub 仓库名 (owner/repo 格式)
-    #     repoId: 仓库 ID (从 giscus.app 获取)
-    #     category: Discussion 分类名称
-    #     categoryId: 分类 ID (从 giscus.app 获取)
-    #     mapping: 映射方式 ('pathname' | 'url' | 'title' | 'og:title'……)
-    #     reactionsEnabled: 启用 reactions (默认: '1') # 仅支持 '0' | '1'
-    #     emitMetadata: 发送元数据 (默认: '0') # 仅支持 '0' | '1'
-    #     inputPosition: 输入框位置 ('top' | 'bottom', 默认: 'top')
-    #     lang: 语言 (默认: 'zh-CN')
-    #     host: 自定义 giscus 主机 (可选) 'https://giscus.app' | '...'
-    #     theme: 主题 (可选) 'light' | 'dark' | '...'
-    #     loading: 加载方式 (可选) 'lazy' | 'eager';
-    #   waline: 简洁安全的评论系统 (https://waline.js.org)
-    #     serverURL: Waline 服务端地址 (必填)
-    #     lang: 语言 (默认: 'zh-CN')
-    #     dark: 暗黑模式支持 (默认: 'html.dark')
-    #           - 字符串: CSS 选择器，当该选择器生效时启用暗黑模式
-    #           - true: 根据设备自适应
-    #           - false: 禁用暗黑模式
-    #     meta: 评论者信息字段 (默认: ['nick', 'mail', 'link'])
-    #     requiredMeta: 必填字段 (默认: [])
-    #     login: 登录模式 ('enable' | 'disable' | 'force', 默认: 'enable')
-    #     wordLimit: 评论字数限制
-    #           - 单个数字: 最大字数限制
-    #           - 数组 [min, max]: 最小和最大字数限制
-    #           - 0: 无限制 (默认: 0)
-    #     pageSize: 每页评论数 (默认: 10)
-    #     imageUploader: 图片上传功能 (默认: false)
-    #     highlighter: 代码高亮 (默认: true)
-    #     texRenderer: LaTeX 渲染 (默认: false)
-    #     search: 搜索功能 (默认: false)
-    #     reaction: 文章反应功能
-    #           - false: 禁用 (默认)
-    #           - true: 启用默认反应
-    #           - 数组: 自定义反应图标 URL 列表
-    #     emoji: 表情包配置
-    #           - false: 禁用表情包
-    #           - true: 使用默认表情包
-    #           - 数组: 自定义表情包列表 (默认: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
-    #     commentSorting: 评论排序方式 ('latest' | 'oldest' | 'hottest', 默认: 'latest')
-    #     noCopyright: 隐藏页脚版权信息 (默认: false)
-    #     comment: 评论数统计 (默认: true)
-    #     pageview: 页面访问量统计 (默认: true)
-    #     recaptchaV3Key: reCAPTCHA v3 Key (可选)
-    #     turnstileKey: Cloudflare Turnstile Key (可选)
-    #     locale: 自定义语言显示 (可选)
+    #   remark42: self-hosted lightweight comment system (https://remark42.com/docs/getting-started/installation/)
+    #     host: https://comment.example.com/ # Remark42 server address
+    #     siteId: your-site-id # site ID
+    #   giscus: comment system based on GitHub Discussions (https://giscus.app)
+    #     repo: GitHub repository (owner/repo format)
+    #     repoId: repository ID (from giscus.app)
+    #     category: Discussion category name
+    #     categoryId: category ID (from giscus.app)
+    #     mapping: mapping mode ('pathname' | 'url' | 'title' | 'og:title' ...)
+    #     reactionsEnabled: enable reactions (default: '1') # only '0' | '1'
+    #     emitMetadata: emit metadata (default: '0') # only '0' | '1'
+    #     inputPosition: input box position ('top' | 'bottom', default: 'top')
+    #     lang: language (default: the page locale)
+    #     host: custom giscus host (optional) 'https://giscus.app' | '...'
+    #     theme: theme (optional) 'light' | 'dark' | '...'
+    #     loading: loading mode (optional) 'lazy' | 'eager';
+    #   waline: simple, secure comment system (https://waline.js.org)
+    #     serverURL: Waline server address (required)
+    #     lang: language (default: the page locale)
+    #     dark: dark mode support (default: 'html.dark')
+    #           - string: CSS selector; dark mode is on when it matches
+    #           - true: follow the device
+    #           - false: disable dark mode
+    #     meta: commenter info fields (default: ['nick', 'mail', 'link'])
+    #     requiredMeta: required fields (default: [])
+    #     login: login mode ('enable' | 'disable' | 'force', default: 'enable')
+    #     wordLimit: comment length limit
+    #           - single number: maximum length
+    #           - array [min, max]: minimum and maximum length
+    #           - 0: no limit (default: 0)
+    #     pageSize: comments per page (default: 10)
+    #     imageUploader: image uploads (default: false)
+    #     highlighter: code highlighting (default: true)
+    #     texRenderer: LaTeX rendering (default: false)
+    #     search: search (default: false)
+    #     reaction: post reactions
+    #           - false: disabled (default)
+    #           - true: default reactions
+    #           - array: custom reaction icon URLs
+    #     emoji: emoji packs
+    #           - false: disable emoji
+    #           - true: default emoji packs
+    #           - array: custom emoji pack list (default: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
+    #     commentSorting: comment order ('latest' | 'oldest' | 'hottest', default: 'latest')
+    #     noCopyright: hide footer copyright (default: false)
+    #     comment: comment count stats (default: true)
+    #     pageview: page view stats (default: true)
+    #     recaptchaV3Key: reCAPTCHA v3 Key (optional)
+    #     turnstileKey: Cloudflare Turnstile Key (optional)
+    #     locale: custom UI strings (optional)
     # twikoo:
-    # envId: # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
-    # region: # 环境地域，默认为 ap-shanghai
-    # path: # 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
-    # lang: # 语言 (默认: 'zh-CN')
+    # envId: # Twikoo environment ID (Tencent Cloud) or Vercel environment URL (required)
+    # region: # environment region, default ap-shanghai
+    # path: # custom JS path used to tell posts apart; set this if your post path is not location.pathname
+    # lang: # language (default: the page locale)
 comment:
   provider: none # 'remark42' | 'giscus' | 'waline' | 'twikoo' | 'none'
   # remark42:
   #   host: https://comment.example.com/
   #   siteId: your-site-id
   # giscus:
-  #   repo: username/repo              # GitHub 仓库名 (owner/repo 格式)
-  #   repoId: R_kgDOxxxxxx             # 仓库 ID (从 giscus.app 获取)
-  #   category: Announcements          # Discussion 分类名称
-  #   categoryId: DIC_kwDOxxxxxx       # 分类 ID (从 giscus.app 获取)
-  #   mapping: pathname                # 映射方式
-  #   reactionsEnabled: '1'            # 启用 reactions ('0' | '1')
-  #   emitMetadata: '0'                # 发送元数据 ('0' | '1')
-  #   inputPosition: top               # 输入框位置 ('top' | 'bottom')
-  #   lang: zh-CN                      # 语言
+  #   repo: username/repo              # GitHub repository (owner/repo format)
+  #   repoId: R_kgDOxxxxxx             # repository ID (from giscus.app)
+  #   category: Announcements          # Discussion category name
+  #   categoryId: DIC_kwDOxxxxxx       # category ID (from giscus.app)
+  #   mapping: pathname                # mapping mode
+  #   reactionsEnabled: '1'            # enable reactions ('0' | '1')
+  #   emitMetadata: '0'                # emit metadata ('0' | '1')
+  #   inputPosition: top               # input box position ('top' | 'bottom')
+  #   lang: en                         # language
 
   # waline:
-  #   serverURL: https://your-waline.vercel.app  # Waline 服务端地址 (必填)
-  #   lang: zh-CN                      # 语言 (默认: 'zh-CN')
-  #   dark: html.dark                  # 暗黑模式 (默认: 'html.dark')
-  #                                    # 可选: true (自适应) | false (禁用) | CSS选择器字符串
-  #   meta:                            # 评论者信息字段 (默认: ['nick', 'mail', 'link'])
+  #   serverURL: https://your-waline.vercel.app  # Waline server address (required)
+  #   lang: en                         # language (default: the page locale)
+  #   dark: html.dark                  # dark mode (default: 'html.dark')
+  #                                    # options: true (follow device) | false (disable) | CSS selector string
+  #   meta:                            # commenter info fields (default: ['nick', 'mail', 'link'])
   #     - nick
   #     - mail
   #     - link
-  #   requiredMeta:                    # 必填字段 (默认: [])
+  #   requiredMeta:                    # required fields (default: [])
   #     - nick
-  #   login: enable                    # 登录模式 ('enable' | 'disable' | 'force', 默认: 'enable')
-  #   wordLimit: 0                     # 评论字数限制 (0 = 无限制, 默认: 0)
-  #                                    # 可选: 单个数字 | [min, max] 数组
-  #   pageSize: 10                     # 每页评论数 (默认: 10)
-  #   imageUploader: false             # 图片上传功能 (默认: false)
-  #   highlighter: true                # 代码高亮 (默认: true)
-  #   texRenderer: false               # LaTeX 渲染 (默认: false)
-  #   search: false                    # 搜索功能 (默认: false)
-  #   reaction: false                  # 文章反应功能 (默认: false)
-  #                                    # 可选: true | false | 字符串数组 (自定义反应图标)
-  #   emoji: true                      # 表情包配置 (默认: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
-  #                                    # 可选: true | false | 字符串/对象数组
-  #                                    # 预设表情包: '//unpkg.com/@waline/emojis@1.2.0/weibo'
+  #   login: enable                    # login mode ('enable' | 'disable' | 'force', default: 'enable')
+  #   wordLimit: 0                     # comment length limit (0 = no limit, default: 0)
+  #                                    # options: single number | [min, max] array
+  #   pageSize: 10                     # comments per page (default: 10)
+  #   imageUploader: false             # image uploads (default: false)
+  #   highlighter: true                # code highlighting (default: true)
+  #   texRenderer: false               # LaTeX rendering (default: false)
+  #   search: false                    # search (default: false)
+  #   reaction: false                  # post reactions (default: false)
+  #                                    # options: true | false | string array (custom reaction icons)
+  #   emoji: true                      # emoji packs (default: ['//unpkg.com/@waline/emojis@1.2.0/weibo'])
+  #                                    # options: true | false | string/object array
+  #                                    # preset pack: '//unpkg.com/@waline/emojis@1.2.0/weibo'
   #                                    #           '//unpkg.com/@waline/emojis@1.2.0/alus'
   #                                    #           '//unpkg.com/@waline/emojis@1.2.0/bilibili'
   #                                    #           '//unpkg.com/@waline/emojis@1.2.0/qq'
   #                                    #           '//unpkg.com/@waline/emojis@1.2.0/tieba'
   #                                    #           '//unpkg.com/@waline/emojis@1.2.0/tw-emoji'
-  #   commentSorting: latest           # 评论排序 ('latest' | 'oldest' | 'hottest', 默认: 'latest')
-  #   noCopyright: false               # 隐藏页脚版权信息 (默认: false)
-  #   comment: true                    # 评论数统计 (默认: true)
-  #   pageview: true                   # 页面访问量统计 (默认: true)
-  #   # recaptchaV3Key: ''             # reCAPTCHA v3 Key (可选)
-  #   # turnstileKey: ''               # Cloudflare Turnstile Key (可选)
-  #   # locale:                        # 自定义语言显示 (可选)
-  #   #   placeholder: '请留言...'      # 自定义输入框占位文本
+  #   commentSorting: latest           # comment order ('latest' | 'oldest' | 'hottest', default: 'latest')
+  #   noCopyright: false               # hide footer copyright (default: false)
+  #   comment: true                    # comment count stats (default: true)
+  #   pageview: true                   # page view stats (default: true)
+  #   # recaptchaV3Key: ''             # reCAPTCHA v3 Key (optional)
+  #   # turnstileKey: ''               # Cloudflare Turnstile Key (optional)
+  #   # locale:                        # custom UI strings (optional)
+  #   #   placeholder: 'Leave a comment...' # custom input placeholder
   twikoo:
-    envId: https://your-twikoo.vercel.app # Twikoo 环境 ID (腾讯云) 或 Vercel 环境地址 (必填)
-    # region: ap-shanghai              # 环境地域，默认为 ap-shanghai
-    # path: location.pathname          # 用于区分不同文章的自定义 js 路径
-    # lang: zh-CN                     # 语言 (默认: 'zh-CN')
+    envId: https://your-twikoo.vercel.app # Twikoo environment ID (Tencent Cloud) or Vercel environment URL (required)
+    # region: ap-shanghai              # environment region, default ap-shanghai
+    # path: location.pathname          # custom JS path used to tell posts apart
+    # lang: en                        # language (default: the page locale)
     # =============================================================================
     # Analytics (Umami)
     # =============================================================================
-    # id: Umami 网站 ID
-    # endpoint: Umami 服务器地址
-    # enabled: 是否启用统计
-    # statistics_display: 统计信息显示配置
-    #   token: Umami 分享链接令牌（只读，可安全暴露到客户端）
-    #   article_page_views: 在文章详情页显示访问量
-    #   footer_site_stats: 在页脚 Site Stats 中显示全站访问量
+    # id: Umami website ID
+    # endpoint: Umami server address
+    # enabled: enable analytics
+    # statistics_display: stats display settings
+    #   token: Umami share-link token (read-only, safe to expose to the client)
+    #   article_page_views: show view counts on post pages
+    #   footer_site_stats: show site-wide views in the footer Site Stats
     # -----------------------------------------------------------------------------
 analytics:
   umami:
@@ -550,21 +548,21 @@ analytics:
     # SEO Configuration
     # =============================================================================
     # https://github.com/alextim/astro-lib/tree/main/packages/astro-robots-txt#readme
-    # robots: robots.txt 配置 (由 astro-robots-txt 自动生成)
-    #   policy: 爬虫策略数组（可选，默认允许所有）
-    #     - userAgent: 爬虫名称，'*' 表示所有
-    #       allow: 允许路径（可为字符串或数组）
-    #       disallow: 禁止路径（可为字符串或数组）
-    #   host: 是否添加 Host 指令（可选，适用于 Yandex）
+    # robots: robots.txt settings (generated by astro-robots-txt)
+    #   policy: crawler policy list (optional, allows all by default)
+    #     - userAgent: crawler name, '*' means all
+    #       allow: allowed paths (string or array)
+    #       disallow: disallowed paths (string or array)
+    #   host: add a Host directive (optional, for Yandex)
     # -----------------------------------------------------------------------------
 seo:
   robots:
-  # policy:                          # 爬虫策略（可选，取消注释并配置）
+  # policy:                          # crawler policy (optional; uncomment and configure)
   #   - userAgent: '*'
   #     allow: '/'
   #     disallow:
   #       - '/api/'
-  # host: true                       # 可选：添加 Host 指令（Yandex）
+  # host: true                       # optional: add Host directive (Yandex)
 bgm:
   enabled: true
   audio:
@@ -582,30 +580,30 @@ bgm:
 
   # =============================================================================
   # Bangumi (Media Tracking)
-  # 追番页面 - 注释掉整个 bangumi 段即可关闭（页面 + 导航自动隐藏）
+  # Bangumi page - comment out the whole bangumi section to turn it off (page + nav hide automatically)
   # =============================================================================
-  # 字段说明：
-  #   userId: Bangumi 用户名或数字 ID（必填）
-  #   label: 导航显示名称（可选，默认：追番）
-  #   icon: 导航图标，Iconify 格式（可选，默认：ri:bilibili-fill）
+  # Fields:
+  #   userId: Bangumi username or numeric ID (required)
+  #   label: navigation name (optional, default: Anime)
+  #   icon: navigation icon, Iconify format (optional, default: ri:bilibili-fill)
   # -----------------------------------------------------------------------------
   # bangumi:
   #   userId: cosine
-  #   # label: 追番
+  #   # label: Anime
   #   # icon: ri:bilibili-fill
   # =============================================================================
   # Development Tools (Dev Only)
-  # 开发工具配置 - 仅在开发环境（pnpm dev）生效
+  # Dev tools - only active in development (pnpm dev)
   # =============================================================================
-  # 配置后，开发环境下文章页会显示编辑按钮，可快速打开本地编辑器
-  # 字段说明：
-  #   localProjectPath: 本地项目的绝对路径（用于生成文件完整路径）
-  #   contentRelativePath: 博客内容相对于项目根目录的路径（默认: 'src/content/blog'）
-  #   editors: 编辑器列表
-  #     - id: 编辑器唯一标识符
-  #     - name: 编辑器显示名称
-  #     - icon: Iconify 图标标识（可从 https://icon-sets.iconify.design/ 中搜寻）
-  #     - urlTemplate: URL 模板，支持占位符 {path}（文件绝对路径）
+  # When set, post pages in development show an edit button that opens your local editor
+  # Fields:
+  #   localProjectPath: absolute path of the local project (used to build full file paths)
+  #   contentRelativePath: blog content path relative to the project root (default: 'src/content/blog')
+  #   editors: editor list
+  #     - id: unique editor id
+  #     - name: editor display name
+  #     - icon: Iconify icon id (search at https://icon-sets.iconify.design/)
+  #     - urlTemplate: URL template, supports the {path} placeholder (absolute file path)
   # -----------------------------------------------------------------------------
 dev:
   localProjectPath: '/home/shubh/Project/astro-koharu'

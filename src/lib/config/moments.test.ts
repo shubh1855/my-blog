@@ -11,7 +11,7 @@ const FIRST_ID = '550e8400-e29b-41d4-a716-446655440000';
 const SECOND_ID = '018f3f7a-2b1c-7def-8abc-1234567890ab';
 const context: MomentsValidationContext = {
   reservedRoutes: ['about', 'archives', 'api', 'music', 'rss', 'rss.xml'],
-  localeCodes: ['zh', 'en', 'ja'],
+  localeCodes: ['en', 'ja'],
   seriesSlugs: ['weekly'],
 };
 
@@ -19,12 +19,12 @@ test('normalizes an absent config to a disabled, safe default', () => {
   assert.deepEqual(normalizeMomentsConfig(undefined, context), {
     enabled: false,
     path: 'moments',
-    title: '碎碎念',
-    description: '记录频道中的日常消息',
+    title: 'Moments',
+    description: 'Everyday notes from the channel',
     ogImage: undefined,
     pathAliases: [],
     channels: [],
-    channelSlugBlocklist: ['about', 'archives', 'api', 'music', 'rss', 'rss.xml', 'zh', 'en', 'ja', 'weekly', 'search'],
+    channelSlugBlocklist: ['about', 'archives', 'api', 'music', 'rss', 'rss.xml', 'en', 'ja', 'weekly', 'search'],
   });
 });
 
@@ -39,7 +39,7 @@ test('normalizes nested paths, aliases, and channel overrides', () => {
           id: FIRST_ID.toUpperCase(),
           slug: 'Daily_Notes',
           aliases: ['Old-Daily'],
-          title: ' 日常 ',
+          title: ' Daily ',
           primary: true,
           ogImage: ' /img/daily.png ',
         },
@@ -54,7 +54,7 @@ test('normalizes nested paths, aliases, and channel overrides', () => {
     id: FIRST_ID,
     slug: 'daily_notes',
     aliases: ['old-daily'],
-    title: '日常',
+    title: 'Daily',
     primary: true,
     hidden: false,
     ogImage: '/img/daily.png',
@@ -135,7 +135,7 @@ test('resolves configured channels first and appends unconfigured suite channels
   const config = normalizeMomentsConfig(
     {
       enabled: true,
-      channels: [{ id: SECOND_ID, slug: 'configured', title: '覆盖标题', hidden: false }],
+      channels: [{ id: SECOND_ID, slug: 'configured', title: 'Override title', hidden: false }],
     },
     context,
   );
@@ -147,7 +147,7 @@ test('resolves configured channels first and appends unconfigured suite channels
   assert.deepEqual(
     result.map(({ id, slug, title, primary }) => ({ id, slug, title, primary })),
     [
-      { id: SECOND_ID, slug: 'configured', title: '覆盖标题', primary: true },
+      { id: SECOND_ID, slug: 'configured', title: 'Override title', primary: true },
       { id: FIRST_ID, slug: 'first_user', title: 'First', primary: false },
     ],
   );
@@ -202,10 +202,10 @@ test('replaces an enabled placeholder in place with a canonical-only link', () =
       { feature: 'moments', icon: 'custom:icon' },
       { name: 'About', path: '/about' },
     ],
-    normalizeMomentsConfig({ enabled: true, path: 'life/moments', title: '动态' }),
+    normalizeMomentsConfig({ enabled: true, path: 'life/moments', title: 'Updates' }),
   );
   assert.deepEqual(result[1], {
-    name: '动态',
+    name: 'Updates',
     path: '/life/moments',
     icon: 'custom:icon',
     localeIndependent: true,

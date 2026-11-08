@@ -62,7 +62,7 @@ interface LocaleConfig {
 
 function loadLocaleConfig(raw: string | null): LocaleConfig {
   if (raw === null) {
-    return { defaultLocale: 'zh', knownLocales: new Set(), enableSlugTransliteration: false };
+    return { defaultLocale: 'en', knownLocales: new Set(), enableSlugTransliteration: false };
   }
 
   const parsed = load(raw);
@@ -70,7 +70,7 @@ function loadLocaleConfig(raw: string | null): LocaleConfig {
     site?: { enableSlugTransliteration?: boolean };
     i18n?: { defaultLocale?: string; locales?: Array<{ code?: string }> };
   };
-  const defaultLocale = config.i18n?.defaultLocale ?? 'zh';
+  const defaultLocale = config.i18n?.defaultLocale ?? 'en';
   const knownLocales = new Set(
     (config.i18n?.locales ?? []).map((locale) => locale.code).filter((code): code is string => Boolean(code)),
   );

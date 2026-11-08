@@ -44,7 +44,13 @@ export function VideoControls({ showTrackButtons, videoRef, ...controlProps }: V
       showModeButton={showTrackButtons}
       showTrackButtons={showTrackButtons}
       extraButtons={
-        <button type="button" className="audio-player-btn" onClick={handleFullscreen} title="全屏">
+        <button
+          type="button"
+          className="audio-player-btn"
+          onClick={handleFullscreen}
+          title="Full screen"
+          aria-label="Full screen"
+        >
           <Icon icon="ri:fullscreen-line" />
         </button>
       }

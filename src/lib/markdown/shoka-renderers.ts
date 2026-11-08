@@ -10,7 +10,7 @@ export function escapeHtml(text: string): string {
 }
 
 /** Validate and sanitize a CSS color value (hex, named, hsl, rgb only) */
-export function sanitizeCssColor(color: string): string | null {
+function sanitizeCssColor(color: string): string | null {
   const trimmed = color.trim();
   if (/^#[0-9a-fA-F]{3,8}$/.test(trimmed)) return trimmed;
   if (/^(rgb|hsl)a?\([\d\s,%./]+\)$/.test(trimmed)) return trimmed;

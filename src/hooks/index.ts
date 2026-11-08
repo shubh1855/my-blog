@@ -6,24 +6,24 @@
  */
 
 // Controlled/uncontrolled state pattern
-export { type UseControlledStateOptions, useControlledState } from './useControlledState';
+export type { UseControlledStateOptions } from './useControlledState';
 // Clipboard with feedback
-export { useCopyToClipboard } from './useCopyToClipboard';
-export { type CurrentHeading, type UseCurrentHeadingOptions, useCurrentHeading } from './useCurrentHeading';
+
+export type { CurrentHeading, UseCurrentHeadingOptions } from './useCurrentHeading';
 // Floating UI wrapper
-export { type UseFloatingUIOptions, useFloatingUI } from './useFloatingUI';
+export type { UseFloatingUIOptions } from './useFloatingUI';
 // TOC hooks (useTocController etc.) are imported via direct paths; see src/hooks/useTocController.ts
 // Theme state hook (monitors actual page theme, not system preference)
 export { useIsDarkTheme } from './useIsDarkTheme';
 // Utility hooks
-export { useIsMounted } from './useIsMounted';
+
 // Keyboard shortcuts
-export { type KeyboardShortcutOptions, type ModifierKey, useEscapeKey, useKeyboardShortcut } from './useKeyboardShortcut';
+export type { KeyboardShortcutOptions, ModifierKey } from './useKeyboardShortcut';
 // Media query hooks
-export { useIsMobile, useIsTablet, useMediaQuery, usePrefersColorSchemeDark, usePrefersReducedMotion } from './useMediaQuery';
+export { useMediaQuery } from './useMediaQuery';
 // Timer management
-export { useRetimer } from './useRetimer';
+
 // Scroll state hooks
-export { type ScrollTriggerState, type UseScrollTriggerOptions, useScrollTrigger } from './useScrollTrigger';
+export type { ScrollTriggerState, UseScrollTriggerOptions } from './useScrollTrigger';
 // Zoom and pan for fullscreen viewers
-export { type UseZoomPanReturn, useZoomPan } from './useZoomPan';
+export type { UseZoomPanReturn } from './useZoomPan';

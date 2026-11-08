@@ -54,7 +54,7 @@ export function buildHeadingTree(flatHeadings: Array<{ id: string; text: string;
 }
 
 /** Find a heading by ID anywhere in the tree */
-export function findHeadingById(headings: Heading[], id: string): Heading | null {
+function findHeadingById(headings: Heading[], id: string): Heading | null {
   for (const heading of headings) {
     if (heading.id === id) return heading;
     const found = findHeadingById(heading.children, id);
@@ -64,7 +64,7 @@ export function findHeadingById(headings: Heading[], id: string): Heading | null
 }
 
 /** Ancestor IDs of a heading, nearest parent first */
-export function getParentIds(heading: Heading): string[] {
+function getParentIds(heading: Heading): string[] {
   const parentIds: string[] = [];
   let current = heading.parent;
   while (current) {

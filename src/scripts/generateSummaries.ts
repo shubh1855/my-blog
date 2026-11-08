@@ -150,11 +150,11 @@ async function generateSummary(text: string, model: string): Promise<string> {
       {
         role: 'system',
         content:
-          '你是一个文章总结助手。请用中文，用 2-3 句话简洁地总结文章的核心内容。只输出总结，不要有任何前缀、解释或思考过程。',
+          'You summarize blog articles. In English, summarize the core of the article in 2-3 concise sentences. Output only the summary, with no prefix, explanation, or reasoning.',
       },
       {
         role: 'user',
-        content: `请总结以下文章：\n\n${truncatedText}`,
+        content: `Summarize the following article:\n\n${truncatedText}`,
       },
     ],
     temperature: 0.3,

@@ -19,7 +19,7 @@ export interface GenerateOptions {
  * Run a TypeScript script using npx tsx
  * Note: Uses spawn without shell for security (avoids command injection)
  */
-export function runScript(scriptPath: string, args: string[] = []): Promise<RunScriptResult> {
+function runScript(scriptPath: string, args: string[] = []): Promise<RunScriptResult> {
   return new Promise((resolve) => {
     const fullPath = path.join(PROJECT_ROOT, scriptPath);
     const child = spawn('npx', ['tsx', fullPath, ...args], {
@@ -98,4 +98,4 @@ export async function runGenerateAll(options: GenerateOptions = {}): Promise<Map
   return results;
 }
 
-export { type GenerateType, GENERATE_ITEMS };
+export type { GenerateType };

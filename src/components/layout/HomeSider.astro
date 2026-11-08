@@ -92,7 +92,7 @@ const nextPost = adjacentPosts.nextPost ? toPostRef(adjacentPosts.nextPost) : nu
   {
     type === HomeSiderType.POST && (
       <div class="shrink-0">
-        <SeriesNavigation client:load prevPost={prevPost} nextPost={nextPost} className="w-full px-2" locale={locale} />
+        <SeriesNavigation client:visible prevPost={prevPost} nextPost={nextPost} className="w-full px-2" locale={locale} />
       </div>
     )
   }

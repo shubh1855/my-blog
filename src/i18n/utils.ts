@@ -7,7 +7,7 @@
 
 import { defaultLocale, isLocaleSupported } from './config';
 import { translations } from './translations';
-import { uiStrings as defaultStrings } from './translations/zh';
+import { uiStrings as defaultStrings } from './translations/en';
 import type { Locale, TranslationKey, TranslationParams } from './types';
 
 /** Replace `{param}` placeholders in a string with provided values. */
@@ -31,11 +31,11 @@ function interpolate(value: string, params?: TranslationParams): string {
  *
  * @example
  * ```ts
- * t('zh', 'post.totalPosts', { count: 5 })
- * // => '共 5 篇文章'
- *
  * t('en', 'post.totalPosts', { count: 5 })
  * // => '5 posts'
+ *
+ * t('ja', 'post.totalPosts', { count: 5 })
+ * // => '5件の投稿'
  * ```
  */
 export function t(locale: Locale, key: TranslationKey, params?: TranslationParams): string {
@@ -73,17 +73,17 @@ function tryTranslate(locale: Locale, key: string, params?: TranslationParams): 
  * Strategy: check if the first path segment is a supported locale code.
  * If not (or for default locale URLs without prefix), return defaultLocale.
  *
- * Note: URLs with the default locale prefix (e.g., '/zh/post/hello') are treated
+ * Note: URLs with the default locale prefix (e.g., '/en/post/hello') are treated
  * as defaultLocale by this parser, but the static site does not generate routes
  * with that prefix, so direct requests to those URLs return 404.
  *
  * @example
  * ```ts
  * getLocaleFromUrl('/en/post/hello')  // => 'en'
- * getLocaleFromUrl('/post/hello')     // => 'zh' (default)
+ * getLocaleFromUrl('/post/hello')     // => 'en' (default)
  * getLocaleFromUrl('/en/')            // => 'en'
- * getLocaleFromUrl('/')               // => 'zh' (default)
- * getLocaleFromUrl('/zh/post/hello')  // => 'zh' (default — prefix ignored)
+ * getLocaleFromUrl('/')               // => 'en' (default)
+ * getLocaleFromUrl('/en/post/hello')  // => 'en' (default — prefix ignored)
  * ```
  */
 export function getLocaleFromUrl(pathname: string): Locale {
@@ -105,7 +105,7 @@ export function getLocaleFromUrl(pathname: string): Locale {
  *
  * @example
  * ```ts
- * localizedPath('/post/hello', 'zh')  // => '/post/hello'
+ * localizedPath('/post/hello', 'en')  // => '/post/hello'
  * localizedPath('/post/hello', 'en')  // => '/en/post/hello'
  * localizedPath('/', 'en')            // => '/en'
  * ```
@@ -149,7 +149,7 @@ export function stripLocaleFromPath(pathname: string): string {
  *
  * @example
  * ```ts
- * getAlternateUrl('/en/post/hello', 'zh')  // => '/post/hello'
+ * getAlternateUrl('/ja/post/hello', 'en')  // => '/post/hello'
  * getAlternateUrl('/post/hello', 'en')     // => '/en/post/hello'
  * ```
  */
@@ -166,14 +166,11 @@ export function getAlternateUrl(currentPathname: string, targetLocale: Locale): 
  *
  * @example
  * ```ts
- * getHtmlLang('zh')  // => 'zh-CN'
  * getHtmlLang('en')  // => 'en'
  * getHtmlLang('ja')  // => 'ja'
  * ```
  */
-const HTML_LANG_MAP: Record<string, string> = {
-  zh: 'zh-CN',
-};
+const HTML_LANG_MAP: Record<string, string> = {};
 
 export function getHtmlLang(locale: Locale): string {
   return HTML_LANG_MAP[locale] ?? locale;

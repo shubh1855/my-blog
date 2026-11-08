@@ -24,7 +24,7 @@ export async function buildMomentsRss(options: {
       const channel = channelsById.get(primary.channel.id);
       if (!channel) return [];
       const plain = primary.content.text?.replace(/\s+/g, ' ').trim();
-      const title = plain ? (plain.length > 80 ? `${plain.slice(0, 79)}…` : plain) : `${channel.title} · 媒体消息`;
+      const title = plain ? (plain.length > 80 ? `${plain.slice(0, 79)}…` : plain) : `${channel.title} · Media post`;
       return [
         {
           title,

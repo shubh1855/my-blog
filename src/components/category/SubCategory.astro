@@ -3,6 +3,7 @@ import { buildCategoryPath, type Category, translateCategoryName } from '@lib/co
 import { getPostSlug } from '@lib/content/locale';
 import { getPostsByCategory } from '@lib/content/posts';
 import { displayDate } from '@lib/date';
+import { buildFilterText } from '@lib/list-filter';
 import { encodeSlug } from '@lib/route';
 import { getLocaleFromUrl, localizedPath } from '@/i18n';
 import CategoryTitle from './CategoryTitle.astro';
@@ -20,6 +21,7 @@ const locale = getLocaleFromUrl(Astro.url.pathname);
 const ctfPosts = await getPostsByCategory(category.name, locale);
 ---
 
+<div class="contents" data-filter-group data-filter-text={buildFilterText(translateCategoryName(category.name, locale))}>
 <CategoryTitle
   title={translateCategoryName(category.name, locale)}
   count={countMap[category.name]}
@@ -31,7 +33,7 @@ const ctfPosts = await getPostsByCategory(category.name, locale);
 {ctfPosts?.length > 0 && (
   <div class="category-second-level-container flex flex-col pl-4">
     {ctfPosts.map((post) => (
-      <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9">
+      <p class="shoka-decoration-circle group text-primary hover:text-blue relative px-6 py-2 text-base/9" data-filter-item data-filter-text={buildFilterText(post.data.title, post.data.tags)}>
         <span class="text-muted-foreground mr-2 text-xs">{displayDate.shortDate(post.data.date)}</span>
         <a href={localizedPath(`/post/${encodeSlug(getPostSlug(post))}`, locale)} class="dashed-border">
           {post?.data?.title}
@@ -45,7 +47,11 @@ const ctfPosts = await getPostsByCategory(category.name, locale);
 {category.children?.length && (
   <div class="category-second-level-container flex flex-col">
     {category.children.map((grandChild) => (
-      <p class="shoka-decoration-circle relative px-7.5 py-2 text-base/9 text-primary hover:text-blue">
+      <p
+        class="shoka-decoration-circle relative px-7.5 py-2 text-base/9 text-primary hover:text-blue"
+        data-filter-item
+        data-filter-text={buildFilterText(translateCategoryName(grandChild.name, locale))}
+      >
         <a href={localizedPath(buildCategoryPath([parentName, category.name, grandChild.name]), locale)} class="dashed-border">
           {translateCategoryName(grandChild.name, locale)}
         </a>
@@ -54,3 +60,4 @@ const ctfPosts = await getPostsByCategory(category.name, locale);
     ))}
   </div>
 )}
+</div>

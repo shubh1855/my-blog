@@ -10,7 +10,8 @@
   --grey-1-a5: rgba(60, 50, 110, 0.35);
   --gradient-shoka-button-start: #6a5acd;
   --gradient-shoka-button-end: #5b4fbf;
-  --gradient-shoka-button: #6a5acd;
+  /* Solid colour, but must stay an <image> value: it is used as background-image (bg-gradient-shoka-button). */
+  --gradient-shoka-button: linear-gradient(#6a5acd, #6a5acd);
   --shoka-blue: 260 50% 55%;
   --grey-4: 245 12% 48%;
   --color-pink: #6a5acd;
@@ -48,7 +49,7 @@
 
   --gradient-shoka-button-start: #b858a8;
   --gradient-shoka-button-end: #b858a8;
-  --gradient-shoka-button: #b858a8;
+  --gradient-shoka-button: linear-gradient(#b858a8, #b858a8);
   --shoka-blue: 305 55% 55%;
   --grey-4: 300 10% 55%;
   --color-pink: #b858a8;

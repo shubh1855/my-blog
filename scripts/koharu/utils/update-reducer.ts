@@ -1,7 +1,7 @@
 import { MAIN_BRANCH, type UpdateAction, type UpdateOptions, type UpdateState } from '../constants/update';
 
 /** Rebase and clean mode rewrite workspace, backup cannot be skipped (ignore skipBackup and force) */
-export function shouldForceBackup(options: UpdateOptions): boolean {
+function shouldForceBackup(options: UpdateOptions): boolean {
   return options.rebase || options.clean;
 }
 

@@ -2,7 +2,7 @@
 # i18n Content Translations
 # =============================================================================
 # Non-default locale translations for content-level strings.
-# Default locale (zh) values come from config/site.yaml — only add overrides here.
+# Default locale (en) values come from config/site.yaml — only add overrides here.
 #
 # Structure:
 #   <locale>:

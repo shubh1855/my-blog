@@ -12,7 +12,7 @@ export function getNonDefaultLocaleGlobs(): string[] {
   const raw = fs.readFileSync(SITE_CONFIG_PATH, 'utf-8');
   const config = yaml.load(raw) as { i18n?: { defaultLocale?: string; locales?: { code: string }[] } };
 
-  const defaultLocale = config?.i18n?.defaultLocale ?? 'zh';
+  const defaultLocale = config?.i18n?.defaultLocale ?? 'en';
   const allCodes = config?.i18n?.locales?.map((l) => l.code) ?? [];
 
   return allCodes.filter((code) => code !== defaultLocale).map((code) => `${CONTENT_BASE}/${code}/**`);

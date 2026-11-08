@@ -1,5 +1,5 @@
 ---
-import Search from 'astro-pagefind/components/Search.astro';
+import '@pagefind/component-ui/css/pagefind-component-ui.css';
 import '@styles/components/pagefind.css';
 
 /**
@@ -7,6 +7,11 @@ import '@styles/components/pagefind.css';
  *
  * Provides the Pagefind search UI that gets portal'd into SearchDialog.
  * Listens for search-dialog-open/close events to move the search component.
+ *
+ * Performance: the Pagefind UI bundle (~37 KB gz) is not part of the initial page load.
+ * The custom elements below stay inert until the reader shows intent to search
+ * (hovering/focusing the trigger, Cmd/Ctrl+K, or opening the dialog); only then is
+ * `@pagefind/component-ui` imported, which upgrades them in place.
  *
  * TODO(i18n): Pagefind search result links are not locale-aware — they always
  * point to root-level URLs (e.g., /post/xxx) regardless of the current locale.
@@ -16,25 +21,53 @@ import { getHtmlLang, getLocaleFromUrl, t } from '@/i18n';
 
 const locale = getLocaleFromUrl(Astro.url.pathname);
 const lang = getHtmlLang(locale);
+const bundlePath = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/pagefind/`;
 ---
 
 <!-- Search Component - will be portal'd into dialog -->
 <div id="search-component-portal">
   <div id="search-for-dialog">
-    <Search
-      className="pagefind-search"
-      configOptions={{ lang }}
-      searchboxOptions={{
-        placeholder: t(locale, 'search.placeholder'),
-        'hide-shortcut': true,
-        'show-keyboard-hints': 'false',
-        debounce: 200,
-      }}
-    />
+    <pagefind-config lang={lang} bundle-path={bundlePath}></pagefind-config>
+    <pagefind-searchbox
+      class="pagefind-search"
+      placeholder={t(locale, 'search.placeholder')}
+      hide-shortcut
+      show-keyboard-hints="false"
+      debounce="200"
+    ></pagefind-searchbox>
   </div>
 </div>
 
 <script>
+  let pagefindUi: Promise<unknown> | null = null;
+
+  /** Import the Pagefind UI once; safe to call on every intent signal. */
+  function loadPagefindUi() {
+    pagefindUi ??= import('@pagefind/component-ui').catch((error) => {
+      pagefindUi = null; // allow a retry on the next intent
+      console.error('Failed to load search UI', error);
+    });
+    return pagefindUi;
+  }
+
+  /** The dialog focuses the input after 150ms; on a cold load the input may not exist yet. */
+  function focusSearchInputWhenReady(attempts = 30) {
+    const input = document.querySelector<HTMLInputElement>('#search-dialog-container .pf-searchbox-input');
+    if (input) {
+      if (document.activeElement !== input) input.focus();
+      return;
+    }
+    if (attempts > 0) requestAnimationFrame(() => focusSearchInputWhenReady(attempts - 1));
+  }
+
+  function handleIntent(event: Event) {
+    if (event.target instanceof Element && event.target.closest('[data-search-trigger]')) loadPagefindUi();
+  }
+
+  function handleShortcut(event: KeyboardEvent) {
+    if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) loadPagefindUi();
+  }
+
   function moveSearchToDialog() {
     const dialogContainer = document.getElementById('search-dialog-container');
     const searchPortal = document.getElementById('search-component-portal');
@@ -66,6 +99,7 @@ const lang = getHtmlLang(locale);
     requestAnimationFrame(() => {
       moveSearchToDialog();
     });
+    loadPagefindUi()?.then(() => focusSearchInputWhenReady());
   }
 
   function handleDialogClose() {
@@ -81,6 +115,9 @@ const lang = getHtmlLang(locale);
 
     window.addEventListener('search-dialog-open', handleDialogOpen);
     window.addEventListener('search-dialog-close', handleDialogClose);
+    document.addEventListener('pointerover', handleIntent, { passive: true });
+    document.addEventListener('focusin', handleIntent);
+    document.addEventListener('keydown', handleShortcut);
   }
 
   function cleanupSearchPortal() {
@@ -88,6 +125,9 @@ const lang = getHtmlLang(locale);
 
     window.removeEventListener('search-dialog-open', handleDialogOpen);
     window.removeEventListener('search-dialog-close', handleDialogClose);
+    document.removeEventListener('pointerover', handleIntent);
+    document.removeEventListener('focusin', handleIntent);
+    document.removeEventListener('keydown', handleShortcut);
     initialized = false;
   }
 

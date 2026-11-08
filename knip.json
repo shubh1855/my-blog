@@ -1,9 +1,19 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/features/moments/pages/**/*.{astro,ts}",
+    "src/live.config.ts",
+    "tests/**/*.{test.ts,mjs}",
+    "src/layouts/PageLayout.astro"
+  ],
   "ignoreExportsUsedInFile": {
     "interface": true,
     "type": true
   },
+  "ignoreDependencies": ["@iconify-json/.*"],
   "tags": ["-lintignore"],
-  "ignore": ["public/**"]
+  "ignore": ["public/**", "cms/**"],
+  "rules": {
+    "enumMembers": "off"
+  }
 }

@@ -1,7 +1,7 @@
 /**
  * 日本語 (ja) — UI 文字列
  *
- * ここに存在しないキーは、デフォルトのロケール (zh) にフォールバックします。
+ * ここに存在しないキーは、デフォルトのロケール (en) にフォールバックします。
  */
 
 import type { UIStrings } from '../types';
@@ -85,6 +85,12 @@ export const uiStrings: UIStrings = {
   // ── アーカイブ ────────────────────────────────────────────────
   'archives.title': 'アーカイブ',
   'archives.totalPosts': '{count}件の投稿',
+
+  // ── リストフィルター ───────────────────────────────────────
+  'listFilter.label': 'タイトル・タグ・カテゴリで絞り込み',
+  'listFilter.results': '{total}件中{shown}件を表示',
+  'listFilter.empty': '「{query}」に一致する項目はありません。',
+  'listFilter.clear': 'フィルターをクリア',
 
   // ── 検索 ──────────────────────────────────────────────────
   'search.placeholder': 'キーワードで検索',
@@ -308,7 +314,7 @@ export const uiStrings: UIStrings = {
   'notFound.description': 'お探しのページは見つかりません',
   'notFound.backHome': 'ホームに戻る',
   'notFound.browseArchives': 'アーカイブを参照',
-  'notFound.message': 'んにゃー? ページは食べられちゃったよ〜',
+  'notFound.message': 'このページは世界から消し去られました。ギアスでも呼び戻せません。',
 
   // ── カテゴリーの統計 ────────────────────────────────────────
   'category.subCategoryCount': '{count}件のサブカテゴリー',

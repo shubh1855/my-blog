@@ -52,22 +52,9 @@ export function useMediaQuery(query: string): boolean {
  * Predefined breakpoint hooks based on Tailwind defaults
  */
 
-/** Mobile (max-width: 768px) */
-export function useIsMobile(): boolean {
-  return useMediaQuery('(max-width: 768px)');
-}
-
 /** Tablet (max-width: 992px) */
 export function useIsTablet(): boolean {
   return useMediaQuery('(max-width: 992px)');
-}
-
-/**
- * User prefers dark color scheme
- * @deprecated Use `useMediaQuery('(prefers-color-scheme: dark)')` for custom media-query behavior.
- */
-export function usePrefersColorSchemeDark(): boolean {
-  return useMediaQuery('(prefers-color-scheme: dark)');
 }
 
 /** User prefers reduced motion for accessibility */

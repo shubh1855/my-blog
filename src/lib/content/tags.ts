@@ -14,7 +14,7 @@ export const normalizeTag = (tag: string) => tag.toLowerCase();
  * Convert tag to URL-safe slug
  * Replaces `/` with `-` for filesystem compatibility
  */
-export const tagToSlug = (tag: string) => encodeSlug(normalizeTag(tag).replace(/\//g, '-'));
+const tagToSlug = (tag: string) => encodeSlug(normalizeTag(tag).replace(/\//g, '-'));
 
 /**
  * Build tag URL path, eg. C# -> /tags/c%23

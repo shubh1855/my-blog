@@ -54,7 +54,7 @@ const _hasSimilarityData = similarityLowerMap.size > 0;
  * @param count Number of related posts to return
  * @returns Array of similar post data with similarity scores
  */
-export function getRelatedPostSlugs(currentSlug: string, count: number = 5): SimilarPost[] {
+function getRelatedPostSlugs(currentSlug: string, count: number = 5): SimilarPost[] {
   // Fast path: exact match (O(1))
   const exactMatch = similarityData[currentSlug];
   if (exactMatch) {

@@ -1,12 +1,11 @@
 /**
- * English (en) — UI strings
+ * English (en) — Default locale UI strings
  *
- * Keys not present here will fall back to the default locale (zh).
+ * This is the source-of-truth dictionary. All translation keys are defined here.
+ * Other locale files only need to provide translations for keys they override.
  */
 
-import type { UIStrings } from '../types';
-
-export const uiStrings: UIStrings = {
+export const uiStrings = {
   'common.copyTextFailed': 'Copy failed. Select and copy the text below.',
   'common.copyManually': 'Text to copy manually',
   'post.readingProgress': 'Reading progress',
@@ -85,6 +84,12 @@ export const uiStrings: UIStrings = {
   // ── Archives ────────────────────────────────────────────────
   'archives.title': 'Archives',
   'archives.totalPosts': '{count} posts',
+
+  // ── List filter ─────────────────────────────────────────────
+  'listFilter.label': 'Filter by title, tag or category',
+  'listFilter.results': 'Showing {shown} of {total}',
+  'listFilter.empty': 'Nothing matches “{query}”.',
+  'listFilter.clear': 'Clear filter',
 
   // ── Search ──────────────────────────────────────────────────
   'search.placeholder': 'Search by keyword',
@@ -307,7 +312,7 @@ export const uiStrings: UIStrings = {
   'notFound.description': 'The page you are looking for does not exist',
   'notFound.backHome': 'Back to Home',
   'notFound.browseArchives': 'Browse Archives',
-  'notFound.message': 'Meow? The page was eaten~',
+  'notFound.message': 'This page has been erased from the world. Not even a Geass can command it back.',
 
   // ── Category Stats ────────────────────────────────────────
   'category.subCategoryCount': '{count} subcategories',

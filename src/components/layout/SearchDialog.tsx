@@ -225,6 +225,7 @@ export function SearchTrigger({ className }: { className?: string }) {
         openModal('search');
       }}
       className={cn('cursor-pointer transition duration-300 hover:scale-125', className)}
+      data-search-trigger
       aria-label={t('common.search')}
       title={title}
     >

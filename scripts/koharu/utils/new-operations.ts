@@ -19,14 +19,14 @@ export function generateSlug(title: string): string {
 /**
  * Ensure a directory exists, creating it if necessary
  */
-export async function ensureDirectory(dirPath: string): Promise<void> {
+async function ensureDirectory(dirPath: string): Promise<void> {
   await fs.promises.mkdir(dirPath, { recursive: true });
 }
 
 /**
  * Load the site configuration from YAML
  */
-export async function loadSiteConfig(): Promise<Record<string, unknown>> {
+async function loadSiteConfig(): Promise<Record<string, unknown>> {
   const content = await fs.promises.readFile(SITE_CONFIG_PATH, 'utf-8');
   const parsed = YAML.parse(content);
   if (!parsed || typeof parsed !== 'object') {
@@ -38,7 +38,7 @@ export async function loadSiteConfig(): Promise<Record<string, unknown>> {
 /**
  * Get category map from site config
  */
-export async function getCategoryMap(): Promise<Record<string, string>> {
+async function getCategoryMap(): Promise<Record<string, string>> {
   const config = await loadSiteConfig();
   return (config.categoryMap as Record<string, string>) || {};
 }
@@ -67,7 +67,7 @@ export async function getCategoryTree(): Promise<CategoryTreeItem[]> {
   const config = await loadSiteConfig();
   const i18nConfig = config.i18n as { defaultLocale?: string; locales?: { code: string }[] } | undefined;
   const localeDirs = new Set(
-    (i18nConfig?.locales ?? []).map((l) => l.code).filter((code) => code !== (i18nConfig?.defaultLocale ?? 'zh')),
+    (i18nConfig?.locales ?? []).map((l) => l.code).filter((code) => code !== (i18nConfig?.defaultLocale ?? 'en')),
   );
 
   const blogDirs = (await fs.promises.readdir(BLOG_CONTENT_PATH, { withFileTypes: true })).filter(
@@ -122,7 +122,7 @@ export async function getCategoryTree(): Promise<CategoryTreeItem[]> {
 /**
  * Format a date for frontmatter
  */
-export function formatDate(date: Date = new Date()): string {
+function formatDate(date: Date = new Date()): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -149,7 +149,7 @@ function yamlQuote(value: string): string {
 /**
  * Generate frontmatter YAML string for a post
  */
-export function generatePostFrontmatter(data: PostData): string {
+function generatePostFrontmatter(data: PostData): string {
   const lines: string[] = ['---'];
 
   lines.push(`title: ${yamlQuote(data.title)}`);
