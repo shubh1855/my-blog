@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Capabilities</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f0b1d;
+    color: #c9c4c8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 24px 20px 48px;
+  }
+
+  header {
+    max-width: 1040px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f3f0f7;
+  }
+
+  header p {
+    font-size: 12px;
+    color: #8c859d;
+  }
+
+  /* 4-col grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 500px) {
+    .grid { grid-template-columns: 1fr; }
+    body  { padding: 16px 12px 32px; }
+  }
+
+  /* card */
+  .card {
+    background: #141026;
+    border: 1px solid #282142;
+    border-top: 2px solid var(--accent);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.15s ease;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+  }
+
+  .card-head {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid #282142;
+  }
+
+  .group-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+
+  .group-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .risk {
+    font-size: 10.5px;
+    color: #8c859d;
+    margin-top: 4px;
+    padding-left: 13px;
+  }
+
+  /* cap list */
+  .cap-list {
+    padding: 6px 0 4px;
+    flex: 1;
+  }
+
+  .cap-item {
+    padding: 5px 14px;
+    cursor: default;
+    transition: background 0.1s ease;
+  }
+
+  .cap-item:hover {
+    background: #1c1635;
+  }
+
+  .cap-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    opacity: 0.9;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .cap-item:hover .cap-name {
+    opacity: 1;
+  }
+
+  .cap-desc {
+    font-size: 11px;
+    color: #8c859d;
+    line-height: 1.35;
+  }
+
+  .cap-item:hover .cap-desc {
+    color: #d1cdd8;
+  }
+
+  /* group accent colours */
+  .g-identity  { --accent: #9d8df8; }
+  .g-fs        { --accent: #60a5fa; }
+  .g-net       { --accent: #2dd4bf; }
+  .g-process   { --accent: #eab308; }
+  .g-kernel    { --accent: #f43f5e; }
+  .g-audit     { --accent: #fb923c; }
+  .g-ipc       { --accent: #34d399; }
+  .g-modern    { --accent: #38bdf8; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Linux Capabilities</h1>
+  <p>Grouped by what they control. Hover to highlight.</p>
+</header>
+
+<div class="grid">
+
+  <div class="card g-identity">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Identity</div>
+      <div class="risk">Critical. Direct path to root.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_SETUID</span><span class="cap-desc">Switch to any UID. setuid(0) gives root.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SETGID</span><span class="cap-desc">Switch to any GID.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SETPCAP</span><span class="cap-desc">Grant or drop caps in other processes.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_CHOWN</span><span class="cap-desc">Change file ownership arbitrarily.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SETFCAP</span><span class="cap-desc">Set file capabilities on binaries.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-fs">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Filesystem</div>
+      <div class="risk">High. DAC does not apply.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_DAC_OVERRIDE</span><span class="cap-desc">Bypass all DAC checks. Read, write, execute anything.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_DAC_READ_SEARCH</span><span class="cap-desc">Bypass read and directory traversal. No write.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_FOWNER</span><span class="cap-desc">Bypass checks when owner UID does not match.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_FSETID</span><span class="cap-desc">Set SUID or SGID without being the file owner.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_LINUX_IMMUTABLE</span><span class="cap-desc">Set or clear immutable and append-only attributes.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_MKNOD</span><span class="cap-desc">Create block and character device files.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_LEASE</span><span class="cap-desc">Establish leases on arbitrary files.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-net">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Network</div>
+      <div class="risk">Situational. Depends on configuration.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_NET_BIND_SERVICE</span><span class="cap-desc">Bind to ports below 1024.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_NET_RAW</span><span class="cap-desc">Raw sockets. ARP spoofing and sniffing.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_NET_ADMIN</span><span class="cap-desc">Interfaces, routing, firewall, net namespaces.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_NET_BROADCAST</span><span class="cap-desc">Socket broadcasts and multicast.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-process">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Process</div>
+      <div class="risk">High. Can target any process.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_KILL</span><span class="cap-desc">Send signals to any process regardless of UID.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_PTRACE</span><span class="cap-desc">Trace any process. Memory injection. Container escape.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_NICE</span><span class="cap-desc">Set scheduling priority for any process.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_RESOURCE</span><span class="cap-desc">Override rlimits for any process.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_PACCT</span><span class="cap-desc">Enable or disable process accounting.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-kernel">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Kernel</div>
+      <div class="risk">Critical. Arbitrary kernel access.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_SYS_ADMIN</span><span class="cap-desc">Mount, namespace, keyring, devices. Broadest cap.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_MODULE</span><span class="cap-desc">Load and unload modules. Arbitrary kernel code.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_RAWIO</span><span class="cap-desc">Raw I/O port access via ioperm and iopl.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_BOOT</span><span class="cap-desc">Reboot and kexec into a new kernel.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_TIME</span><span class="cap-desc">Set the system and hardware clock.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_CHROOT</span><span class="cap-desc">Call chroot() to change root directory.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_LOG</span><span class="cap-desc">syslog and kernel message ring buffer.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_SYS_TTY_CONFIG</span><span class="cap-desc">TTY configuration and virtual console control.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-audit">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Audit and Security</div>
+      <div class="risk">High. Can disable MAC enforcement.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_AUDIT_CONTROL</span><span class="cap-desc">Enable or disable kernel audit. Change filter rules.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_AUDIT_READ</span><span class="cap-desc">Read the audit log via netlink socket.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_AUDIT_WRITE</span><span class="cap-desc">Write records to the kernel audit log.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_MAC_ADMIN</span><span class="cap-desc">Override MAC. Bypasses Smack policy.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_MAC_OVERRIDE</span><span class="cap-desc">Override MAC entirely. Bypasses AppArmor and SELinux.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-ipc">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>IPC and Memory</div>
+      <div class="risk">Low. No clear escalation path.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_IPC_LOCK</span><span class="cap-desc">Lock memory pages into RAM. Prevents swapping.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_IPC_OWNER</span><span class="cap-desc">Bypass IPC checks for shared memory and semaphores.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_BLOCK_SUSPEND</span><span class="cap-desc">Prevent the system from entering suspend.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_WAKE_ALARM</span><span class="cap-desc">Trigger wake alarms from suspend state.</span></div>
+    </div>
+  </div>
+
+  <div class="card g-modern">
+    <div class="card-head">
+      <div class="group-label"><span class="group-dot"></span>Modern</div>
+      <div class="risk">Situational. Split from CAP_SYS_ADMIN in 5.8.</div>
+    </div>
+    <div class="cap-list">
+      <div class="cap-item"><span class="cap-name">CAP_PERFMON</span><span class="cap-desc">Performance monitoring. perf_event_open. Kernel 5.8.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_BPF</span><span class="cap-desc">Privileged BPF. Kernel memory reads possible. 5.8.</span></div>
+      <div class="cap-item"><span class="cap-name">CAP_CHECKPOINT_RESTORE</span><span class="cap-desc">Checkpoint and restore process state. Kernel 5.9.</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
