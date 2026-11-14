@@ -66,6 +66,8 @@ flowchart LR
 
 Root gets all of them. A well-configured binary gets exactly one.
 
+![Root is 41 capabilities in a trenchcoat](/img/posts/root-caps-split.webp)
+
 ---
 
 # Root Behind The Curtains
@@ -185,6 +187,8 @@ flowchart LR
 
 Attack surface went from 41 capabilities down to 1 (kinda).
 
+![SUID Ping Denji Chainsaw](/img/posts/suid-ping.webp)
+
 ---
 
 # The Ecosystem Left Root Behind
@@ -198,6 +202,8 @@ docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE myapp
 ```
 
 `--privileged` hands back all 41. That is why it is dangerous.
+
+![Container Privileged](/img/posts/container-privilege.webp)
 
 ## systemd
 
@@ -277,6 +283,8 @@ uid=1000(user) gid=1000(user) groups=1000(user)
 ```
 
 Still uid 1000. The payload **FAILED** .
+
+![Opening GTFOBins vs CAP_DAC_READ_SEARCH](/img/posts/gtfobins-cap-dac-read-search.webp)
 
 Why?
 
@@ -657,6 +665,8 @@ A process with `CAP_NET_RAW` can create raw sockets and nothing else. If it has 
 A process with `CAP_DAC_READ_SEARCH` can read any file on the filesystem. The kernel has no concept of which files it should be allowed to read. The capability is binary: either the process has it, or it does not.
 
 If you want to say "this process can read /var/log/app.log but not /etc/shadow", capabilities cannot express that. That requires a different layer. One that sits above DAC and capabilities and enforces policy on individual operations rather than granting broad privilege classes.
+
+![Reading etc shadow with CAP_DAC_READ_SEARCH](/img/posts/etc-shadow-read.webp)
 
 That layer is Mandatory Access Control and the Linux Security Module framework. We will cover this a bit later (I promise :])
 
