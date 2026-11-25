@@ -51,7 +51,7 @@
     --popover: 253 45% 6%;
     --popover-foreground: 300 8% 78%;
 
-    --primary: 305 55% 52%; /* Muted magenta — easier on eyes */
+    --primary: 246 72% 64%; /* Indigo-violet; white text 4.65:1 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 253 45% 12%;
@@ -74,9 +74,9 @@
 
     --border: 253 45% 14%;
     --input: 253 45% 14%;
-    --ring: 305 55% 52%;
+    --ring: 246 72% 64%;
 
-    --badge-primary: 305 55% 52%;
+    --badge-primary: 246 72% 64%;
 
     --radius: 0rem;
   }

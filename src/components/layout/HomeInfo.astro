@@ -136,9 +136,9 @@ const strippedPath = stripLocaleFromPath(Astro.url.pathname);
             label={displayName}
             variant="gradient-shoka"
             className={cn(
-              'shoka-button-shadow h-12 w-40 rounded-xl text-base tracking-wider opacity-75 transition-all duration-300 hover:opacity-100',
+              'shoka-button-shadow h-12 w-40 rounded-xl text-base tracking-wider transition-all duration-300',
               {
-                'text-muted-foreground/80 hover:bg-muted-foreground/10 bg-none shadow-none hover:shadow-none':
+                'text-muted-foreground/80 hover:bg-muted-foreground/10 bg-none opacity-75 shadow-none hover:opacity-100 hover:shadow-none':
                   item.path !== strippedPath,
               },
             )}

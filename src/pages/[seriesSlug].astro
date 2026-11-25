@@ -41,7 +41,13 @@ const pageTitle = seriesFullName || seriesLabel || series.categoryName;
         <span class="text-muted-foreground text-lg md:text-base"> / </span>
         {t(locale, 'post.totalPosts', { count: seriesPosts.length })}
       </h2>
-      <PostList posts={seriesPosts} showPaginator={false} isSimple={true} />
+      {
+        seriesPosts.length > 0 ? (
+          <PostList posts={seriesPosts} showPaginator={false} isSimple={true} />
+        ) : (
+          <p class="text-muted-foreground py-8 text-center">{t(locale, 'series.noPosts')}</p>
+        )
+      }
     </div>
   </TwoColumnLayout>
 </Layout>

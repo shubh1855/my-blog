@@ -40,20 +40,20 @@
   --gradient-bg-start: hsl(var(--card));
   --gradient-bg-end: hsl(var(--card));
   --gradient-bg: hsl(var(--card));
-  --gradient-pink: #b858a8;
+  --gradient-pink: #6e61e5;
   --gradient-header: hsl(var(--background));
 
   /* shoka migrate */
   --box-bg-shadow: rgba(0, 0, 0, 0.5);
   --grey-1-a5: rgba(15, 11, 29, 0.6);
 
-  --gradient-shoka-button-start: #b858a8;
-  --gradient-shoka-button-end: #b858a8;
-  --gradient-shoka-button: linear-gradient(#b858a8, #b858a8);
-  --shoka-blue: 305 55% 55%;
+  --gradient-shoka-button-start: #6e61e5;
+  --gradient-shoka-button-end: #6e61e5;
+  --gradient-shoka-button: linear-gradient(#6e61e5, #6e61e5);
+  --shoka-blue: 246 72% 64%;
   --grey-4: 300 10% 55%;
-  --color-pink: #b858a8;
-  --color-pink-a3: rgba(184, 88, 168, 0.3);
+  --color-pink: #6e61e5;
+  --color-pink-a3: rgba(110, 97, 229, 0.3);
 
   /* Shoka container/effect colors (dark mode) */
   --shoka-default: 300 8% 52%;
@@ -64,7 +64,7 @@
 
   /* Named text colors — slightly brighter for dark backgrounds */
   --color-red: #c04080;
-  --color-pink-text: #b858a8;
+  --color-pink-text: #8b80ee;
   --color-orange: #d4a020;
   --color-yellow: #d4b020;
   --color-green: #3ab868;
