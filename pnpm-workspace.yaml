@@ -4,7 +4,8 @@ allowBuilds:
   '@parcel/watcher': true
   esbuild: true
   nice-napi: true
-  onnxruntime-node: true
+  # Its postinstall only fetches the optional CUDA add-on (404s on CI); CPU binaries ship in the package.
+  onnxruntime-node: false
   protobufjs: true
   re2: true
   sharp: true
