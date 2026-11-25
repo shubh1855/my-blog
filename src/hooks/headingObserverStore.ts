@@ -173,6 +173,12 @@ function createHeadingObserverStore({ selector, offsetTop, scopeSelector }: Head
     }
   };
 
+  // IO only fires on state changes, so a fast flick that jumps headings over the thin band
+  // never reports them; re-derive from layout on scroll whenever nothing is in the band.
+  const handleScroll = () => {
+    if (visible.size === 0 && !getLockedHeadingId()) resolveCurrent();
+  };
+
   const handlePageLoad = () => {
     visible.clear();
     update(null);
@@ -185,6 +191,7 @@ function createHeadingObserverStore({ selector, offsetTop, scopeSelector }: Head
         if (document.readyState !== 'loading') setupObserver();
         document.addEventListener('astro:page-load', handlePageLoad);
         document.addEventListener('content:decrypted', handlePageLoad);
+        window.addEventListener('scroll', handleScroll, { passive: true });
       }
 
       listeners.add(listener);
@@ -197,6 +204,7 @@ function createHeadingObserverStore({ selector, offsetTop, scopeSelector }: Head
         observer = null;
         document.removeEventListener('astro:page-load', handlePageLoad);
         document.removeEventListener('content:decrypted', handlePageLoad);
+        window.removeEventListener('scroll', handleScroll);
         cancelPendingRaf();
         visible.clear();
         trackedHeadings = [];

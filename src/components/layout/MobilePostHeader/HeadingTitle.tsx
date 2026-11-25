@@ -18,8 +18,9 @@ interface HeadingTitleProps {
 export function HeadingTitle({ heading, className }: HeadingTitleProps) {
   const shouldReduceMotion = useReducedMotion();
 
+  // popLayout: the new title enters immediately instead of waiting for the old one's exit spring
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       {heading && (
         <m.span
           key={heading.id}

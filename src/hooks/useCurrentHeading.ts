@@ -14,8 +14,9 @@ import type { ObservedHeading } from '@lib/toc';
 import { useSyncExternalStore } from 'react';
 import { getHeadingObserverStore } from './headingObserverStore';
 
-/** Article H2/H3 only, excluding link preview cards */
-const ARTICLE_SECTION_SELECTOR = 'h2:not(.link-preview-block h2), h3:not(.link-preview-block h3)';
+/** Article H1–H3 (posts may use `#` for sections), excluding link preview cards */
+const ARTICLE_SECTION_SELECTOR =
+  'h1:not(.link-preview-block h1), h2:not(.link-preview-block h2), h3:not(.link-preview-block h3)';
 
 export type CurrentHeading = ObservedHeading;
 
