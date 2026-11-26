@@ -9,6 +9,7 @@ import { siteConfig } from '@constants/site-config';
 import jetBrainsMonoLatinUrl from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
 import { getOgImageUrl } from '@lib/seo/og-image';
 import { SEO } from 'astro-seo';
+import codeZeroUrl from '@/assets/fonts/code-zero-traced.woff2?url';
 import { defaultLocale, getAlternateUrl, getHtmlLang, isI18nEnabled, localeList, localizedPath } from '@/i18n';
 
 const { meta } = Astro.props;
@@ -42,6 +43,8 @@ const hreflangLinks = showLocaleAlternates
 {/* Preload the primary font file to break the HTML→CSS→font network dependency chain.
     The browser discovers fonts only after parsing CSS; preloading eliminates that delay. */}
 <link rel="preload" href={jetBrainsMonoLatinUrl} as="font" type="font/woff2" crossorigin="anonymous" />
+{/* Hero title font (8 KB); preloaded so the title does not swap in late. */}
+<link rel="preload" href={codeZeroUrl} as="font" type="font/woff2" crossorigin="anonymous" />
 
 {/* Preload the page's LCP image when the caller knows which image is above-the-fold.
     This eliminates resource-load delay by telling the browser before layout runs.

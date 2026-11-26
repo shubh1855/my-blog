@@ -1,15 +1,30 @@
-.wave-wrap {
-  width: 100%;
-  height: 15dvh;
-  min-height: 3.125rem;
-  max-height: 9.375rem;
+/* Shared geometry: crests at the cover's bottom edge, body hanging below (clipped by the cover's overflow). */
+.wave-wrap,
+.wave-swell {
+  --wave-h: clamp(3.125rem, 15dvh, 9.375rem);
   position: absolute;
-  bottom: 0px;
+  left: 0;
+  right: 0;
+  top: calc(100% - var(--wave-h));
+  height: calc(100% + var(--wave-h));
+  display: flex;
+  flex-direction: column;
+}
+
+.wave-wrap {
+  /* Stacked above the translucent swell; the hero title (z-30) floats above both. */
+  z-index: 20;
+  /* Deep water: starts at the page colour under the crest and darkens with depth. */
+  .wave-sea {
+    flex: 1;
+    background: linear-gradient(var(--gradient-bg-start), color-mix(in oklab, var(--gradient-bg-start) 70%, #140c2a));
+  }
   .wave {
     display: block;
+    flex: none;
     width: 100%;
     margin: 0;
-    height: 100%;
+    height: var(--wave-h);
     .parallax > use {
       -webkit-animation: move-forever 12s linear infinite;
       -moz-animation: move-forever 12s linear infinite;
@@ -110,21 +125,115 @@
   }
 }
 
+/* Translucent swell: rises ahead of the deep sea so the art shows through the water first.
+   At rest it sits exactly behind the opaque crest, so the hero looks unchanged. */
+.wave-swell {
+  --water: color-mix(in oklab, var(--gradient-bg-start) 60%, hsl(var(--primary)));
+  /* Translucency is applied once to the whole group, so crest and body can't double up at their seam.
+     Near the surface you see through it; deeper down it gets denser. */
+  mask-image: linear-gradient(rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.85));
+  .swell-crest {
+    display: block;
+    flex: none;
+    width: 100%;
+    height: var(--wave-h);
+    use {
+      fill: var(--water);
+      animation: move-forever 9s linear infinite;
+      animation-delay: -5s;
+    }
+  }
+  .swell-body {
+    flex: 1;
+    margin-top: -1px; /* overlap the crest's anti-aliased bottom row */
+    background: var(--water);
+  }
+}
+
 /* Settings Center controls */
 
 /* Hide cover waves when their individual preference is disabled. */
-html.wave-off .wave-wrap {
+html.wave-off :is(.wave-wrap, .wave-swell) {
   display: none;
 }
 
 /* The master motion preference preserves the wave shape but stops its animation. */
-html.motion-off .wave .parallax > use {
+html.motion-off :is(.wave .parallax > use, .swell-crest use) {
   /* html.motion-off … outranks the .wave-wrap-nested source rule, so no !important needed. */
   animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wave .parallax > use {
+  :is(.wave .parallax > use, .swell-crest use) {
     animation: none;
+  }
+}
+
+/* Drowning hero: the art and title stay anchored while two layers of water rise —
+   a translucent swell first and fastest, then the darker deep sea (parallax).
+   Scroll-driven, so it runs off the main thread; unsupported browsers keep static waves. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cover-drown {
+      view-timeline: --cover block;
+    }
+
+    html:not(.motion-off) .cover-drown {
+      .wave-swell,
+      .wave-wrap,
+      #banner-box img,
+      .cover-title {
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --cover;
+      }
+
+      .wave-swell {
+        animation-name: sea-rise;
+        animation-range: exit 0% exit 65%;
+      }
+
+      .wave-wrap {
+        animation-name: sea-rise;
+        animation-range: exit 15% exit 100%;
+      }
+
+      #banner-box img {
+        animation-name: anchor;
+        animation-range: exit 0% exit 100%;
+      }
+
+      /* Parallax title: floats above all the water at half the page's scroll speed and fades out as
+         the waves climb up to it. */
+      .cover-title {
+        animation-name: title-float;
+        animation-range: exit 0% exit 100%;
+      }
+    }
+  }
+}
+
+@keyframes sea-rise {
+  to {
+    /* -100% of (cover + wave) + wave = exactly one cover height up. */
+    translate: 0 calc(-100% + var(--wave-h));
+  }
+}
+
+@keyframes title-float {
+  45% {
+    opacity: 0;
+  }
+  to {
+    /* ~half its own height while the cover scrolls one cover height: about half the page's speed. */
+    translate: 0 57%;
+    opacity: 0;
+  }
+}
+
+/* Moving down by its own height while the cover scrolls up by about the same keeps it in place. */
+@keyframes anchor {
+  to {
+    translate: 0 100%;
   }
 }

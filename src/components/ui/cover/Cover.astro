@@ -42,14 +42,14 @@ const copyFailedLabel = t(locale, 'common.copyFailed');
 
 <div
   class:list={[
-    'relative z-0 flex overflow-hidden',
+    'cover-drown relative z-0 flex overflow-hidden',
     compact ? 'h-[42dvh] min-h-72 max-h-120 tablet:h-[36dvh] tablet:min-h-64' : 'h-[60dvh] max-h-200',
   ]}
 >
   <div class="absolute inset-0 h-full bg-black/40"></div>
   <div
     class:list={[
-      'absolute inset-0 flex flex-col items-center justify-center px-5 text-white',
+      'cover-title absolute inset-0 z-30 flex flex-col items-center justify-center px-5 text-white',
       compact ? 'bottom-[4dvh]' : 'bottom-[8dvh]',
     ]}
   >
@@ -122,8 +122,8 @@ const copyFailedLabel = t(locale, 'common.copyFailed');
         </>
       ) : (
         <>
-          <h1 class="shadow-text text-3xl/[1.2] font-bold tracking-widest sm:text-4xl/[1.2] md:text-5xl/[1.2]">{siteConfig?.title}</h1>
-          <p class="shadow-text mt-3 text-xs sm:mt-5 sm:text-sm">= {siteConfig?.subtitle} =</p>
+          <h1 class="font-geass shadow-text text-6xl/[1.15] tracking-wide md:text-4xl/[1.2]">{siteConfig?.title}</h1>
+          <p class="font-geass shadow-text mt-4 text-xl tracking-wide md:mt-3 md:text-base">{siteConfig?.subtitle}</p>
         </>
       )
     }

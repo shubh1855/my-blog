@@ -4,6 +4,17 @@
 @import "./utils.css";
 @config "../../../tailwind.config.mjs";
 
+/* Code Zero capitals traced from the Code Geass specimen; lowercase renders as capitals (plus comma, period, apostrophe). */
+@font-face {
+  font-family: "Code Zero Traced";
+  src: url("../../assets/fonts/code-zero-traced.woff2") format("woff2");
+  font-display: swap;
+}
+
+@utility font-geass {
+  font-family: "Code Zero Traced", "JetBrains Mono", monospace;
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -167,10 +178,21 @@
     text-align: center;
     font-family: "JetBrains Mono", monospace;
     font-weight: 700;
-    color: #e9546b;
+    color: #5a4bd6;
   }
 }
 
+/* Wordmark: light violet over the hero art; the deeper accent once the light-theme header gets its pale background. */
+#site-header {
+  --logo-color: #b3abf5;
+}
+html:not(.dark) #site-header.with-background {
+  --logo-color: #5a4bd6;
+}
+.logo-mark {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.45));
+}
+
 .dark .logo-text {
-  color: #ed788c;
+  color: #8b80ee;
 }
