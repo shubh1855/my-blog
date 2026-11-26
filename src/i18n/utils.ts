@@ -140,7 +140,8 @@ export function stripLocaleFromPath(pathname: string): string {
     return rest ? `/${rest}` : '/';
   }
 
-  return pathname;
+  // Static builds serve /categories/writeups/ while nav paths are configured without the slash.
+  return pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 }
 
 /**
