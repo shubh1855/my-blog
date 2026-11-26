@@ -326,6 +326,7 @@ export const uiStrings = {
   'series.viewAll': 'View all',
   'series.postCount': '{count} posts',
   'series.noPosts': 'No posts in this series',
+  'series.weekOf': 'Week of {date}',
   'series.rss': 'RSS Feed',
   'series.chromeExtension': 'Chrome Extension',
   'series.docs': 'Documentation',

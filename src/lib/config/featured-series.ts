@@ -32,6 +32,7 @@ function isFeaturedSeriesItem(value: unknown): value is FeaturedSeriesItem {
   if (item.slug !== undefined && typeof item.slug !== 'string') return false;
   if (item.label !== undefined && typeof item.label !== 'string') return false;
   if (item.enabled !== undefined && typeof item.enabled !== 'boolean') return false;
+  if (item.weeklyDigest !== undefined && typeof item.weeklyDigest !== 'boolean') return false;
   return true;
 }
 

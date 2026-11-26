@@ -6,9 +6,12 @@ import { CONTENT_PADDING } from '@constants/layout';
 import { siteConfig } from '@constants/site-config';
 import Layout from '@layouts/Layout.astro';
 import TwoColumnLayout from '@layouts/TwoColumnLayout.astro';
+import { siteTimezone } from '@lib/config/site';
 import type { FeaturedSeriesItem } from '@lib/config/types';
-import { getPostsByCategory, translateSeriesField } from '@lib/content';
+import { getPostsByCategory, getSortedPosts, translateSeriesField } from '@lib/content';
 import { toPostCardDataList } from '@lib/content/transforms';
+import { groupPostsByWeek } from '@lib/content/weekly-digest';
+import { formatInTimeZone } from 'date-fns-tz';
 import { localizedPath, t } from '@/i18n';
 import { seriesRoute } from './_shared/routes';
 
@@ -26,6 +29,22 @@ const seriesPosts = series.categoryName
   ? toPostCardDataList(await getPostsByCategory(series.categoryName, locale), locale)
   : [];
 
+// Digest mode: every post grouped by week, with this series' post leading its week as the issue.
+const issueSlugs = new Set(seriesPosts.map((post) => post.slug));
+const weeks = series.weeklyDigest
+  ? groupPostsByWeek(
+      toPostCardDataList(await getSortedPosts(locale), locale),
+      (post) => issueSlugs.has(post.slug),
+      siteTimezone,
+    )
+  : [];
+const postCount = series.weeklyDigest
+  ? weeks.reduce((n, week) => n + week.posts.length + (week.issue ? 1 : 0), 0)
+  : seriesPosts.length;
+// weekStart is a calendar date (yyyy-MM-dd), so format it in UTC to keep the same day.
+const weekLabel = (weekStart: string) =>
+  t(locale, 'series.weekOf', { date: formatInTimeZone(new Date(`${weekStart}T00:00:00Z`), 'UTC', 'MMM d, yyyy') });
+
 const seriesFullName = translateSeriesField(series.slug, 'fullName', series.fullName, locale);
 const seriesLabel = translateSeriesField(series.slug, 'label', series.label, locale);
 const pageTitle = seriesFullName || seriesLabel || series.categoryName;
@@ -39,10 +58,18 @@ const pageTitle = seriesFullName || seriesLabel || series.categoryName;
       <h2 class="shoka-decoration-circle group relative h-19 px-6 py-5 text-2xl/9 font-bold md:text-xl/9">
         <a href={localizedPath('/', locale)} class="dashed-border text-muted-foreground group-hover:border-blue group-hover:text-blue border-b">{t(locale, 'nav.home')}</a>
         <span class="text-muted-foreground text-lg md:text-base"> / </span>
-        {t(locale, 'post.totalPosts', { count: seriesPosts.length })}
+        {t(locale, 'post.totalPosts', { count: postCount })}
       </h2>
       {
-        seriesPosts.length > 0 ? (
+        series.weeklyDigest ? (
+          weeks.map((week, index) => (
+            <section class="mt-6 flex flex-col gap-2">
+              <h3 class="text-muted-foreground px-6 font-medium text-sm uppercase tracking-wider md:px-2">{weekLabel(week.weekStart)}</h3>
+              {week.issue && <PostList posts={[week.issue]} showPaginator={false} markFirstAsLCP={index === 0} />}
+              {week.posts.length > 0 && <PostList posts={week.posts} showPaginator={false} isSimple={true} markFirstAsLCP={false} />}
+            </section>
+          ))
+        ) : seriesPosts.length > 0 ? (
           <PostList posts={seriesPosts} showPaginator={false} isSimple={true} />
         ) : (
           <p class="text-muted-foreground py-8 text-center">{t(locale, 'series.noPosts')}</p>

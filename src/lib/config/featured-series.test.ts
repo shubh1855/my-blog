@@ -91,3 +91,11 @@ test('enabledFeaturedSeriesSlugs skips explicitly disabled series', () => {
   );
   assert.deepEqual(enabledFeaturedSeriesSlugs(series), ['weekly']);
 });
+
+test('accepts a boolean weeklyDigest flag and rejects other types', () => {
+  assert.equal(normalizeFeaturedSeries({ categoryName: '周刊', weeklyDigest: true }, context)[0].weeklyDigest, true);
+  assert.throws(
+    () => normalizeFeaturedSeries({ categoryName: '周刊', weeklyDigest: 'yes' }, context),
+    /not a valid FeaturedSeriesItem/,
+  );
+});

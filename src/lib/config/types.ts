@@ -73,6 +73,8 @@ export interface FeaturedSeriesItem {
   icon?: string;
   /** Whether to highlight latest post on home page */
   highlightOnHome?: boolean;
+  /** List every post grouped by week, with this series' posts leading their week as the issue */
+  weeklyDigest?: boolean;
   /** Related links */
   links?: FeaturedSeriesLinks;
 }
