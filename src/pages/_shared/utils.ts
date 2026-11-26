@@ -76,8 +76,6 @@ const PAGE_MODULES = import.meta.glob('/src/pages/**/*.{astro,md,mdx,ts}');
 const MIRROR_EXEMPT = new Set([
   // Static hosts serve a single /404.html; the page localizes itself at runtime.
   '404',
-  // Locale-agnostic RSS stylesheet asset.
-  'rss/feed.xsl',
 ]);
 
 const toRoute = (moduleKey: string) => moduleKey.replace('/src/pages/', '').replace(/\.(astro|md|mdx|ts)$/, '');
