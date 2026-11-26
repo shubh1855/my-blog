@@ -1,26 +1,26 @@
 @layer base {
   :root {
-    /* Code Geass Light Mode — Rich blue-purple */
-    --background: 245 32% 82%; /* Muted periwinkle #c4c0db */
-    --foreground: 250 35% 15%; /* Deep indigo text */
+    /* Code Geass Light Mode — paper lavender ground, white surfaces, indigo-violet accent */
+    --background: 252 45% 96%; /* #f4f2fa */
+    --foreground: 256 39% 14%; /* #1c1530 */
 
-    --card: 248 30% 78%; /* Dusty violet card bg */
-    --card-foreground: 250 35% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 256 39% 14%;
 
-    --popover: 248 30% 78%;
-    --popover-foreground: 250 35% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 256 39% 14%;
 
-    --primary: 268 55% 45%; /* Rich blue-purple accent */
+    --primary: 247 63% 57%; /* #5a4bd6; white text 5.6:1 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 245 28% 74%; /* Deeper periwinkle */
-    --secondary-foreground: 250 35% 16%;
+    --secondary: 252 35% 92%;
+    --secondary-foreground: 256 39% 16%;
 
-    --muted: 245 25% 76%;
-    --muted-foreground: 250 22% 30%; /* Boosted contrast for readability */
+    --muted: 252 35% 92%;
+    --muted-foreground: 256 15% 40%; /* #5e5674 */
 
-    --accent: 248 28% 72%; /* Even deeper lavender */
-    --accent-foreground: 250 35% 15%;
+    --accent: 252 35% 90%;
+    --accent-foreground: 256 39% 14%;
 
     --destructive: 345 65% 45%;
     --destructive-foreground: 0 0% 98%;
@@ -31,13 +31,13 @@
     --warning: 45 100% 46%;
     --warning-foreground: 0 0% 10%;
 
-    --border: 248 25% 70%; /* Visible purple-grey border */
-    --input: 248 25% 70%;
-    --ring: 268 55% 45%;
+    --border: 252 33% 88%; /* #dcd7ec */
+    --input: 252 33% 88%;
+    --ring: 247 63% 57%;
 
-    --badge-primary: 268 55% 45%;
+    --badge-primary: 247 63% 57%;
 
-    --radius: 0.5rem;
+    --radius: 0.375rem;
   }
 
   .dark {
@@ -78,6 +78,6 @@
 
     --badge-primary: 246 72% 64%;
 
-    --radius: 0rem;
+    --radius: 0.375rem; /* same shape in both themes */
   }
 }

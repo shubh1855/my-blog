@@ -6,7 +6,6 @@ import { TagItem } from './TagItem';
 interface TagData {
   tag: string;
   count: number;
-  colorIndex: number;
 }
 
 interface CollapsibleTagsProps {

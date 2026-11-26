@@ -3,11 +3,11 @@
   font-size: var(--reader-font-size, 1rem);
   line-height: var(--reader-line-height, 1.8);
 
-  /* Preserve the original full-width layout until the reader chooses a custom measure.
+  /* Default to a readable ~72-character column; a reader-chosen measure overrides it.
      JavaScript converts that measure to px so differently sized children share one width. */
   width: 100%;
   min-width: 0;
-  max-width: var(--reader-measure, none);
+  max-width: var(--reader-measure, 44em); /* ~72 mono chars; reader settings can override */
   margin-inline: auto;
 
   /* Emergency wrapping keeps unknown long text from widening the document. */
@@ -650,6 +650,23 @@
   overflow: hidden;
   background-color: hsl(var(--card));
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Mermaid puts labels in <p>; keep prose colours from leaking into them. */
+.prose pre.mermaid :is(.nodeLabel, .edgeLabel) p {
+  color: inherit;
+}
+
+/* Diagrams with their own %%{init}%% palette are authored for a dark canvas: keep that canvas in light mode too. */
+/* [data-processed] outranks astro-mermaid's runtime-injected [data-theme] background rule. */
+.mermaid-wrapper > pre.mermaid[data-processed][data-diagram*="%%{init"] {
+  background-color: #110d1c;
+  color: #e0d8ee;
+}
+
+/* Mermaid's #id rule colours .edgeLabel dark; colour the inner <p> instead so no !important is needed. */
+.prose pre.mermaid[data-diagram*="%%{init"] .edgeLabel p {
+  color: #e0d8ee;
 }
 
 /* Fullscreen SVG container */

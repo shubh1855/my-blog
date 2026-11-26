@@ -20,7 +20,7 @@ const posts = await getSortedPosts(locale);
 const tags = getAllTags(posts);
 const sortedTags = Object.entries(tags)
   .sort(([, a], [, b]) => b - a)
-  .map(([tag, count], index) => ({ tag, count, colorIndex: index % 4 }));
+  .map(([tag, count]) => ({ tag, count }));
 
 const mainTags = sortedTags.filter(({ count }) => count > 1);
 const singleTags = sortedTags.filter(({ count }) => count === 1);
